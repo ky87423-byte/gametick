@@ -1,4 +1,7 @@
 // 순수 SVG 스파크라인 — 서버 렌더 가능(인터랙션 없음)
+// 색상: 한국 시세 관례 — 상승=빨강, 하락=파랑
+
+import { trendStroke } from "@/lib/format";
 
 export function Sparkline({
   data,
@@ -27,8 +30,6 @@ export function Sparkline({
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     })
     .join(" ");
-  const up = data[data.length - 1] >= data[0];
-  const stroke = up ? "#34d399" : "#f87171";
   return (
     <svg
       width={width}
@@ -41,7 +42,7 @@ export function Sparkline({
       <polyline
         points={points}
         fill="none"
-        stroke={stroke}
+        stroke={trendStroke(data)}
         strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"

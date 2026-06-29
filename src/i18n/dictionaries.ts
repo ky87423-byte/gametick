@@ -1,47 +1,129 @@
 // 카피 사전 — 라이브러리 없이 단순 객체로 관리 (MVP)
-// 키가 늘면 messages/{ko,vi}.json 으로 분리 가능.
 
 import { Locale } from "@/i18n/config";
 
 export interface Dictionary {
   brand: string;
   tagline: string;
+  // 시세표
+  rank: string;
   server: string;
   price: string;
   change24h: string;
-  perUnit: (label: string, currency: string) => string; // "만 아데나당"
+  chart: string;
+  perUnit: (label: string, currency: string) => string;
   noData: string;
   updatedAt: string;
-  games: string;
+  searchPlaceholder: string;
+  favorites: string;
+  sortBy: string;
+  sortDefault: string;
+  sortPrice: string;
+  sortChange: string;
+  // 요약 카드
+  avgPrice: string;
+  highest: string;
+  lowest: string;
+  serverCount: string;
+  // 급등/급락
+  topGainers: string;
+  topLosers: string;
+  // 상세
+  currentPrice: string;
+  high: string;
+  low: string;
+  range24h: string;
+  range7d: string;
+  backToList: string;
+  priceTitle: (game: string, currency: string) => string;
+  // CTA / 광고
+  ctaTitle: string;
+  ctaDesc: string;
+  ctaSell: string;
+  ctaBoost: string;
+  adSlot: string;
+  adInquiry: string;
   footerNote: string;
 }
 
 const ko: Dictionary = {
   brand: "겜틱",
   tagline: "게임머니 서버별 실시간 시세",
+  rank: "#",
   server: "서버",
-  price: "시세",
-  change24h: "24h",
-  perUnit: (label, currency) => `${label} ${currency}당`,
+  price: "현재가",
+  change24h: "24h 등락",
+  chart: "추이",
+  perUnit: (label, currency) => `${label} ${currency}당 (원)`,
   noData: "데이터 없음",
   updatedAt: "업데이트",
-  games: "게임",
+  searchPlaceholder: "서버 검색…",
+  favorites: "즐겨찾기",
+  sortBy: "정렬",
+  sortDefault: "기본",
+  sortPrice: "가격순",
+  sortChange: "등락순",
+  avgPrice: "평균가",
+  highest: "최고가",
+  lowest: "최저가",
+  serverCount: "서버",
+  topGainers: "급등 TOP",
+  topLosers: "급락 TOP",
+  currentPrice: "현재가",
+  high: "최고",
+  low: "최저",
+  range24h: "24시간",
+  range7d: "7일",
+  backToList: "← 시세표로",
+  priceTitle: (game, currency) => `${game} ${currency} 시세`,
+  ctaTitle: "게임머니 팔거나 캐릭터 키우세요",
+  ctaDesc: "베트남 유저 게임머니 최고가 매입 · 리니지 클래식 대리육성",
+  ctaSell: "게임머니 매입 문의",
+  ctaBoost: "대리육성 보러가기",
+  adSlot: "광고 영역",
+  adInquiry: "광고/제휴 문의",
   footerNote:
-    "본 시세는 외부 거래소 데이터를 수집·가공한 참고용 정보입니다. 실제 거래가와 다를 수 있습니다.",
+    "본 시세는 외부 거래소 데이터를 수집·가공한 참고용 정보이며 실제 거래가와 다를 수 있습니다. 겜틱(GameTick)은 직접 거래를 중개하지 않으며 거래로 인한 책임을 지지 않습니다.",
 };
 
 const vi: Dictionary = {
   brand: "GameTick",
-  tagline: "Giá tiền game theo máy chủ, cập nhật thời gian thực",
+  tagline: "Giá tiền game theo máy chủ, thời gian thực",
+  rank: "#",
   server: "Máy chủ",
   price: "Giá",
   change24h: "24h",
-  perUnit: (label, currency) => `mỗi ${label} ${currency}`,
+  chart: "Xu hướng",
+  perUnit: (label, currency) => `mỗi ${label} ${currency} (KRW)`,
   noData: "Không có dữ liệu",
   updatedAt: "Cập nhật",
-  games: "Trò chơi",
+  searchPlaceholder: "Tìm máy chủ…",
+  favorites: "Yêu thích",
+  sortBy: "Sắp xếp",
+  sortDefault: "Mặc định",
+  sortPrice: "Theo giá",
+  sortChange: "Theo biến động",
+  avgPrice: "Giá TB",
+  highest: "Cao nhất",
+  lowest: "Thấp nhất",
+  serverCount: "Máy chủ",
+  topGainers: "Tăng mạnh",
+  topLosers: "Giảm mạnh",
+  currentPrice: "Giá hiện tại",
+  high: "Cao",
+  low: "Thấp",
+  range24h: "24 giờ",
+  range7d: "7 ngày",
+  backToList: "← Danh sách giá",
+  priceTitle: (game, currency) => `Giá ${currency} ${game}`,
+  ctaTitle: "Bán tiền game hoặc thuê cày thuê",
+  ctaDesc: "Thu mua tiền game giá cao nhất · Dịch vụ cày thuê Lineage Classic",
+  ctaSell: "Liên hệ thu mua",
+  ctaBoost: "Xem dịch vụ cày thuê",
+  adSlot: "Khu vực quảng cáo",
+  adInquiry: "Liên hệ quảng cáo",
   footerNote:
-    "Giá tham khảo được tổng hợp từ dữ liệu sàn giao dịch bên ngoài, có thể khác giá giao dịch thực tế.",
+    "Giá tham khảo được tổng hợp từ dữ liệu sàn giao dịch bên ngoài, có thể khác giá thực tế. GameTick không trung gian giao dịch.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ko, vi };

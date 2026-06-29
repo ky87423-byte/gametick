@@ -157,3 +157,10 @@ export const DEFAULT_GAME_SLUG = GAMES[0].slug;
 export function findGame(slug: string | null | undefined): GameInfo | null {
   return GAMES.find((g) => g.slug === slug) ?? null;
 }
+
+export function findServer(
+  game: GameInfo,
+  serverId: string | null | undefined
+): ServerInfo | null {
+  return game.servers.find((s) => s.id === serverId) ?? null;
+}
