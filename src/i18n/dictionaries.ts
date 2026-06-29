@@ -29,6 +29,12 @@ export interface Dictionary {
   calcTitle: string;
   calcAmount: string;
   calcWorth: string;
+  tradesTitle: string;
+  tradesEmpty: string;
+  rankingsTitle: string;
+  namedTitle: string;
+  bjTitle: string;
+  rankEmpty: string;
   sortBy: string;
   sortDefault: string;
   sortPrice: string;
@@ -85,6 +91,12 @@ const ko: Dictionary = {
   calcTitle: "시세 계산기",
   calcAmount: "수량",
   calcWorth: "예상 가치",
+  tradesTitle: "실시간 거래완료",
+  tradesEmpty: "최근 거래완료 내역을 불러오는 중…",
+  rankingsTitle: "랭킹",
+  namedTitle: "네임드 순위",
+  bjTitle: "BJ 순위",
+  rankEmpty: "준비 중입니다",
   sortBy: "정렬",
   sortDefault: "기본",
   sortPrice: "가격순",
@@ -138,6 +150,12 @@ const vi: Dictionary = {
   calcTitle: "Máy tính giá",
   calcAmount: "Số lượng",
   calcWorth: "Giá trị ước tính",
+  tradesTitle: "Giao dịch hoàn tất",
+  tradesEmpty: "Đang tải giao dịch gần đây…",
+  rankingsTitle: "Xếp hạng",
+  namedTitle: "Xếp hạng nhân vật",
+  bjTitle: "Xếp hạng BJ",
+  rankEmpty: "Đang chuẩn bị",
   sortBy: "Sắp xếp",
   sortDefault: "Mặc định",
   sortPrice: "Theo giá",

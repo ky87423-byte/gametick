@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { findGame } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
+import { readTrades } from "@/lib/trades";
+import { getRankings } from "@/data/rankings";
 import { faqItems, gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -11,6 +13,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarketTable } from "@/components/MarketTable";
 import { TrendChart } from "@/components/TrendChart";
+import { TradeFeed } from "@/components/TradeFeed";
+import { Rankings } from "@/components/Rankings";
 import { Faq } from "@/components/Faq";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 
@@ -46,12 +50,14 @@ export default async function GamePage({
   if (!game) notFound();
 
   const dict = getDictionary(locale);
-  const [table, trend] = await Promise.all([
+  const [table, trend, trades] = await Promise.all([
     getMarketTable(game),
     getGameTrend(game),
+    readTrades(game.slug),
   ]);
   const summary = summarize(table);
   const { gainers, losers } = movers(table, 3);
+  const rankings = getRankings(game.slug);
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
 
   const stat = (label: string, value: string, sub?: string) => (
@@ -143,13 +149,13 @@ export default async function GamePage({
               locale={locale}
               gameSlug={game.slug}
             />
-            {/* 커뮤니티(실시간 거래·토론) — 데이터 소스 연동 전 빈 상태 */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
-              <h3 className="mb-2 text-sm font-semibold text-zinc-300">
-                {dict.community}
-              </h3>
-              <p className="text-xs text-zinc-600">{dict.communityEmpty}</p>
-            </div>
+            {/* 실시간 거래완료 피드 (바로템 display=3 실데이터) */}
+            <TradeFeed
+              trades={trades}
+              title={dict.tradesTitle}
+              empty={dict.tradesEmpty}
+              locale={locale}
+            />
             <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-zinc-800 text-xs text-zinc-600">
               {dict.adSlot}
             </div>
@@ -167,6 +173,17 @@ export default async function GamePage({
             )}
           </div>
           <TrendChart points={trend.points} />
+        </section>
+
+        {/* 네임드 / BJ 순위 */}
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-bold">{dict.rankingsTitle}</h2>
+          <Rankings
+            rankings={rankings}
+            namedTitle={dict.namedTitle}
+            bjTitle={dict.bjTitle}
+            empty={dict.rankEmpty}
+          />
         </section>
 
         {/* 게임 소개 (SEO) */}
