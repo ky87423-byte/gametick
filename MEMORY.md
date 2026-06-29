@@ -45,7 +45,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - [x] 앱 정상(게임시세 렌더), nginx Host 라우팅 OK
 - [x] **DNS gamesise.co.kr + www → 111.90.148.135** 전파 완료
 - [x] **HTTPS 발급 완료** (certbot, 만료 2026-09-27, 자동갱신, HTTP→HTTPS 301) → **https://gamesise.co.kr 라이브**
-- [ ] **gamesise.com 미설정** — A레코드(@·www) 추가 후 .com→.co.kr 301 리다이렉트 + 인증서 확장 필요
+- [x] **gamesise.com + www** A레코드 전파 + 인증서 4도메인 확장 + **.com → .co.kr 301 리다이렉트** 완료
 - [ ] **시세 데이터 비어있음** — 바로템 API 고장(§4) 때문, 인프라는 완성
 
 **업데이트 절차**: `cd /var/www/gamesise && git pull && npm ci && npm run build && pm2 reload gamesise`
@@ -59,22 +59,21 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **해결 위치**: lc_vn `src/lib/barotem.ts` (게임시세 아님). 바로템 현재 사이트의 게임머니 페이지를 다시 분석해 **새 엔드포인트/파라미터/응답형식**을 찾아야 함.
 - 이게 안 풀리면 두 사이트 다 데이터가 안 나옴 → **다음 세션 1순위 후보**.
 
-## 5. DNS / HTTPS 상태
+## 5. DNS / HTTPS 상태 — 완료
 
-- [x] **gamesise.co.kr + www** A레코드 → 111.90.148.135 전파 완료, HTTPS 발급 완료 → **https://gamesise.co.kr 라이브**.
-  - 발급 명령(참고): `certbot --nginx -d gamesise.co.kr -d www.gamesise.co.kr --non-interactive --agree-tos --register-unsafely-without-email --redirect`
-- [ ] **gamesise.com**: 사용자가 A레코드(@·www → 111.90.148.135) 추가하면 →
-  ① nginx에 .com→https://gamesise.co.kr **301 리다이렉트** server 블록 추가(중복콘텐츠 방지),
-  ② 인증서 확장 `certbot --nginx -d gamesise.co.kr -d www.gamesise.co.kr -d gamesise.com -d www.gamesise.com`.
+- [x] **gamesise.co.kr + www + gamesise.com + www** 전부 A레코드 → 111.90.148.135.
+- [x] 인증서 1장으로 4도메인 SAN 커버(`live/gamesise.co.kr/`), 자동갱신, 만료 2026-09-27.
+- [x] **.co.kr → 앱(3003) 서빙 / .com → .co.kr 301 리다이렉트** (정식=.co.kr).
+- nginx 설정은 내가 직접 작성(certbot --nginx 아님): `/etc/nginx/conf.d/gamesise.conf` = 3개 server 블록(:80 챌린지+리다이렉트 / :443 .co.kr 프록시 / :443 .com 301). 인증서 갱신은 webroot(`/var/www/html`).
+- 로컬 사본: `C:\Users\User\gamesise.conf` (scp 원본).
 
 ## 6. 다음 작업 (우선순위)
 
 1. **바로템 API 복구** (§4) — lc_vn `barotem.ts` 재조정. 두 사이트 데이터의 전제. **최우선** (사이트는 떴는데 시세가 비어있음).
-2. **gamesise.com 마무리** (§5) — 사용자 A레코드 추가 후 .com→.co.kr 301 + 인증서 확장.
-3. **lc_vn 서버 배포** — lc_vn 수집기가 매물수(`listingCount`) 저장하도록 이미 수정·푸시됨(커밋 `7275900`)이나 **서버 lc_vn은 아직 구버전 실행 중**. `cd /var/www/lc_vn && git pull && npm ci && npm run build && pm2 reload lc_vn` 하면 매물수가 라이브로 채워짐(단 바로템 복구가 선행돼야 의미 있음).
-4. (선택) **리네이밍** gametick → gamesise: GitHub 레포명, 로컬 폴더, `GAMETICK_DATA_DIR` env명. 순전히 정리용.
-5. (선택) **멀티 거래소 실연동** (아이템매니아/베이) — `data/exchanges.ts` 추상화 있음, 현재 barotem만 active. 바로템이 계속 불안정하면 대체 소스로도 유용.
-6. (선택) 커뮤니티 위젯 실데이터, 텔레그램/디스코드 알림(워커 필요).
+2. **lc_vn 서버 배포** — lc_vn 수집기가 매물수(`listingCount`) 저장하도록 이미 수정·푸시됨(커밋 `7275900`)이나 **서버 lc_vn은 아직 구버전 실행 중**. `cd /var/www/lc_vn && git pull && npm ci && npm run build && pm2 reload lc_vn` 하면 매물수가 라이브로 채워짐(단 바로템 복구가 선행돼야 의미 있음).
+3. (선택) **리네이밍** gametick → gamesise: GitHub 레포명, 로컬 폴더, `GAMETICK_DATA_DIR` env명. 순전히 정리용.
+4. (선택) **멀티 거래소 실연동** (아이템매니아/베이) — `data/exchanges.ts` 추상화 있음, 현재 barotem만 active. 바로템이 계속 불안정하면 대체 소스로도 유용.
+5. (선택) 커뮤니티 위젯 실데이터, 텔레그램/디스코드 알림(워커 필요).
 
 ## 7. 기능 인벤토리 (실동작 vs 스텁)
 
