@@ -43,8 +43,10 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - [x] **스왑 1GB→2GB 증설** (`/swapfile2`, fstab 등록). 빌드 OOM 없음, 4앱 RAM 여유 1.0Gi 유지 → **합배포 RAM 우려 실측 통과**
 - [x] 서버 `.env.local`: `GAMETICK_DATA_DIR=/var/www/lc_vn/data`, `NEXT_PUBLIC_SITE_URL=https://gamesise.co.kr`
 - [x] 앱 정상(게임시세 렌더), nginx Host 라우팅 OK
-- [ ] **DNS 미설정** — 공개 접속 불가 상태 (아래 §5)
-- [ ] **HTTPS 미발급** — DNS 후 certbot
+- [x] **DNS gamesise.co.kr + www → 111.90.148.135** 전파 완료
+- [x] **HTTPS 발급 완료** (certbot, 만료 2026-09-27, 자동갱신, HTTP→HTTPS 301) → **https://gamesise.co.kr 라이브**
+- [ ] **gamesise.com 미설정** — A레코드(@·www) 추가 후 .com→.co.kr 301 리다이렉트 + 인증서 확장 필요
+- [ ] **시세 데이터 비어있음** — 바로템 API 고장(§4) 때문, 인프라는 완성
 
 **업데이트 절차**: `cd /var/www/gamesise && git pull && npm ci && npm run build && pm2 reload gamesise`
 
@@ -57,25 +59,18 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **해결 위치**: lc_vn `src/lib/barotem.ts` (게임시세 아님). 바로템 현재 사이트의 게임머니 페이지를 다시 분석해 **새 엔드포인트/파라미터/응답형식**을 찾아야 함.
 - 이게 안 풀리면 두 사이트 다 데이터가 안 나옴 → **다음 세션 1순위 후보**.
 
-## 5. 📌 사용자(사람)가 해야 할 일 — DNS
+## 5. DNS / HTTPS 상태
 
-도메인 등록업체에서 A레코드 추가:
-```
-@    A   111.90.148.135
-www  A   111.90.148.135
-```
-설정 후, 서버에서 HTTPS 발급:
-```
-ssh ... root@111.90.148.135
-certbot --nginx -d gamesise.co.kr -d www.gamesise.co.kr
-# (lc_info 때처럼 python3-certbot-nginx 필요, 이메일 없이 register --register-unsafely-without-email --agree-tos)
-```
-nginx는 이미 80포트로 떠 있으니 DNS만 붙으면 됨.
+- [x] **gamesise.co.kr + www** A레코드 → 111.90.148.135 전파 완료, HTTPS 발급 완료 → **https://gamesise.co.kr 라이브**.
+  - 발급 명령(참고): `certbot --nginx -d gamesise.co.kr -d www.gamesise.co.kr --non-interactive --agree-tos --register-unsafely-without-email --redirect`
+- [ ] **gamesise.com**: 사용자가 A레코드(@·www → 111.90.148.135) 추가하면 →
+  ① nginx에 .com→https://gamesise.co.kr **301 리다이렉트** server 블록 추가(중복콘텐츠 방지),
+  ② 인증서 확장 `certbot --nginx -d gamesise.co.kr -d www.gamesise.co.kr -d gamesise.com -d www.gamesise.com`.
 
 ## 6. 다음 작업 (우선순위)
 
-1. **바로템 API 복구** (§4) — lc_vn `barotem.ts` 재조정. 두 사이트 데이터의 전제.
-2. **DNS 후 HTTPS 발급** (§5) — 사용자 DNS → certbot.
+1. **바로템 API 복구** (§4) — lc_vn `barotem.ts` 재조정. 두 사이트 데이터의 전제. **최우선** (사이트는 떴는데 시세가 비어있음).
+2. **gamesise.com 마무리** (§5) — 사용자 A레코드 추가 후 .com→.co.kr 301 + 인증서 확장.
 3. **lc_vn 서버 배포** — lc_vn 수집기가 매물수(`listingCount`) 저장하도록 이미 수정·푸시됨(커밋 `7275900`)이나 **서버 lc_vn은 아직 구버전 실행 중**. `cd /var/www/lc_vn && git pull && npm ci && npm run build && pm2 reload lc_vn` 하면 매물수가 라이브로 채워짐(단 바로템 복구가 선행돼야 의미 있음).
 4. (선택) **리네이밍** gametick → gamesise: GitHub 레포명, 로컬 폴더, `GAMETICK_DATA_DIR` env명. 순전히 정리용.
 5. (선택) **멀티 거래소 실연동** (아이템매니아/베이) — `data/exchanges.ts` 추상화 있음, 현재 barotem만 active. 바로템이 계속 불안정하면 대체 소스로도 유용.

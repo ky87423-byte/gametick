@@ -67,6 +67,12 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 결론: **바로템 API가 개편/고장** → lc_vn·게임시세 둘 다 시세 비어있음. 앞선 로컬 null도 이 때문(스로틀 아님).
 - 해결 위치: lc_vn `src/lib/barotem.ts` (새 엔드포인트 재분석 필요).
 
+### 10) DNS + HTTPS (당일 후반)
+- 사용자가 gamesise.co.kr A레코드(@·www → 111.90.148.135) 입력 → 전파 확인.
+- `certbot --nginx`로 Let's Encrypt 발급, HTTP→HTTPS 301 리다이렉트, 자동갱신(만료 2026-09-27).
+- **https://gamesise.co.kr 라이브** 확인(게임시세 렌더). 단 시세 데이터는 바로템 고장으로 비어있음.
+- gamesise.com은 아직 DNS 미입력 → 추가 시 .com→.co.kr 301 + 인증서 확장 예정.
+
 ### 다음 세션 진입점
 1. **바로템 API 복구** (lc_vn `barotem.ts`) — 데이터의 전제. 1순위.
 2. **DNS**(사용자: A레코드 @·www → 111.90.148.135) → **certbot** HTTPS 발급.
