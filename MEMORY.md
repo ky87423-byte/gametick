@@ -46,18 +46,17 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - [x] **DNS gamesise.co.kr + www → 111.90.148.135** 전파 완료
 - [x] **HTTPS 발급 완료** (certbot, 만료 2026-09-27, 자동갱신, HTTP→HTTPS 301) → **https://gamesise.co.kr 라이브**
 - [x] **gamesise.com + www** A레코드 전파 + 인증서 4도메인 확장 + **.com → .co.kr 301 리다이렉트** 완료
-- [ ] **시세 데이터 비어있음** — 바로템 API 고장(§4) 때문, 인프라는 완성
+- [x] **시세 데이터 복구** — 바로템 Referer 수정 배포(§4)로 실데이터 흐름. 현재가·매물수 표시됨, 차트/등락은 수집 누적에 따라 채워짐
 
 **업데이트 절차**: `cd /var/www/gamesise && git pull && npm ci && npm run build && pm2 reload gamesise`
 
-## 4. 🔴 현재 최대 블로커: 바로템 API가 깨져 있음
+## 4. ✅ (해결됨) 바로템 API — Referer 헤더 요구로 변경됐던 것
 
-- 바로템 `productTable` API가 **모든 파라미터에서** `{"code":0,"msg":"Undefined variable $common"}` (바로템 서버 PHP 에러) 반환.
-- 바로템 메인 페이지(`https://www.barotem.com/`)는 200 정상 → **API 엔드포인트만 고장/개편**됨.
-- 결과: **서버 lc_vn의 최근 1700개 수집 포인트 전부 가격 null** → lc_vn(gmhm365.com)·게임시세 **둘 다 실시간 시세가 비어있음**.
-- 3주 전엔 정상이었음(로컬 옛 데이터에 실가격 존재) → 그 사이 바로템이 개편/고장.
-- **해결 위치**: lc_vn `src/lib/barotem.ts` (게임시세 아님). 바로템 현재 사이트의 게임머니 페이지를 다시 분석해 **새 엔드포인트/파라미터/응답형식**을 찾아야 함.
-- 이게 안 풀리면 두 사이트 다 데이터가 안 나옴 → **다음 세션 1순위 후보**.
+- 증상: `productTable` API가 모든 파라미터에서 `{"code":0,"msg":"Undefined variable $common"}` 반환 → 수집 포인트 전부 null.
+- **원인**: 바로템이 2026-06경 **Referer 헤더 검사**를 추가. UA/X-Requested-With만 보내던 lc_vn은 거부당함.
+- **해결**: lc_vn `src/lib/barotem.ts` fetch에 `Referer: https://www.barotem.com/product/lists/{threadId}` 추가 (커밋 `c48b1f7`). 응답 형식(`rows[]`/`total`/`unit_price`)은 그대로 → 파서 무수정.
+- 배포 완료(서버 lc_vn reload). lc_vn(gmhm365)·게임시세 **양쪽 데이터 복구 확인**(오렌 1,538원/102건).
+- **교훈**: 바로템 비공식 API라 또 막힐 수 있음. 깨지면 응답 헤더 요구사항(Referer 등)부터 의심. 진단법: `curl`로 Referer 유무 비교.
 
 ## 5. DNS / HTTPS 상태 — 완료
 
@@ -69,11 +68,13 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 
 ## 6. 다음 작업 (우선순위)
 
-1. **바로템 API 복구** (§4) — lc_vn `barotem.ts` 재조정. 두 사이트 데이터의 전제. **최우선** (사이트는 떴는데 시세가 비어있음).
-2. **lc_vn 서버 배포** — lc_vn 수집기가 매물수(`listingCount`) 저장하도록 이미 수정·푸시됨(커밋 `7275900`)이나 **서버 lc_vn은 아직 구버전 실행 중**. `cd /var/www/lc_vn && git pull && npm ci && npm run build && pm2 reload lc_vn` 하면 매물수가 라이브로 채워짐(단 바로템 복구가 선행돼야 의미 있음).
-3. (선택) **리네이밍** gametick → gamesise: GitHub 레포명, 로컬 폴더, `GAMETICK_DATA_DIR` env명. 순전히 정리용.
-4. (선택) **멀티 거래소 실연동** (아이템매니아/베이) — `data/exchanges.ts` 추상화 있음, 현재 barotem만 active. 바로템이 계속 불안정하면 대체 소스로도 유용.
-5. (선택) 커뮤니티 위젯 실데이터, 텔레그램/디스코드 알림(워커 필요).
+> 인프라·데이터 파이프라인은 완성됨(라이브 + 실데이터). 아래는 개선/마감 작업.
+
+1. **차트 누적 확인** — 바로템 복구 직후라 실데이터 포인트가 1개. 시간 지나며 스파크/캔들/24h등락이 채워지는지 며칠 모니터링. (서버 lc_vn 수집기가 300초 주기로 쌓음)
+2. (선택) **리네이밍** gametick → gamesise: GitHub 레포명, 로컬 폴더, `GAMETICK_DATA_DIR` env명. 순전히 정리용.
+3. (선택) **멀티 거래소 실연동** (아이템매니아/베이) — `data/exchanges.ts` 추상화 있음, 현재 barotem만 active. 바로템이 또 막히면 대체 소스로도 유용.
+4. (선택) 커뮤니티 위젯 실데이터, 텔레그램/디스코드 알림(워커 필요).
+5. (선택) 콘텐츠/연락처/광고 슬롯 실링크, 메타 OG 이미지.
 
 ## 7. 기능 인벤토리 (실동작 vs 스텁)
 

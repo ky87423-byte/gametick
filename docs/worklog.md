@@ -74,6 +74,17 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 이어서 gamesise.com A레코드 입력 → 전파 확인 → nginx 직접 재작성(.co.kr 앱 / .com 301) + 인증서 webroot로 4도메인 확장.
   - 검증: 인증서 SAN 4개, https .co.kr=200(앱), https/http .com → .co.kr 301. **도메인 구성 완료.**
 
+### 11) 바로템 API 복구 (블로커 해소)
+- 진단: `productTable`에 **Referer 헤더 없으면** `code:0 / Undefined variable $common`, **있으면 정상**(`rows[]`/`total` 동일 형식).
+  → 바로템이 2026-06경 Referer 검사 추가한 것. 응답 구조는 그대로.
+- 수정: lc_vn `src/lib/barotem.ts` fetch에 `Referer: .../product/lists/{threadId}` 추가 (커밋 `c48b1f7`, 매물수 커밋 `7275900`과 함께 배포).
+- 서버 lc_vn 배포(git pull+build+pm2 reload) → 수집 강제 → **실데이터 흐름 복구 확인**:
+  오렌 1,538원/매물 102건, https://gamesise.co.kr API price 28/29·count 29/29.
+- lc_vn 라이브(gmhm365.com)도 동반 복구.
+- 차트/24h등락은 수집 누적(300초 주기)에 따라 시간 지나며 채워짐(현재 실포인트 1개).
+
+### 현재 상태: gamesise.co.kr 라이브 + 실데이터 흐름. 인프라/파이프라인 완성.
+
 ### 다음 세션 진입점
 1. **바로템 API 복구** (lc_vn `barotem.ts`) — 데이터의 전제. 1순위.
 2. **DNS**(사용자: A레코드 @·www → 111.90.148.135) → **certbot** HTTPS 발급.
