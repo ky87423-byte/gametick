@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getMarketTable, movers, summarize } from "@/lib/market";
+import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
+import { faqItems, gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarketTable } from "@/components/MarketTable";
+import { TrendChart } from "@/components/TrendChart";
+import { Faq } from "@/components/Faq";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +46,10 @@ export default async function GamePage({
   if (!game) notFound();
 
   const dict = getDictionary(locale);
-  const table = await getMarketTable(game);
+  const [table, trend] = await Promise.all([
+    getMarketTable(game),
+    getGameTrend(game),
+  ]);
   const summary = summarize(table);
   const { gainers, losers } = movers(table, 3);
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
@@ -149,6 +155,29 @@ export default async function GamePage({
             </div>
           </aside>
         </div>
+
+        {/* 게임 평균 시세 추이 (gamebit엔 없는 인사이트) */}
+        <section className="mt-8">
+          <div className="mb-2 flex items-baseline justify-between">
+            <h2 className="text-lg font-bold">{dict.trendTitle}</h2>
+            {trend.changePercent !== null && (
+              <span className={`font-mono text-sm ${changeColor(trend.changePercent)}`}>
+                {changeText(trend.changePercent)}
+              </span>
+            )}
+          </div>
+          <TrendChart points={trend.points} />
+        </section>
+
+        {/* 게임 소개 (SEO) */}
+        <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <p className="text-sm leading-6 text-zinc-400">
+            {gameIntro(locale, game)}
+          </p>
+        </section>
+
+        {/* FAQ */}
+        <Faq title={dict.faqTitle} items={faqItems(locale, game)} />
       </main>
 
       <Footer locale={locale} />

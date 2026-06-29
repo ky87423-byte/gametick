@@ -10,6 +10,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CandleChart } from "@/components/CandleChart";
 import { AlertButton } from "@/components/AlertButton";
+import { PriceCalc } from "@/components/PriceCalc";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 import { change24h, latestCount, readHistory } from "@/lib/history";
 
@@ -139,6 +140,21 @@ export default async function ServerDetail({
         </div>
 
         <CandleChart candles={data.candles} ma={data.ma} />
+
+        <div className="mt-6 max-w-md">
+          <PriceCalc
+            currency={game.currency}
+            unitAmount={game.unitAmount}
+            priceKrw={data.current}
+            vndRate={rates.vnd}
+            locale={locale}
+            labels={{
+              title: dict.calcTitle,
+              amount: dict.calcAmount,
+              worth: dict.calcWorth,
+            }}
+          />
+        </div>
       </main>
 
       <Footer locale={locale} />

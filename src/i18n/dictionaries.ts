@@ -24,6 +24,11 @@ export interface Dictionary {
   favoritesEmpty: string;
   community: string;
   communityEmpty: string;
+  trendTitle: string;
+  faqTitle: string;
+  calcTitle: string;
+  calcAmount: string;
+  calcWorth: string;
   sortBy: string;
   sortDefault: string;
   sortPrice: string;
@@ -75,6 +80,11 @@ const ko: Dictionary = {
   favoritesEmpty: "시세표에서 ☆를 눌러 관심 서버를 추가하세요.",
   community: "실시간 거래·토론",
   communityEmpty: "준비 중입니다.",
+  trendTitle: "평균 시세 추이 (24h)",
+  faqTitle: "자주 묻는 질문",
+  calcTitle: "시세 계산기",
+  calcAmount: "수량",
+  calcWorth: "예상 가치",
   sortBy: "정렬",
   sortDefault: "기본",
   sortPrice: "가격순",
@@ -123,6 +133,11 @@ const vi: Dictionary = {
   favoritesEmpty: "Nhấn ☆ trong bảng giá để thêm máy chủ quan tâm.",
   community: "Giao dịch · thảo luận",
   communityEmpty: "Đang chuẩn bị.",
+  trendTitle: "Xu hướng giá TB (24h)",
+  faqTitle: "Câu hỏi thường gặp",
+  calcTitle: "Máy tính giá",
+  calcAmount: "Số lượng",
+  calcWorth: "Giá trị ước tính",
   sortBy: "Sắp xếp",
   sortDefault: "Mặc định",
   sortPrice: "Theo giá",

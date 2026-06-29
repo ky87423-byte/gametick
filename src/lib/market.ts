@@ -126,6 +126,41 @@ export function movers(
   return { gainers, losers };
 }
 
+export interface GameTrend {
+  points: { t: number; v: number }[];
+  current: number | null;
+  changePercent: number | null;
+}
+
+/** 게임 전체 평균 시세 추이 — 각 시점의 서버 평균(원/단위). gamebit엔 없는 인사이트. */
+export async function getGameTrend(
+  game: GameInfo,
+  rangeMs: number = 24 * 60 * 60 * 1000
+): Promise<GameTrend> {
+  const history = await readHistory(game.slug);
+  const since = Date.now() - rangeMs;
+  const raw: { t: number; v: number }[] = [];
+  for (const pt of history) {
+    if (pt.t < since) continue;
+    const vals = Object.values(pt.p).filter(
+      (v): v is number => typeof v === "number" && v > 0
+    );
+    if (vals.length)
+      raw.push({
+        t: pt.t,
+        v: Math.round(vals.reduce((a, b) => a + b, 0) / vals.length),
+      });
+  }
+  const points = downsample(raw, 90);
+  const current = points.length ? points[points.length - 1].v : null;
+  const first = points.length ? points[0].v : null;
+  const changePercent =
+    current !== null && first !== null && first > 0
+      ? ((current - first) / first) * 100
+      : null;
+  return { points, current, changePercent };
+}
+
 export interface ServerChart {
   serverId: string;
   nameKo: string;
