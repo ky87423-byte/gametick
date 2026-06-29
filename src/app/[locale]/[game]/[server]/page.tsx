@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { CandleChart } from "@/components/CandleChart";
 import { AlertButton } from "@/components/AlertButton";
 import { PriceCalc } from "@/components/PriceCalc";
+import { serverIntro } from "@/data/content";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 import { change24h, latestCount, readHistory } from "@/lib/history";
 
@@ -155,6 +156,13 @@ export default async function ServerDetail({
             }}
           />
         </div>
+
+        {/* 서버별 SEO 소개 */}
+        <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <p className="text-sm leading-6 text-zinc-400">
+            {serverIntro(locale, game, server.nameKo)}
+          </p>
+        </section>
       </main>
 
       <Footer locale={locale} />

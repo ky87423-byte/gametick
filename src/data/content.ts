@@ -10,6 +10,17 @@ export function gameIntro(locale: Locale, game: GameInfo): string {
   return `${game.nameKo} ${game.currency} 서버별 실시간 시세입니다. 외부 거래소의 거래가능 매물 중 최저 판매가를 ${game.unitLabelKo} ${game.currency}당(원) 기준으로 수집해 자동 갱신합니다. 서버를 누르면 캔들 차트와 24시간 등락, 가격 알림을 볼 수 있습니다. 표시 가격은 참고용이며 실제 거래가와 다를 수 있습니다.`;
 }
 
+export function serverIntro(
+  locale: Locale,
+  game: GameInfo,
+  serverName: string
+): string {
+  if (locale === "vi") {
+    return `Giá ${game.currency} máy chủ ${serverName} của ${game.nameEn} theo thời gian thực. Cung cấp giá thấp nhất mỗi ${game.unitLabelKo} ${game.currency}, biến động 24h, biểu đồ nến (3 phút/1 giờ/ngày) và cảnh báo giá. Giá chỉ mang tính tham khảo.`;
+  }
+  return `${serverName} 서버 ${game.nameKo} ${game.currency} 실시간 시세입니다. ${game.unitLabelKo} ${game.currency}당 최저 판매가와 24시간 등락률, 캔들 차트(3분·1시간·일봉), 가격 알림을 제공합니다. 시세는 외부 거래소 거래가능 매물을 기준으로 자동 갱신되며 참고용입니다.`;
+}
+
 export interface FaqItem {
   q: string;
   a: string;
