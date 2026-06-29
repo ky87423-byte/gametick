@@ -2,7 +2,13 @@
 // 겜틱은 시세 정보 사이트이므로 매입가/할인 없이 시장가(바로템 최저가)를 그대로 보여준다.
 
 import { GameInfo, ServerInfo } from "@/data/games";
-import { change24h, downsample, readHistory, seriesFor } from "@/lib/history";
+import {
+  change24h,
+  downsample,
+  latestCount,
+  readHistory,
+  seriesFor,
+} from "@/lib/history";
 
 export interface ServerMarket {
   serverId: string;
@@ -14,6 +20,8 @@ export interface ServerMarket {
   change24hPercent: number | null;
   /** 최근 24시간 시세 스파크라인 (다운샘플, 원/단위) */
   spark: number[];
+  /** 현재 매물 수 (거래가능물품 건수), 데이터 없으면 null */
+  listingCount: number | null;
   /** 이 서버 마지막 갱신 시각 (epoch ms), 없으면 null */
   updatedAt: number | null;
 }
@@ -52,6 +60,7 @@ export async function getMarketTable(game: GameInfo): Promise<MarketTable> {
       priceKrw: price !== null ? Math.round(price) : null,
       change24hPercent: change24h(history, s.id, price),
       spark,
+      listingCount: latestCount(history, s.id),
       updatedAt: last ? last.t : null,
     };
   });

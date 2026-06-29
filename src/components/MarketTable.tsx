@@ -13,6 +13,7 @@ export interface ServerRow {
   priceKrw: number | null;
   change24hPercent: number | null;
   spark: number[];
+  listingCount: number | null;
 }
 
 export interface TableLabels {
@@ -20,6 +21,7 @@ export interface TableLabels {
   server: string;
   price: string;
   change24h: string;
+  listings: string;
   chart: string;
   searchPlaceholder: string;
   favorites: string;
@@ -207,6 +209,9 @@ export function MarketTable({
               <th className="px-3 py-2 text-right font-medium">
                 {labels.change24h}
               </th>
+              <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
+                {labels.listings}
+              </th>
               <th className="px-3 py-2 text-right font-medium">{labels.chart}</th>
             </tr>
           </thead>
@@ -245,6 +250,9 @@ export function MarketTable({
                   )}`}
                 >
                   {changeText(s.change24hPercent)}
+                </td>
+                <td className="hidden px-3 py-2 text-right font-mono tabular-nums text-zinc-400 sm:table-cell">
+                  {s.listingCount === null ? "—" : s.listingCount.toLocaleString("ko-KR")}
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex justify-end">

@@ -104,12 +104,14 @@ export default async function GamePage({
               priceKrw: s.priceKrw,
               change24hPercent: s.change24hPercent,
               spark: s.spark,
+              listingCount: s.listingCount,
             }))}
             labels={{
               rank: dict.rank,
               server: dict.server,
               price: dict.price,
               change24h: dict.change24h,
+              listings: dict.listings,
               chart: dict.chart,
               searchPlaceholder: dict.searchPlaceholder,
               favorites: dict.favorites,

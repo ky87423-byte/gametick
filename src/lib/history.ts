@@ -21,6 +21,8 @@ export interface HistoryPoint {
   t: number; // epoch ms
   /** serverId → 시장가(원/단위), 매물 없으면 null */
   p: Record<string, number | null>;
+  /** serverId → 매물 수. 구버전(lc_vn 수집기 업데이트 전) 포인트엔 없음 */
+  c?: Record<string, number>;
 }
 
 const caches = new Map<string, { points: HistoryPoint[]; loadedAt: number }>();
@@ -45,6 +47,18 @@ export async function readHistory(gameSlug: string): Promise<HistoryPoint[]> {
   const points = await readFromDisk(gameSlug);
   caches.set(gameSlug, { points, loadedAt: Date.now() });
   return points;
+}
+
+/** 특정 서버의 최신 매물 수 — c가 있는 가장 최근 포인트에서. 없으면 null */
+export function latestCount(
+  history: HistoryPoint[],
+  serverId: string
+): number | null {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const c = history[i].c?.[serverId];
+    if (typeof c === "number") return c;
+  }
+  return null;
 }
 
 /** 특정 서버의 (t, 시세) 시계열 — null 제외, 오래된 순 */

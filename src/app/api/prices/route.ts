@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
       priceKrw: s.priceKrw,
       change24hPercent: s.change24hPercent,
       spark: s.spark,
+      listingCount: s.listingCount,
     })),
   });
 }

@@ -10,6 +10,7 @@ export interface Dictionary {
   server: string;
   price: string;
   change24h: string;
+  listings: string;
   chart: string;
   perUnit: (label: string, currency: string) => string;
   noData: string;
@@ -60,6 +61,7 @@ const ko: Dictionary = {
   server: "서버",
   price: "현재가",
   change24h: "24h 등락",
+  listings: "매물",
   chart: "추이",
   perUnit: (label, currency) => `${label} ${currency}당 (원)`,
   noData: "데이터 없음",
@@ -107,6 +109,7 @@ const vi: Dictionary = {
   server: "Máy chủ",
   price: "Giá",
   change24h: "24h",
+  listings: "Tin",
   chart: "Xu hướng",
   perUnit: (label, currency) => `mỗi ${label} ${currency} (KRW)`,
   noData: "Không có dữ liệu",

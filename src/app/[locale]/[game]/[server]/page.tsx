@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 import { CandleChart } from "@/components/CandleChart";
 import { AlertButton } from "@/components/AlertButton";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
-import { change24h, readHistory } from "@/lib/history";
+import { change24h, latestCount, readHistory } from "@/lib/history";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +63,7 @@ export default async function ServerDetail({
     readHistory(game.slug),
   ]);
   const change = change24h(history, server.id, data.current);
+  const count = latestCount(history, server.id);
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
   const secondary = secondaryCurrency(data.current, locale, rates);
 
@@ -118,6 +119,11 @@ export default async function ServerDetail({
         <p className="mb-5 text-sm text-zinc-500">
           {unitText}
           {secondary && <span className="ml-2 text-zinc-400">{secondary}</span>}
+          {count !== null && (
+            <span className="ml-2">
+              · {dict.listings} {count.toLocaleString("ko-KR")}건
+            </span>
+          )}
         </p>
 
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
