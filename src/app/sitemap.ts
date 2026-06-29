@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { GAMES } from "@/data/games";
 import { locales } from "@/i18n/config";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gametick.co.kr";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
 
 // [locale] 동적 세그먼트가 /sitemap.xml 을 가로채지 않도록 라우트로 강제
 export const dynamic = "force-dynamic";

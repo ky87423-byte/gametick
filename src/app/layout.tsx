@@ -15,14 +15,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://gametick.co.kr"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr"
   ),
   title: {
-    default: "겜틱 GameTick — 게임머니 서버별 실시간 시세",
+    default: "게임시세 GameSise — 게임머니 서버별 실시간 시세",
     template: "%s",
   },
   description:
-    "리니지 클래식 아데나, 메이플 메소, 아이온2 키나 등 게임머니 서버별 실시간 시세·차트. 겜틱(GameTick).",
+    "리니지 클래식 아데나, 메이플 메소, 아이온2 키나 등 게임머니 서버별 실시간 시세·차트. 게임시세(GameSise).",
 };
 
 export const viewport: Viewport = {

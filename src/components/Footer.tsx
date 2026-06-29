@@ -38,8 +38,8 @@ export function Footer({ locale }: { locale: Locale }) {
         <p className="text-xs leading-5 text-zinc-600">{dict.footerNote}</p>
         <p className="mt-2 text-xs text-zinc-600">
           {dict.adInquiry}:{" "}
-          <a href="mailto:ad@gametick.co.kr" className="underline hover:text-zinc-400">
-            ad@gametick.co.kr
+          <a href="mailto:ad@gamesise.co.kr" className="underline hover:text-zinc-400">
+            ad@gamesise.co.kr
           </a>{" "}
           · © {new Date().getFullYear()} {dict.brand}
         </p>

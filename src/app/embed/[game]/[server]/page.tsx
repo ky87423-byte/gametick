@@ -1,5 +1,5 @@
 // 임베드 위젯 — 외부 카페/블로그에 iframe으로 삽입.
-// <iframe src="https://gametick.co.kr/embed/lineage-classic/26641" width="320" height="120" />
+// <iframe src="https://gamesise.co.kr/embed/lineage-classic/26641" width="320" height="120" />
 
 import { notFound } from "next/navigation";
 import { findGame, findServer } from "@/data/games";
@@ -38,7 +38,7 @@ export default async function EmbedWidget({
           rel="noopener noreferrer"
           className="text-xs font-bold text-red-400"
         >
-          겜틱
+          게임시세
         </a>
       </div>
       <div className="flex items-end justify-between">

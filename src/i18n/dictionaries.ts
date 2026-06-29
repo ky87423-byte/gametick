@@ -55,7 +55,7 @@ export interface Dictionary {
 }
 
 const ko: Dictionary = {
-  brand: "겜틱",
+  brand: "게임시세",
   tagline: "게임머니 서버별 실시간 시세",
   rank: "#",
   server: "서버",
@@ -99,11 +99,11 @@ const ko: Dictionary = {
   adSlot: "광고 영역",
   adInquiry: "광고/제휴 문의",
   footerNote:
-    "본 시세는 외부 거래소 데이터를 수집·가공한 참고용 정보이며 실제 거래가와 다를 수 있습니다. 겜틱(GameTick)은 직접 거래를 중개하지 않으며 거래로 인한 책임을 지지 않습니다.",
+    "본 시세는 외부 거래소 데이터를 수집·가공한 참고용 정보이며 실제 거래가와 다를 수 있습니다. 게임시세(GameSise)는 직접 거래를 중개하지 않으며 거래로 인한 책임을 지지 않습니다.",
 };
 
 const vi: Dictionary = {
-  brand: "GameTick",
+  brand: "GameSise",
   tagline: "Giá tiền game theo máy chủ, thời gian thực",
   rank: "#",
   server: "Máy chủ",
@@ -147,7 +147,7 @@ const vi: Dictionary = {
   adSlot: "Khu vực quảng cáo",
   adInquiry: "Liên hệ quảng cáo",
   footerNote:
-    "Giá tham khảo được tổng hợp từ dữ liệu sàn giao dịch bên ngoài, có thể khác giá thực tế. GameTick không trung gian giao dịch.",
+    "Giá tham khảo được tổng hợp từ dữ liệu sàn giao dịch bên ngoài, có thể khác giá thực tế. GameSise không trung gian giao dịch.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ko, vi };

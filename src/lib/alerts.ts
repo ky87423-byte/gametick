@@ -83,7 +83,7 @@ export function checkAlerts(
     const hit = a.op === "lte" ? cur <= a.price : cur >= a.price;
     if (!hit) continue;
     if (a.firedAt && now - a.firedAt < REFIRE_COOLDOWN_MS) continue;
-    new Notification("겜틱 가격 알림", {
+    new Notification("게임시세 가격 알림", {
       body: `${a.name} ${cur.toLocaleString("ko-KR")}원 (${
         a.op === "lte" ? "이하" : "이상"
       } ${a.price.toLocaleString("ko-KR")}원 도달)`,
