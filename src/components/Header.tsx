@@ -23,8 +23,8 @@ export function Header({
           </span>
         </Link>
         <nav className="flex items-center gap-3 text-xs text-zinc-400">
-          <Link href="#cta" className="hover:text-zinc-200">
-            {dict.adInquiry}
+          <Link href={`/${locale}/favorites`} className="hover:text-amber-300">
+            {dict.favoritesNav}
           </Link>
           <span className="text-zinc-700">|</span>
           {locales.map((l) => (

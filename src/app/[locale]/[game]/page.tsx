@@ -1,15 +1,36 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame } from "@/data/games";
+import { SOURCE_LABEL } from "@/data/exchanges";
 import { getMarketTable, movers, summarize } from "@/lib/market";
 import { getDictionary } from "@/i18n/dictionaries";
-import { isLocale } from "@/i18n/config";
+import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarketTable } from "@/components/MarketTable";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; game: string }>;
+}): Promise<Metadata> {
+  const { locale, game: slug } = await params;
+  const game = findGame(slug);
+  if (!game || !isLocale(locale)) return {};
+  const dict = getDictionary(locale as Locale);
+  const title = `${dict.priceTitle(game.nameKo, game.currency)} | ${dict.brand}`;
+  const description = `${game.nameKo} ${game.currency} 서버별 실시간 시세·등락·차트. ${dict.brand}.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/${game.slug}` },
+    openGraph: { title, description, type: "website" },
+  };
+}
 
 export default async function GamePage({
   params,
@@ -50,7 +71,9 @@ export default async function GamePage({
             {dict.updatedAt}: {formatTime(table.updatedAt, locale)}
           </span>
         </div>
-        <p className="mb-5 text-sm text-zinc-500">{unitText}</p>
+        <p className="mb-5 text-sm text-zinc-500">
+          {unitText} · {dict.source}: {SOURCE_LABEL}
+        </p>
 
         {/* 요약 카드 */}
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -73,6 +96,7 @@ export default async function GamePage({
           <MarketTable
             locale={locale}
             gameSlug={game.slug}
+            initialUpdatedAt={table.updatedAt}
             servers={table.servers.map((s) => ({
               serverId: s.serverId,
               nameKo: s.nameKo,
@@ -92,6 +116,8 @@ export default async function GamePage({
               sortDefault: dict.sortDefault,
               sortPrice: dict.sortPrice,
               sortChange: dict.sortChange,
+              updatedAt: dict.updatedAt,
+              live: dict.live,
             }}
           />
 
@@ -109,6 +135,13 @@ export default async function GamePage({
               locale={locale}
               gameSlug={game.slug}
             />
+            {/* 커뮤니티(실시간 거래·토론) — 데이터 소스 연동 전 빈 상태 */}
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+              <h3 className="mb-2 text-sm font-semibold text-zinc-300">
+                {dict.community}
+              </h3>
+              <p className="text-xs text-zinc-600">{dict.communityEmpty}</p>
+            </div>
             <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-zinc-800 text-xs text-zinc-600">
               {dict.adSlot}
             </div>

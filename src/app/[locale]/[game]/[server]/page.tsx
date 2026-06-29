@@ -1,22 +1,49 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, findServer } from "@/data/games";
-import { getServerChart } from "@/lib/market";
+import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
+import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { getDictionary } from "@/i18n/dictionaries";
-import { isLocale } from "@/i18n/config";
+import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { PriceChart } from "@/components/PriceChart";
+import { CandleChart } from "@/components/CandleChart";
+import { AlertButton } from "@/components/AlertButton";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
+import { change24h, readHistory } from "@/lib/history";
 
 export const dynamic = "force-dynamic";
+
+const TF_ORDER: Timeframe[] = ["3m", "1h", "1d"];
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; game: string; server: string }>;
+}): Promise<Metadata> {
+  const { locale, game: gslug, server: sid } = await params;
+  const game = findGame(gslug);
+  if (!game || !isLocale(locale)) return {};
+  const server = findServer(game, sid);
+  if (!server) return {};
+  const dict = getDictionary(locale as Locale);
+  const title = `${server.nameKo} ${game.currency} 시세 | ${dict.brand}`;
+  const description = `${game.nameKo} ${server.nameKo} 서버 ${game.currency} 실시간 시세·24h 등락·캔들 차트.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/${game.slug}/${server.id}` },
+    openGraph: { title, description, type: "website" },
+  };
+}
 
 export default async function ServerDetail({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string; game: string; server: string }>;
-  searchParams: Promise<{ range?: string }>;
+  searchParams: Promise<{ tf?: string }>;
 }) {
   const { locale, game: gameSlug, server: serverId } = await params;
   if (!isLocale(locale)) notFound();
@@ -25,22 +52,31 @@ export default async function ServerDetail({
   const server = findServer(game, serverId);
   if (!server) notFound();
 
-  const { range: rangeParam } = await searchParams;
-  const range = rangeParam === "7d" ? "7d" : "24h";
+  const { tf: tfParam } = await searchParams;
+  const tf: Timeframe = TF_ORDER.includes(tfParam as Timeframe)
+    ? (tfParam as Timeframe)
+    : "1h";
   const dict = getDictionary(locale);
-  const chart = await getServerChart(game, server, range);
+  const [data, rates, history] = await Promise.all([
+    getServerCandles(game, server, tf),
+    getRates(),
+    readHistory(game.slug),
+  ]);
+  const change = change24h(history, server.id, data.current);
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
+  const secondary = secondaryCurrency(data.current, locale, rates);
 
-  const rangeTab = (r: "24h" | "7d", label: string) => (
+  const tfTab = (t: Timeframe) => (
     <Link
-      href={`/${locale}/${game.slug}/${server.id}?range=${r}`}
+      key={t}
+      href={`/${locale}/${game.slug}/${server.id}?tf=${t}`}
       className={`rounded px-3 py-1 text-sm ${
-        range === r
+        tf === t
           ? "bg-zinc-100 text-zinc-900"
           : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
       }`}
     >
-      {label}
+      {TF_SPECS[t].label}
     </Link>
   );
 
@@ -65,33 +101,38 @@ export default async function ServerDetail({
           {dict.backToList}
         </Link>
 
-        <div className="mt-2 mb-1 flex items-baseline justify-between">
+        <div className="mt-2 mb-1 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold tracking-tight">
             {server.nameKo}
             <span className="ml-2 text-base font-normal text-zinc-500">
               {game.nameKo} {game.currency}
             </span>
           </h1>
+          <AlertButton
+            gameSlug={game.slug}
+            serverId={server.id}
+            name={`${server.nameKo} ${game.currency}`}
+            current={data.current}
+          />
         </div>
-        <p className="mb-5 text-sm text-zinc-500">{unitText}</p>
+        <p className="mb-5 text-sm text-zinc-500">
+          {unitText}
+          {secondary && <span className="ml-2 text-zinc-400">{secondary}</span>}
+        </p>
 
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stat(dict.currentPrice, formatKrw(chart.current))}
-          {stat(
-            dict.change24h,
-            changeText(chart.change24hPercent),
-            changeColor(chart.change24hPercent)
-          )}
-          {stat(`${dict.high} (${range === "7d" ? dict.range7d : dict.range24h})`, formatKrw(chart.high))}
-          {stat(`${dict.low} (${range === "7d" ? dict.range7d : dict.range24h})`, formatKrw(chart.low))}
+          {stat(dict.currentPrice, formatKrw(data.current))}
+          {stat(dict.change24h, changeText(change), changeColor(change))}
+          {stat(`${dict.high} (${TF_SPECS[tf].label})`, formatKrw(data.high))}
+          {stat(`${dict.low} (${TF_SPECS[tf].label})`, formatKrw(data.low))}
         </div>
 
-        <div className="mb-3 flex gap-2">
-          {rangeTab("24h", dict.range24h)}
-          {rangeTab("7d", dict.range7d)}
+        <div className="mb-3 flex items-center gap-2">
+          {TF_ORDER.map(tfTab)}
+          <span className="ml-1 text-xs text-amber-400/80">— MA</span>
         </div>
 
-        <PriceChart points={chart.points} />
+        <CandleChart candles={data.candles} ma={data.ma} />
       </main>
 
       <Footer locale={locale} />

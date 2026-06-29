@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,10 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "겜틱 GameTick — 게임머니 서버별 실시간 시세",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://gametick.co.kr"
+  ),
+  title: {
+    default: "겜틱 GameTick — 게임머니 서버별 실시간 시세",
+    template: "%s",
+  },
   description:
     "리니지 클래식 아데나, 메이플 메소, 아이온2 키나 등 게임머니 서버별 실시간 시세·차트. 겜틱(GameTick).",
 };
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
+};
+
+const UMAMI_SRC = process.env.NEXT_PUBLIC_UMAMI_SRC;
+const UMAMI_ID = process.env.NEXT_PUBLIC_UMAMI_ID;
 
 export default function RootLayout({
   children,
@@ -28,7 +42,16 @@ export default function RootLayout({
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        {UMAMI_SRC && UMAMI_ID && (
+          <Script
+            src={UMAMI_SRC}
+            data-website-id={UMAMI_ID}
+            strategy="afterInteractive"
+          />
+        )}
+      </body>
     </html>
   );
 }

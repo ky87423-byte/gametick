@@ -14,8 +14,15 @@ export interface Dictionary {
   perUnit: (label: string, currency: string) => string;
   noData: string;
   updatedAt: string;
+  live: string;
+  source: string;
   searchPlaceholder: string;
   favorites: string;
+  favoritesNav: string;
+  favoritesTitle: string;
+  favoritesEmpty: string;
+  community: string;
+  communityEmpty: string;
   sortBy: string;
   sortDefault: string;
   sortPrice: string;
@@ -57,8 +64,15 @@ const ko: Dictionary = {
   perUnit: (label, currency) => `${label} ${currency}당 (원)`,
   noData: "데이터 없음",
   updatedAt: "업데이트",
+  live: "실시간",
+  source: "데이터 출처",
   searchPlaceholder: "서버 검색…",
   favorites: "즐겨찾기",
+  favoritesNav: "★ 즐겨찾기",
+  favoritesTitle: "즐겨찾기 시세",
+  favoritesEmpty: "시세표에서 ☆를 눌러 관심 서버를 추가하세요.",
+  community: "실시간 거래·토론",
+  communityEmpty: "준비 중입니다.",
   sortBy: "정렬",
   sortDefault: "기본",
   sortPrice: "가격순",
@@ -97,8 +111,15 @@ const vi: Dictionary = {
   perUnit: (label, currency) => `mỗi ${label} ${currency} (KRW)`,
   noData: "Không có dữ liệu",
   updatedAt: "Cập nhật",
+  live: "Trực tiếp",
+  source: "Nguồn dữ liệu",
   searchPlaceholder: "Tìm máy chủ…",
   favorites: "Yêu thích",
+  favoritesNav: "★ Yêu thích",
+  favoritesTitle: "Giá yêu thích",
+  favoritesEmpty: "Nhấn ☆ trong bảng giá để thêm máy chủ quan tâm.",
+  community: "Giao dịch · thảo luận",
+  communityEmpty: "Đang chuẩn bị.",
   sortBy: "Sắp xếp",
   sortDefault: "Mặc định",
   sortPrice: "Theo giá",
