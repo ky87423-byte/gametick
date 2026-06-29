@@ -23,6 +23,12 @@ export function Header({
           </span>
         </Link>
         <nav className="flex items-center gap-3 text-xs text-zinc-400">
+          <Link href={`/${locale}/report`} className="hover:text-zinc-200">
+            {dict.reportNav}
+          </Link>
+          <Link href={`/${locale}/guide`} className="hover:text-zinc-200">
+            {dict.guideNav}
+          </Link>
           <Link href={`/${locale}/favorites`} className="hover:text-amber-300">
             {dict.favoritesNav}
           </Link>

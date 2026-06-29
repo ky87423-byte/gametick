@@ -35,6 +35,13 @@ export interface Dictionary {
   namedTitle: string;
   bjTitle: string;
   rankEmpty: string;
+  reportNav: string;
+  reportTitle: string;
+  reportDesc: string;
+  periodLabel: string;
+  avgChangeLabel: string;
+  reportEmpty: string;
+  guideNav: string;
   sortBy: string;
   sortDefault: string;
   sortPrice: string;
@@ -97,6 +104,13 @@ const ko: Dictionary = {
   namedTitle: "네임드 순위",
   bjTitle: "BJ 순위",
   rankEmpty: "준비 중입니다",
+  reportNav: "리포트",
+  reportTitle: "시세 리포트",
+  reportDesc: "최근 기간 동안 게임별 평균 등락과 급등·급락 서버를 한눈에.",
+  periodLabel: "기간",
+  avgChangeLabel: "평균 등락",
+  reportEmpty: "데이터가 쌓이는 중입니다.",
+  guideNav: "가이드",
   sortBy: "정렬",
   sortDefault: "기본",
   sortPrice: "가격순",
@@ -156,6 +170,13 @@ const vi: Dictionary = {
   namedTitle: "Xếp hạng nhân vật",
   bjTitle: "Xếp hạng BJ",
   rankEmpty: "Đang chuẩn bị",
+  reportNav: "Báo cáo",
+  reportTitle: "Báo cáo giá",
+  reportDesc: "Biến động trung bình và máy chủ tăng/giảm mạnh theo từng game.",
+  periodLabel: "Kỳ",
+  avgChangeLabel: "Biến động TB",
+  reportEmpty: "Đang thu thập dữ liệu.",
+  guideNav: "Hướng dẫn",
   sortBy: "Sắp xếp",
   sortDefault: "Mặc định",
   sortPrice: "Theo giá",

@@ -161,6 +161,74 @@ export async function getGameTrend(
   return { points, current, changePercent };
 }
 
+export interface ReportServer {
+  serverId: string;
+  nameKo: string;
+  current: number;
+  base: number;
+  changePercent: number;
+}
+
+export interface GameReport {
+  slug: string;
+  nameKo: string;
+  currency: string;
+  unitLabelKo: string;
+  /** 실제 비교 기간(ms) — 데이터가 7일 미만이면 그만큼만 */
+  periodMs: number | null;
+  avgChangePercent: number | null;
+  topGainer: ReportServer | null;
+  topLoser: ReportServer | null;
+  activeCount: number;
+}
+
+/** 시세 리포트 — 가용 기간(최대 7일) 동안의 서버별 변동 랭킹. */
+export async function getReport(
+  game: GameInfo,
+  maxRangeMs: number = 7 * 24 * 60 * 60 * 1000
+): Promise<GameReport> {
+  const history = await readHistory(game.slug);
+  const since = Date.now() - maxRangeMs;
+  const rows: ReportServer[] = [];
+  let tMin: number | null = null;
+  let tMax: number | null = null;
+
+  for (const s of game.servers) {
+    const series = seriesFor(history, s.id, since);
+    if (series.length < 2) continue;
+    const base = series[0];
+    const cur = series[series.length - 1];
+    if (base.v <= 0) continue;
+    tMin = tMin === null ? base.t : Math.min(tMin, base.t);
+    tMax = tMax === null ? cur.t : Math.max(tMax, cur.t);
+    rows.push({
+      serverId: s.id,
+      nameKo: s.nameKo,
+      current: Math.round(cur.v),
+      base: Math.round(base.v),
+      changePercent: ((cur.v - base.v) / base.v) * 100,
+    });
+  }
+
+  const sorted = [...rows].sort((a, b) => b.changePercent - a.changePercent);
+  const avg =
+    rows.length > 0
+      ? rows.reduce((a, b) => a + b.changePercent, 0) / rows.length
+      : null;
+
+  return {
+    slug: game.slug,
+    nameKo: game.nameKo,
+    currency: game.currency,
+    unitLabelKo: game.unitLabelKo,
+    periodMs: tMin !== null && tMax !== null ? tMax - tMin : null,
+    avgChangePercent: avg,
+    topGainer: sorted.length ? sorted[0] : null,
+    topLoser: sorted.length ? sorted[sorted.length - 1] : null,
+    activeCount: rows.length,
+  };
+}
+
 export interface ServerChart {
   serverId: string;
   nameKo: string;

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { GAMES } from "@/data/games";
+import { guideList } from "@/data/guides";
 import { locales } from "@/i18n/config";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
@@ -11,6 +12,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const out: MetadataRoute.Sitemap = [];
   for (const locale of locales) {
     out.push({ url: `${BASE}/${locale}`, changeFrequency: "hourly", priority: 1 });
+    for (const p of ["report", "guide", "about", "terms", "privacy"]) {
+      out.push({
+        url: `${BASE}/${locale}/${p}`,
+        changeFrequency: p === "report" ? "daily" : "weekly",
+        priority: 0.5,
+      });
+    }
+    for (const gd of guideList(locale)) {
+      out.push({
+        url: `${BASE}/${locale}/guide/${gd.slug}`,
+        changeFrequency: "monthly",
+        priority: 0.5,
+      });
+    }
     for (const g of GAMES) {
       out.push({
         url: `${BASE}/${locale}/${g.slug}`,
