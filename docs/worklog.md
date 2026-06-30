@@ -195,10 +195,9 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 무료 텔레그램 Bot API. 봇 @gamesise_alert_bot(토큰=lc_vn 서버 .env.local). VPS→telegram OK.
 - lc_vn `telegram.ts`: alerts.json 구독 + getUpdates 폴러(/start 딥링크, /list/clear) + checkAlerts(tick, 최저가 비교·발송·재무장). gametick `TelegramAlert.tsx`: 서버상세 딥링크 버튼.
 - 폴러 생존 확인: 외부 getUpdates→409 Conflict(정상). 봇 명령어/설명 setMyCommands로 설정.
-- 검증: 빌드·배포·버튼 렌더·폴러 409 확인. **E2E(실제 봇 [시작]→알림 수신)는 사용자 테스트 필요**.
+- 검증: 빌드·배포·버튼 렌더·폴러 409 확인. **✅ E2E 성공**(사용자 봇 [시작]→알림 수신 확인, 2026-06-30).
 
 ### 다음 세션 할 일
-- [ ] **텔레그램 E2E 테스트**(사용자): 서버페이지 "텔레그램 알림"→기준가→[시작], 시세 도달 시 수신 확인.
 - [ ] (선택) **#7 디스코드**: 채널 웹훅 URL 입력받아 POST(폴러 불필요, 더 간단).
 - [ ] (선택) KR 수집기 확보 시 아이템매니아 부활(코드 준비됨), 유튜브 폴백 키, liveMatch 튜닝.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).

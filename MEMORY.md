@@ -139,7 +139,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **백엔드(lc_vn `src/lib/telegram.ts`)**: `data/alerts.json` 구독저장 + `getUpdates` 폴러(`/start` 딥링크 등록, `/list`·`/clear`) + `checkAlerts`(매 tick, 활성 거래소 최저가 비교→조건 도달 시 발송→히스테리시스 재무장). instrumentation에서 폴러 시작+tick 훅. **토큰 없으면 전부 no-op**.
 - **UI(gametick `TelegramAlert.tsx`)**: 서버 상세에 "📲 텔레그램 알림" — 기준가/이하·이상 입력 → 딥링크 `t.me/gamesise_alert_bot?start={slug}_{serverId}_{price}_{b|a}`. 사용자가 [시작]만 누르면 등록.
 - **폴러 생존 확인법**: 외부에서 `getUpdates` 호출 시 **409 Conflict**면 서버 폴러 작동중(텔레그램은 getUpdates 단일 소비자만 허용). 절대 외부에서 getUpdates/webhook 걸지 말 것(폴러 깨짐).
-- **남음**: E2E는 실제 텔레그램 계정으로 봇 [시작]→알림 수신 확인 필요(사용자). 디스코드(웹훅 POST)는 후속.
+- **✅ E2E 검증 완료**(2026-06-30, 실제 봇 [시작]→알림 수신 확인). 디스코드(웹훅 POST)는 후속.
 
 ## 8. 파일 가이드 (게임시세)
 
