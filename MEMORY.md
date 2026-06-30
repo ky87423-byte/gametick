@@ -25,9 +25,10 @@
 ## 2. 아키텍처 (핵심)
 
 - **스택**: Next.js 16.2.9 + React 19 + Tailwind v4 (lc_vn/lc_info와 동일).
-- **데이터 (A 방식)**: 직접 거래소 폴링 안 함. lc_vn 수집기가 만든 `history-{game}.json`을 `GAMETICK_DATA_DIR` 경로로 **읽기 전용** 접근.
+- **데이터 (A 방식)**: 직접 거래소 폴링 안 함. lc_vn 수집기가 만든 `history-{game}[-{exchange}].json`을 `GAMETICK_DATA_DIR` 경로로 **읽기 전용** 접근.
   - 로컬: `C:\Users\User\lc_vn\data` / 서버: `/var/www/lc_vn/data`
   - 이유: 같은 VPS IP에서 거래소를 두 번 긁으면 차단 위험 → 수집기 1개만 둠.
+  - **멀티거래소(Phase 1)**: 바로템=`history-{game}.json`(기본·시계열 기준), 아이템베이=`history-{game}-itembay.json`. 거래소 추가 시 파일만 늘어남. `market.ts`가 활성 거래소(`data/exchanges.ts`)를 다 읽어 서버별 **최저가/거래소칩/스프레드** 계산(등락·스파크·매물수는 바로템 기준 유지).
 - **표시**: 시세 정보 사이트라 매입가/할인 없음. 시장가(원/단위) 그대로 표시.
 - **시세 단위**: 아데나 만당 / 키나 천만당 / 메소 백만당 / 다이아 만당(미확정). `games.ts`의 `unitAmount`+`unitLabelKo`.
 - **색상 관례(한국식)**: 상승=🔴빨강, 하락=🔵파랑 (`lib/format.ts`).
@@ -74,8 +75,14 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - 실시간 거래완료 피드(바로템 display=3 실데이터), 평균 추이 차트, 게임 소개·FAQ, 시세 계산기, 네임드/BJ 순위 위젯(데이터 비어 "준비중").
 
 ### 1~7 추천작업: ✅#1 SEO · ✅#2 리포트 · ✅#3 가이드 · ✅#4 게임확대 · ✅#6 약관/정책 / 남음:
-- **#5 멀티 거래소**(아이템매니아/베이): 리버스 엔지니어링, 큰 작업. `data/exchanges.ts` 추상화 있음.
+- **#5 멀티 거래소**: 🟢**Phase 1 완료**(바로템+아이템베이, 리니지클래식, 라이브). 남은 Phase: 2)아이템매니아(`gamemoney_servers.xml.php?gamecode=`로 게임당 1콜·전서버 XML) 3)땡스아이템(`itemthankyou.com` 매물 파싱, 깔끔한 시세API 없음) 4)나머지 게임 매핑+서버상세 거래소 오버레이.
 - **#7 텔레그램/디스코드 알림**: 별도 워커(봇 토큰) 필요.
+
+### ✅ #5 멀티거래소 Phase 1 — 바로템+아이템베이 (2026-06-30, gametick `ed91823` / lc_vn `fb8763e`)
+- **아이템베이 시세 API(keyless)**: `GET itembay.com/item/api/sell/getRealTimeMarket?iGameServerSeq={seq}` → `{iMarkePrice, iLowestPrice}`. 단위: `/api/game/server/market-info?iGameSeq=&iGameServerSeq=` → `{biBasePrice, vcUnit}`. 서버명이 우리와 동일 → **이름으로 매핑**.
+- **수집(lc_vn)**: `src/lib/itembay.ts`(부품 모듈, 매핑 내장: 클래식 iGameSeq=3828) → `collectItembay`가 서버별 최저가를 우리 단위로 정규화해 `history-{game}-itembay.json` 기록. instrumentation tick에 추가(게임당 priceRevalidateSeconds 주기, 서버 호출 150ms 딜레이, try-catch 격리). **lc_vn은 gmhm365 라이브 사이트라 변경 주의**.
+- **계산/표시(gametick)**: `market.ts`가 최저가·스프레드 계산, 시세표에 최저가+거래소칩(최저=앰버). 라이브 검증: 22/29서버, 서버마다 최저 거래소 다름(데포로쥬 베이1220<바로템1300, 이실로테 바로템1100<베이1180).
+- **다음 거래소 추가법**: `data/exchanges.ts`에 active=true, lc_vn에 `{exchange}.ts` 부품(매핑) 작성+instrumentation 훅. gametick은 자동 합산.
 
 ### ✅ BJ 순위 실데이터 연동 (2026-06-30, `233fb84`)
 - **BJ 순위 = 치지직 공개 라이브 검색 API 자동화**. `src/lib/chzzk.ts`가 게임별
@@ -114,7 +121,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 
 **실동작**: 시세표(검색·정렬·즐겨찾기) · 자동갱신 폴링(`/api/prices`, 60s, 탭 숨김 시 중단) · 서버상세 캔들차트(3분/1시간/일봉 + 이동평균선) · 24h 등락 · 매물수 표시 · 브라우저 가격알림(localStorage) · 즐겨찾기 대시보드 · SEO(페이지별 메타+sitemap+robots) · 임베드 위젯 · VND 환산(vi) · PWA manifest · umami(env로 켬) · 다크테마/한국색상 · **BJ 순위(치지직+SOOP+유튜브 라이브 통합·시청자순, 게임페이지 위젯)** · **인기 영상(치지직 영상 조회수순)** · **라이브 페이지(3플랫폼 인페이지 시청, `/live/[game]`)**.
 
-**스텁/대기**: 멀티거래소(추상화만, barotem 1곳) · 커뮤니티 위젯(빈 상태) · 텔레그램/디스코드 알림(워커 필요).
+**스텁/대기**: 멀티거래소(🟢바로템+아이템베이 활성/클래식, 매니아·땡스·타게임은 후속) · 커뮤니티 위젯(빈 상태) · 텔레그램/디스코드 알림(워커 필요).
 **선택 설정**: `GAMETICK_YT_API_KEY` — 라이브 유튜브 발견의 **폴백**(스크래핑이 빈 배열일 때만 Data API 사용). 평소엔 스크래핑(SOCS 쿠키로 안정, 무료)만 써서 쿼터 미사용. 현재 미설정이어도 정상 동작.
 
 ## 8. 파일 가이드 (게임시세)
@@ -122,13 +129,13 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | 파일 | 역할 |
 | --- | --- |
 | `src/data/games.ts` | 4게임 87서버 + 시세단위. slug는 lc_vn history 파일명과 일치 필수 |
-| `src/data/exchanges.ts` | 거래소(데이터 출처) 목록. barotem active, 나머지 false |
+| `src/data/exchanges.ts` | 거래소 목록. barotem·**itembay active**, 매니아 false. `ACTIVE_EXCHANGES`/`SOURCE_LABEL` |
 | `src/lib/live.ts` | 멀티플랫폼 라이브 발견(치지직/SOOP/유튜브)+임베드 URL. `fetchAllLives(LiveQuery)`=검색+관련성필터(include/exclude). 유튜브=스크래핑 1순위/Data API 폴백 |
 | `src/data/games.ts` | …+ `liveKeywords`/`liveMatch`/`liveExclude` 필드 + `liveQuery(game)` 리졸버(라이브 검색 설정) |
 | `src/components/LivePlayer.tsx` | (client) 라이브 플레이어+채팅+방송목록 전환 위젯 |
 | `src/app/[locale]/live/[game]/page.tsx` | 멀티플랫폼 인페이지 시청 페이지 (`/live` = 기본게임 redirect) |
-| `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory`/`seriesFor`/`change24h`/`latestCount`/`downsample` |
-| `src/lib/market.ts` | 시세표(`getMarketTable`), `summarize`/`movers`, `getServerChart`, `listingCount` |
+| `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory(slug,exchange?)`/`seriesFor`/`change24h`/`latestCount`/`latestPrice`/`downsample` |
+| `src/lib/market.ts` | 시세표(`getMarketTable`, 멀티거래소 최저가/quotes/spread), `summarize`/`movers`, `getServerChart`, `listingCount` |
 | `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 |
 | `src/lib/alerts.ts` | 브라우저 가격알림(localStorage, 백엔드 없음) |
 | `src/lib/exchange.ts` | KRW→VND/USD 환율(1시간 캐시, er-api) |
@@ -170,4 +177,6 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `7214783` 게임 페이지 BJ 위젯 멀티플랫폼화(`fetchAllLives` 상위5)+라이브 링크 (배포·라이브 검증)
 - `2aaefc8` 유튜브 라이브 안정화: 스크래핑 1순위 + Data API 폴백 (배포·라이브 검증)
 - `0a8f4a7` 라이브 키워드 튜닝: 플랫폼별 검색어 + 관련성 필터(포함/제외) (배포·라이브 검증)
+- `ed91823` #5 멀티거래소 Phase 1: 바로템+아이템베이 최저가/스프레드 (배포·라이브 검증)
+- (lc_vn 레포) `fb8763e` 멀티거래소 수집: 아이템베이 부품 모듈 (배포 완료)
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)

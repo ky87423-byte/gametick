@@ -168,8 +168,16 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **남은 한계**: 이름 포함관계(아이온2를 "아이온"으로만 표기 등)는 완전 분리 불가 — 감수.
 - 검증: 로컬·프로덕션에서 솔인챈트·리니지클래식 누수 제거, 아이온 분리 확인.
 
+### 22) #5 멀티거래소 Phase 1 — 바로템+아이템베이 (gametick `ed91823` / lc_vn `fb8763e`, 배포·라이브)
+- **정찰**: 아이템베이 시세 API keyless 확인 — `getRealTimeMarket?iGameServerSeq=`(최저가·시장가) + `market-info`(단위). 서버명이 우리와 동일 → 이름 매핑. (아이템매니아=`gamemoney_servers.xml.php?gamecode=` 게임당 1콜 XML, 땡스아이템=매물 파싱 필요 — Phase 2/3용으로 확인해둠)
+- **구조**: 거래소 "부품" 방식. 수집은 lc_vn 단일 수집기에 추가(A 방식 유지), 거래소별 파일 분리(`history-{game}-itembay.json`), gametick은 읽어서 최저가/스프레드 계산.
+- **lc_vn**: `history.ts` exchange 인자 일반화 + `itembay.ts`(collectItembay, 클래식 매핑 내장, 단위 정규화, 150ms 딜레이·게임당 주기 게이트) + instrumentation 훅(try-catch 격리).
+- **gametick**: `exchanges.ts` itembay active, `market.ts` 멀티거래소 계산(quotes/lowest/spreadPercent), `MarketTable` 최저가+거래소칩(최저=앰버).
+- **검증**: 서버 수집기가 `history-lineage-classic-itembay.json` 생성(23/29서버), 라이브 22/29 멀티거래소. 서버마다 최저 거래소 다름(데포로쥬 베이1220<바로템1300, 이실로테 바로템1100<베이1180). ✅ "진짜 최저가" 구현.
+
 ### 다음 세션 할 일
-- [ ] (선택) 유튜브 폴백 강화하려면 `GAMETICK_YT_API_KEY`(Google Cloud, 무료) 발급해 서버 `.env.local`에 추가. 현재 스크래핑만으로 안정 동작 중이라 필수 아님.
-- [ ] (선택) 게임별 `liveMatch` 추가 튜닝(누락/누수 발견 시).
+- [ ] **#5 Phase 2**: 아이템매니아 추가(`gamemoney_servers.xml.php`, gamecode 매핑+단위 정규화). 토대 있어 부품만 추가.
+- [ ] **#5 Phase 3**: 땡스아이템(매물 파싱) + 나머지 게임 itembay 매핑 + 서버상세 거래소 오버레이.
+- [ ] (선택) 유튜브 폴백 키(`GAMETICK_YT_API_KEY`), 게임별 `liveMatch` 튜닝.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
