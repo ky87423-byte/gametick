@@ -169,6 +169,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/app/api/prices/route.ts` | 시세 JSON (폴링·즐겨찾기용) |
 | `src/app/embed/[game]/[server]/page.tsx` | iframe 임베드 위젯 |
 | `src/app/{sitemap,robots,manifest}.ts` | SEO/PWA. **sitemap은 `dynamic="force-dynamic"` 필수**(§9) |
+| `src/app/opengraph-image.tsx` | 공유 썸네일(전 페이지 기본). `next/og` ImageResponse + `src/assets/BlackHanSans.woff`(한글). satori는 ttf/otf/woff만(woff2 X) |
 | `scripts/gen-sample.mjs` | 로컬 차트 확인용 **샘플** 데이터 생성기 (실데이터 아님) |
 
 ## 9. 밟은 함정 / 교훈 (재발 방지)
