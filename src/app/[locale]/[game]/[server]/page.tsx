@@ -13,6 +13,7 @@ import { CandleChart } from "@/components/CandleChart";
 import { ExchangeOverlay } from "@/components/ExchangeOverlay";
 import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
+import { DiscordAlert } from "@/components/DiscordAlert";
 import { PriceCalc } from "@/components/PriceCalc";
 import { serverIntro } from "@/data/content";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
@@ -115,8 +116,13 @@ export default async function ServerDetail({
               {game.nameKo} {game.currency}
             </span>
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <TelegramAlert
+              gameSlug={game.slug}
+              serverId={server.id}
+              current={data.current}
+            />
+            <DiscordAlert
               gameSlug={game.slug}
               serverId={server.id}
               current={data.current}
