@@ -4,11 +4,29 @@
 
 import { RankItem } from "@/data/rankings";
 
+const PLATFORM_BADGE: Record<
+  NonNullable<RankItem["platform"]>,
+  { label: string; color: string }
+> = {
+  youtube: { label: "Y", color: "bg-red-600" },
+  soop: { label: "S", color: "bg-blue-600" },
+  chzzk: { label: "C", color: "bg-emerald-600" },
+};
+
 function RankRow({ it }: { it: RankItem }) {
+  const badge = it.platform ? PLATFORM_BADGE[it.platform] : null;
   const name = (
     <span className="flex items-center gap-1.5 truncate">
-      {it.live && (
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+      {badge ? (
+        <span
+          className={`shrink-0 rounded px-1 py-0.5 text-[9px] font-bold text-white ${badge.color}`}
+        >
+          {badge.label}
+        </span>
+      ) : (
+        it.live && (
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+        )
       )}
       <span className="truncate text-zinc-200">{it.name}</span>
     </span>

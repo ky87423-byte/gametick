@@ -5,12 +5,8 @@ import { findGame } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
-import {
-  fetchLiveBjs,
-  chzzkChannelUrl,
-  fetchPopularVideos,
-  chzzkVideoUrl,
-} from "@/lib/chzzk";
+import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
+import { fetchAllLives, channelUrl } from "@/lib/live";
 import { faqItems, gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -62,11 +58,11 @@ export default async function GamePage({
 
   const dict = getDictionary(locale);
   const keyword = game.chzzkKeyword ?? game.nameKo;
-  const [table, trend, trades, liveBjs, popularVideos] = await Promise.all([
+  const [table, trend, trades, lives, popularVideos] = await Promise.all([
     getMarketTable(game),
     getGameTrend(game),
     readTrades(game.slug),
-    fetchLiveBjs(keyword, 5),
+    fetchAllLives(keyword, 5),
     fetchPopularVideos(keyword, 5),
   ]);
   const summary = summarize(table);
@@ -77,12 +73,13 @@ export default async function GamePage({
     note: `${formatViewers(v.readCount, locale)} ${dict.videoViews}`,
     url: chzzkVideoUrl(v.videoNo),
   }));
-  const bjRanks = liveBjs.map((b, i) => ({
+  const bjRanks = lives.slice(0, 5).map((s, i) => ({
     rank: i + 1,
-    name: b.channelName,
-    note: `${formatViewers(b.viewers, locale)} ${dict.viewersSuffix}`,
-    url: chzzkChannelUrl(b.channelId),
+    name: s.channelName,
+    note: `${formatViewers(s.viewers, locale)} ${dict.viewersSuffix}`,
+    url: channelUrl(s),
     live: true,
+    platform: s.platform,
   }));
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
 
@@ -201,9 +198,17 @@ export default async function GamePage({
           <TrendChart points={trend.points} />
         </section>
 
-        {/* 네임드 / BJ 순위 */}
+        {/* 인기 영상 / BJ 순위 */}
         <section className="mt-8">
-          <h2 className="mb-3 text-lg font-bold">{dict.rankingsTitle}</h2>
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-lg font-bold">{dict.rankingsTitle}</h2>
+            <Link
+              href={`/${locale}/live/${game.slug}`}
+              className="text-xs text-red-400 hover:text-red-300"
+            >
+              ● {dict.liveNav} →
+            </Link>
+          </div>
           <Rankings
             named={namedRanks}
             bj={bjRanks}

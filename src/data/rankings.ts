@@ -11,4 +11,5 @@ export interface RankItem {
   note?: string; // 보조 정보(조회수/시청자수 등)
   url?: string; // 외부 링크 (치지직 채널·영상 등)
   live?: boolean; // 방송 중 표시
+  platform?: "chzzk" | "soop" | "youtube"; // 플랫폼 배지 (라이브 BJ용)
 }
