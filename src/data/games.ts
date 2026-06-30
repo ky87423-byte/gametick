@@ -19,6 +19,8 @@ export interface GameInfo {
   unitAmount: number;
   /** 단위 라벨 (예: "만", "천만", "백만") */
   unitLabelKo: string;
+  /** 수집 주기(초) — lc_vn site.ts와 동일하게. 미지정 시 300. 카운트다운 표시용 */
+  refreshSeconds?: number;
   /** 치지직 라이브 검색 키워드 (BJ 순위용). 없으면 nameKo 사용 */
   chzzkKeyword?: string;
   /** 라이브 검색어를 플랫폼별로 다르게 줄 때(미지정 시 chzzkKeyword ?? nameKo) */
@@ -39,6 +41,7 @@ export const GAMES: GameInfo[] = [
     currency: "아데나",
     unitAmount: 10_000,
     unitLabelKo: "만",
+    refreshSeconds: 180,
     liveExclude: ["리니지M", "리니지2M", "리니지W", "리마스터"],
     servers: [
       { id: "24487", nameKo: "데포로쥬", nameEn: "Deporoju" },
@@ -79,6 +82,7 @@ export const GAMES: GameInfo[] = [
     currency: "키나",
     unitAmount: 10_000_000,
     unitLabelKo: "천만",
+    refreshSeconds: 180,
     // 아이온2 방송은 그냥 "아이온"으로도 많이 씀 → 넓게 잡음(아이온 클래식은 소수라 감수)
     liveMatch: ["아이온2", "아이온", "Aion2", "Aion"],
     servers: [

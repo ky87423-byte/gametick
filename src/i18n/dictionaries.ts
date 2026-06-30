@@ -15,6 +15,8 @@ export interface Dictionary {
   perUnit: (label: string, currency: string) => string;
   noData: string;
   updatedAt: string;
+  nextUpdate: string;
+  updatingSoon: string;
   live: string;
   source: string;
   searchPlaceholder: string;
@@ -96,6 +98,8 @@ const ko: Dictionary = {
   perUnit: (label, currency) => `${label} ${currency}당 (원)`,
   noData: "데이터 없음",
   updatedAt: "업데이트",
+  nextUpdate: "다음 갱신",
+  updatingSoon: "갱신 중",
   live: "실시간",
   source: "데이터 출처",
   searchPlaceholder: "서버 검색…",
@@ -174,6 +178,8 @@ const vi: Dictionary = {
   perUnit: (label, currency) => `mỗi ${label} ${currency} (KRW)`,
   noData: "Không có dữ liệu",
   updatedAt: "Cập nhật",
+  nextUpdate: "Cập nhật sau",
+  updatingSoon: "Đang cập nhật",
   live: "Trực tiếp",
   source: "Nguồn dữ liệu",
   searchPlaceholder: "Tìm máy chủ…",

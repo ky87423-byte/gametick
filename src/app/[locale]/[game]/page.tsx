@@ -132,6 +132,7 @@ export default async function GamePage({
             locale={locale}
             gameSlug={game.slug}
             initialUpdatedAt={table.updatedAt}
+            updateIntervalSeconds={game.refreshSeconds ?? 300}
             servers={table.servers.map((s) => ({
               serverId: s.serverId,
               nameKo: s.nameKo,
@@ -156,6 +157,8 @@ export default async function GamePage({
               sortPrice: dict.sortPrice,
               sortChange: dict.sortChange,
               updatedAt: dict.updatedAt,
+              nextUpdate: dict.nextUpdate,
+              updatingSoon: dict.updatingSoon,
               live: dict.live,
             }}
           />

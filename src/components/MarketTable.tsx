@@ -39,7 +39,39 @@ export interface TableLabels {
   sortPrice: string;
   sortChange: string;
   updatedAt: string;
+  nextUpdate: string;
+  updatingSoon: string;
   live: string;
+}
+
+// 다음 시세 갱신까지 남은 시간 카운트다운(1초 단위). 테이블 본체와 분리해 이것만 리렌더.
+function UpdateCountdown({
+  updatedAt,
+  intervalSeconds,
+  nextLabel,
+  soonLabel,
+}: {
+  updatedAt: number | null;
+  intervalSeconds: number;
+  nextLabel: string;
+  soonLabel: string;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  if (!updatedAt) return null;
+  const remainMs = updatedAt + intervalSeconds * 1000 - now;
+  if (remainMs <= 0) return <span className="text-zinc-600">· {soonLabel}…</span>;
+  const total = Math.ceil(remainMs / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return (
+    <span className="text-zinc-600">
+      · {nextLabel} {m}:{String(s).padStart(2, "0")}
+    </span>
+  );
 }
 
 type SortMode = "default" | "price" | "change";
@@ -51,6 +83,7 @@ export function MarketTable({
   initialUpdatedAt,
   labels,
   refreshSeconds = 60,
+  updateIntervalSeconds = 300,
 }: {
   locale: string;
   gameSlug: string;
@@ -58,6 +91,7 @@ export function MarketTable({
   initialUpdatedAt: number | null;
   labels: TableLabels;
   refreshSeconds?: number;
+  updateIntervalSeconds?: number;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -200,6 +234,12 @@ export function MarketTable({
               }`}
             />
             {labels.live} {formatTime(updatedAt, locale)}
+            <UpdateCountdown
+              updatedAt={updatedAt}
+              intervalSeconds={updateIntervalSeconds}
+              nextLabel={labels.nextUpdate}
+              soonLabel={labels.updatingSoon}
+            />
           </span>
         </div>
         <div className="flex gap-1">
