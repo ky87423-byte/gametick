@@ -12,6 +12,7 @@ import { Footer } from "@/components/Footer";
 import { CandleChart } from "@/components/CandleChart";
 import { ExchangeOverlay } from "@/components/ExchangeOverlay";
 import { AlertButton } from "@/components/AlertButton";
+import { TelegramAlert } from "@/components/TelegramAlert";
 import { PriceCalc } from "@/components/PriceCalc";
 import { serverIntro } from "@/data/content";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
@@ -114,12 +115,19 @@ export default async function ServerDetail({
               {game.nameKo} {game.currency}
             </span>
           </h1>
-          <AlertButton
-            gameSlug={game.slug}
-            serverId={server.id}
-            name={`${server.nameKo} ${game.currency}`}
-            current={data.current}
-          />
+          <div className="flex items-center gap-2">
+            <TelegramAlert
+              gameSlug={game.slug}
+              serverId={server.id}
+              current={data.current}
+            />
+            <AlertButton
+              gameSlug={game.slug}
+              serverId={server.id}
+              name={`${server.nameKo} ${game.currency}`}
+              current={data.current}
+            />
+          </div>
         </div>
         <p className="mb-5 text-sm text-zinc-500">
           {unitText}
