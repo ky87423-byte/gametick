@@ -73,8 +73,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 ### gamebit 보강 (완료)
 - 실시간 거래완료 피드(바로템 display=3 실데이터), 평균 추이 차트, 게임 소개·FAQ, 시세 계산기, 네임드/BJ 순위 위젯(데이터 비어 "준비중").
 
-### 1~7 추천작업: ✅#1 SEO텍스트 · ✅#2 리포트 · ✅#3 가이드 · ✅#6 약관/정책 / 남음:
-- **#4 게임 확대**(로아·던파·리니지M…): lc_vn `site.ts` GAMES에 바로템 스레드ID·서버 opt1 추가 필요(바로템 메인 HTML/lists 페이지 조사).
+### 1~7 추천작업: ✅#1 SEO · ✅#2 리포트 · ✅#3 가이드 · ✅#4 게임확대 · ✅#6 약관/정책 / 남음:
 - **#5 멀티 거래소**(아이템매니아/베이): 리버스 엔지니어링, 큰 작업. `data/exchanges.ts` 추상화 있음.
 - **#7 텔레그램/디스코드 알림**: 별도 워커(봇 토큰) 필요.
 - **네임드/BJ 데이터 소스**: BJ=치지직/SOOP API 자동화 후보, 네임드=수동/랭킹사이트.
@@ -122,7 +121,8 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 4. **PowerShell 커밋 메시지에 큰따옴표 넣지 말 것** — 파싱 깨짐. here-string `@'...'@` 사용.
 5. **Set-Content는 UTF-8 BOM 붙여 JSON.parse 깨뜨림** → `[System.IO.File]::WriteAllText` 사용.
 6. **next start는 한 번에 하나만** — 옛 인스턴스가 포트 점유 중이면 새 빌드가 안 뜨고 옛 빌드에 검사가 맞음. 재시작 전 포트 점유 프로세스 kill.
-7. 로컬 테스트: `cd C:\Users\User\gametick; npx next start -p 3212` (3000은 lc_info, 3001 lc_vn 등 점유 가능). 검증용 데이터는 lc_vn/data 또는 샘플.
+8. **게임 추가법(검증됨)**: 바로템 메인 HTML의 게임메뉴 JSON에서 `{"title":"게임명","thread":"2382rXXX"}` = 그 게임의 머니 스레드(메뉴 순서=인기순). **서버 필터는 게임마다 opt1/opt2로 다름** — lists 페이지의 `<li data-title="optN" data-optN="ID"><p>서버명</p>`로 확인. lc_vn `GameInfo.serverParam`로 지정. (조사/생성 스크립트: `C:\Users\User\gen-games.py`, `gen-config.py`)
+9. 로컬 테스트: `cd C:\Users\User\gametick; npx next start -p 3212` (3000은 lc_info, 3001 lc_vn 등 점유 가능). 검증용 데이터는 lc_vn/data 또는 샘플.
 
 ## 10. 커밋 히스토리 (2026-06-30, master)
 
