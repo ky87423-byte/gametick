@@ -1,7 +1,7 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-06-30 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
-> **세션 시작 시 이 파일부터 읽으세요.**
+> 마지막 갱신: 2026-07-01 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
 
 ## 0. 한 줄 요약
 
@@ -68,19 +68,23 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - nginx 설정은 내가 직접 작성(certbot --nginx 아님): `/etc/nginx/conf.d/gamesise.conf` = 3개 server 블록(:80 챌린지+리다이렉트 / :443 .co.kr 프록시 / :443 .com 301). 인증서 갱신은 webroot(`/var/www/html`).
 - 로컬 사본: `C:\Users\User\gamesise.conf` (scp 원본).
 
-## 6. 다음 작업 (우선순위)
+## 6. 현재 상태 & 다음 작업
 
-> 인프라·데이터 파이프라인 완성(라이브 + 실데이터). 콘텐츠 보강 진행 중.
+> **차별 기능 대부분 라이브 완료**(멀티거래소·라이브·알림·OG). 추천작업 #1~#7 전부 처리.
+> **다음 세션 할 일(우선순위)은 `docs/worklog.md` 맨 끝**에 정리됨 — 거기부터 보면 됨.
 
-### gamebit 보강 (완료)
-- 실시간 거래완료 피드(바로템 display=3 실데이터), 평균 추이 차트, 게임 소개·FAQ, 시세 계산기, 네임드/BJ 순위 위젯(데이터 비어 "준비중").
+### 라이브 완료된 핵심 (요약)
+- ✅ **멀티거래소**: 바로템+아이템베이+아이템매니아 통합 최저가/스프레드. **리니지클래식·아이온2 = 3거래소**, 나머지=바로템(거래소 시세피드 한계). 서버상세 거래소 비교 오버레이.
+- ✅ **라이브 탭** `/live/[game]`(치지직+SOOP+유튜브 시청) + 인기영상/BJ 위젯.
+- ✅ **가격 알림** #7: 텔레그램(@gamesise_alert_bot)+디스코드(웹훅), 둘 다 E2E 확인.
+- ✅ OG 썸네일, 다음갱신 카운트다운, 게임별 수집주기 차등.
+- 추천작업: ✅#1 SEO ✅#2 리포트 ✅#3 가이드 ✅#4 게임확대 ✅#5 멀티거래소 ✅#6 약관 ✅#7 알림.
 
-### 1~7 추천작업: ✅#1 SEO · ✅#2 리포트 · ✅#3 가이드 · ✅#4 게임확대 · ✅#6 약관/정책 / 남음:
-- **#5 멀티 거래소**: 🟢**바로템+아이템베이 라이브**(리니지클래식 22/29, 아이온2 25/44). ⛔**아이템매니아·땡스는 VPS(말레이시아)에서 한국 외 차단** → 현재 인프라론 수집 불가(아래 §6 박스). 남은: 추가 게임 itembay 매핑(아래 주의) + 서버상세 거래소 오버레이 + (KR 수집기 확보 시) 매니아/땡스.
-  - **아이템베이 게임 추가법**: 홈 JSON-LD/검색으로 `iGameSeq` 찾고 `game-{id}/type-3` 페이지의 `data-server-seq`↔서버명 추출 → 우리 nameKo와 **이름 정규화 매칭**(괄호/공백 제거), `itembay.ts ITEMBAY`에 추가. 단위는 `market-info` biBasePrice로 factor 정규화.
-  - **추가 안 되는 게임**: 리니지M(2583)·리니지2M(3429)=아이템베이 "통합거래소" 단일(서버별 없음), 메이플월드(4047)·나이트크로우(3954)=아이템베이 시세 데이터 없음. → 바로템만.
-  - ⚠️ **레이트리밋**: 아이템베이 API를 무딜레이로 연타하면 일시 차단(code -1). 정찰 스크립트는 딜레이 넣을 것. 수집기는 150ms 딜레이+300초 게이트라 안전.
-- **#7 텔레그램/디스코드 알림**: 별도 워커(봇 토큰) 필요.
+### 멀티거래소 — 게임 추가법 (참고)
+- **아이템베이**(말레이시아에서 직접 가능): 홈 JSON-LD/검색으로 `iGameSeq` 찾고 `game-{id}/type-3` 페이지의 `data-server-seq`↔서버명 추출 → 우리 nameKo와 **이름 정규화 매칭**(괄호/공백 제거) → `lib/itembay.ts ITEMBAY`에 추가. 단위는 `market-info` biBasePrice로 factor 정규화.
+- **아이템매니아**(한국 차단 → KR 프록시 경유): `lib/itemmania.ts ITEMMANIA`에 게임별 gamecode만 추가(서버명 자동 매칭). gamecode = 매니아 `sell/list.html?search_game=N`의 N(=시세 gamecode). `result="na"`면 매니아가 시세 미제공.
+- **현 한계**: 리니지M(2583)·2M(3429)=아이템베이 "통합거래소" 단일(서버별 없음), 메이플월드(4047)·나크(3954)·솔인챈트=거래소 시세 미운영. → 바로템만.
+- ⚠️ **레이트리밋**: 아이템베이 API 무딜레이 연타 시 일시 차단(code -1). 정찰 스크립트는 딜레이 필수. 수집기는 150ms+게임주기 게이트라 안전.
 
 ### ✅ #5 멀티거래소 Phase 1 — 바로템+아이템베이 (2026-06-30, gametick `ed91823` / lc_vn `fb8763e`)
 - **아이템베이 시세 API(keyless)**: `GET itembay.com/item/api/sell/getRealTimeMarket?iGameServerSeq={seq}` → `{iMarkePrice, iLowestPrice}`. 단위: `/api/game/server/market-info?iGameSeq=&iGameServerSeq=` → `{biBasePrice, vcUnit}`. 서버명이 우리와 동일 → **이름으로 매핑**.
@@ -98,12 +102,10 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 ### ⛔ 땡스아이템 — 데이터센터 IP까지 차단
 - 땡스(`itemthankyou.com`)는 한국 프록시(Vultr 데이터센터 IP)로도 **403(WAF)**. 한국 IP여도 데이터센터면 막힘 + 데이터 품질도 낮음(총액·수량범위) → **보류**. (살리려면 residential proxy 필요)
 
-### ⛔ (구) VPS 한국 외 차단 메모
-- **정찰은 성공**: 아이템매니아 시세 XML `_xml/gamemoney_servers.xml.php?gamecode=`(게임당 1콜 전서버, 단가=price/multiple, 클래식 gamecode=5913, 서버명 매핑). 땡스(`itemthankyou.com`)는 EUC-KR 매물목록+총액(수량 범위)이라 단가 산출 불안정.
-- **그러나 둘 다 말레이시아 VPS에서 차단**: 매니아=연결 타임아웃(http 000, ~134s), 땡스=403. 로컬(한국)은 됨. → **현재 서버에선 수집 불가**.
-- 대응: lc_vn `itemmania.ts`는 보존(향후 KR 수집기/프록시 확보 시 instrumentation에 훅 다시 추가). 땡스 모듈은 미작성. `exchanges.ts`에서 둘 다 active=false.
-- **교훈(수집기)**: 외부 fetch엔 반드시 `AbortSignal.timeout` — 무타임아웃이면 차단 사이트가 instrumentation tick을 134초 행시킴(바로템/베이 수집까지 지연). itembay/itemmania에 8s 타임아웃 적용.
-- VPS 가용성 요약: 바로템✅ 아이템베이✅ chzzk✅ SOOP✅ 유튜브✅ / 아이템매니아❌ 땡스❌.
+### 교훈 / VPS 가용성 (수집 관련)
+- **VPS 가용성(말레이시아 직접)**: 바로템✅ 아이템베이✅ chzzk✅ SOOP✅ 유튜브✅ / **아이템매니아❌(→KR 프록시로 해결)** / 땡스❌(데이터센터 IP까지 403, 보류).
+- **교훈**: 외부 fetch엔 반드시 `AbortSignal.timeout`(undici fetch는 signal 지원). 무타임아웃이면 차단 사이트가 instrumentation tick을 134초 행시켜 바로템/베이 수집까지 지연됨(실제 겪음).
+- 매니아 시세 형식: `_xml/gamemoney_servers.xml.php?gamecode=`(게임당 1콜 전서버, 단가=price/multiple). 땡스는 EUC-KR 매물목록+총액(수량범위)이라 단가 산출 불안정 + 차단이라 미작성.
 
 ### ✅ BJ 순위 실데이터 연동 (2026-06-30, `233fb84`)
 - **BJ 순위 = 치지직 공개 라이브 검색 API 자동화**. `src/lib/chzzk.ts`가 게임별
