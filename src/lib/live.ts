@@ -122,17 +122,21 @@ function extractBalancedObject(
   return null;
 }
 
-// 유튜브 라이브 발견.
-//  - GAMETICK_YT_API_KEY 가 있으면 공식 Data API(결정적·ToS 준수) 사용 — 권장.
-//  - 없으면 검색결과 페이지 스크래핑(키 0). 단 유튜브가 videoRenderer/lockupViewModel
-//    포맷을 A/B로 비결정적으로 내려줘 best-effort(실패 시 빈 배열).
+// 유튜브 라이브 발견 — 스크래핑 1순위 + Data API 폴백.
+//  - 1순위: 검색결과 페이지 스크래핑(키 0·무제한). SOCS consent 쿠키로 classic 포맷을
+//    유도해 안정적. 평소엔 이것만 쓰므로 API 쿼터를 전혀 쓰지 않는다.
+//  - 폴백: 스크래핑이 빈 배열이고(쿠키 만료·포맷 변경 등) `GAMETICK_YT_API_KEY`가
+//    있으면 공식 Data API로 재시도(결정적·ToS 준수). 폴백이라 쿼터 소모가 최소.
+//  - 둘 다 실패 시 빈 배열 → 위젯/라이브 페이지 graceful.
 export async function fetchYoutubeLives(
   keyword: string,
   limit = 10
 ): Promise<LiveStream[]> {
+  const scraped = await fetchYoutubeViaScrape(keyword, limit);
+  if (scraped.length > 0) return scraped;
   const key = process.env.GAMETICK_YT_API_KEY;
   if (key) return fetchYoutubeViaApi(keyword, key, limit);
-  return fetchYoutubeViaScrape(keyword, limit);
+  return scraped;
 }
 
 interface YtApiSearchItem {
@@ -148,6 +152,10 @@ interface YtApiVideoItem {
   liveStreamingDetails?: { concurrentViewers?: string };
 }
 
+// Data API는 폴백 전용이라 캐시를 길게(15분) 잡아 쿼터(무료 1만 유닛/일,
+// search.list=100유닛/콜)를 보수적으로 사용한다.
+const API_REVALIDATE = 900;
+
 async function fetchYoutubeViaApi(
   keyword: string,
   key: string,
@@ -158,7 +166,7 @@ async function fetchYoutubeViaApi(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&eventType=live&type=video` +
       `&order=viewCount&regionCode=KR&relevanceLanguage=ko&maxResults=${limit}` +
       `&q=${encodeURIComponent(keyword)}&key=${key}`;
-    const sRes = await fetch(sUrl, { next: { revalidate: REVALIDATE } });
+    const sRes = await fetch(sUrl, { next: { revalidate: API_REVALIDATE } });
     if (!sRes.ok) return [];
     const sJson = (await sRes.json()) as { items?: YtApiSearchItem[] };
     const ids = (sJson.items ?? [])
@@ -169,7 +177,7 @@ async function fetchYoutubeViaApi(
     const vUrl =
       `https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails` +
       `&id=${ids.join(",")}&key=${key}`;
-    const vRes = await fetch(vUrl, { next: { revalidate: REVALIDATE } });
+    const vRes = await fetch(vUrl, { next: { revalidate: API_REVALIDATE } });
     if (!vRes.ok) return [];
     const vJson = (await vRes.json()) as { items?: YtApiVideoItem[] };
     return (vJson.items ?? [])
