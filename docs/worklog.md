@@ -118,3 +118,20 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 3. **lc_vn 서버 재배포** — 매물수 라이브 반영(바로템 복구 후).
 4. (선택) gametick→gamesise 리네이밍, 멀티거래소 실연동.
 → 상세는 `../MEMORY.md` §4~6.
+
+---
+
+## 2026-06-30 — BJ 순위 실데이터 연동 (세션)
+
+### 16) BJ 순위 = 치지직 라이브 검색 자동화 (`233fb84`, 배포·라이브 완료)
+- 그동안 "준비 중" 스텁이던 BJ 순위 위젯에 **치지직(Chzzk) 공개 라이브 검색 API** 실데이터 연동.
+- `src/lib/chzzk.ts`: `search/lives?keyword=` 호출 → `concurrentUserCount` 내림차순, 채널 dedupe, 상위 5. `fetch revalidate:300`(5분 캐시), 실패 시 `[]` → 위젯 "준비 중" graceful. **별도 수집기/워커·DB 불필요**(요청 시 직접 fetch, 페이지가 force-dynamic이라 자연스럽게 동작).
+- `games.ts`: `GameInfo.chzzkKeyword`(없으면 nameKo). 보정: 메이플→메이플랜드, 조선협객전·RF온라인·아키에이지.
+- 위젯(`Rankings.tsx`): BJ는 채널 링크(`chzzk.naver.com/live/{id}`)+방송중 빨간점+시청자수 note+"실시간·치지직" 서브타이틀. `RankItem`에 `url`/`live` 추가. `format.ts` `formatViewers`(1.2천/1.2만), i18n `bjLive`/`viewersSuffix`.
+- **네임드 순위는 그대로 수동 큐레이션**(`rankings.ts` RANKINGS, 비면 "준비 중"). 깔끔한 자동 소스 없음.
+- **검증**: 로컬(메이플 24/9/8…), **VPS(말레이시아)에서 api.chzzk.naver.com 200+데이터**(지역차단 없음), 배포 후 https://gamesise.co.kr/ko/maplestory-world BJ 5채널 렌더(27/10/6/6/2 시청) 확인.
+
+### 다음 세션 할 일
+- [ ] (선택) **네임드 순위 채우기** — 게임 랭킹사이트 스크래핑 or 수동 입력.
+- [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
+- [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
