@@ -197,8 +197,11 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 폴러 생존 확인: 외부 getUpdates→409 Conflict(정상). 봇 명령어/설명 setMyCommands로 설정.
 - 검증: 빌드·배포·버튼 렌더·폴러 409 확인. **✅ E2E 성공**(사용자 봇 [시작]→알림 수신 확인, 2026-06-30).
 
+### 27) #7 디스코드 알림 추가 (lc_vn `60c51c3` / gametick `2516084`, 라이브)
+- 웹훅 방식(폴러 불필요). `AlertSub.webhook` + `sendDiscord`/`notify`/`addDiscordSub` + lc_vn `POST /api/alert`. gametick `DiscordAlert.tsx`(웹훅URL+기준가) → `/api/discord-alert` 프록시가 lc_vn(127.0.0.1:3001)로 서버측 전달(CORS 없음). alerts.json 단일 writer=lc_vn.
+- 검증: 버튼 렌더 + 프록시→lc_vn→검증에러 반환(체인 정상, 프로덕션). 실제 웹훅 수신은 사용자 테스트.
+
 ### 다음 세션 할 일
-- [ ] (선택) **#7 디스코드**: 채널 웹훅 URL 입력받아 POST(폴러 불필요, 더 간단).
 - [ ] (선택) KR 수집기 확보 시 아이템매니아 부활(코드 준비됨), 유튜브 폴백 키, liveMatch 튜닝.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
