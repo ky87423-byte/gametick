@@ -131,8 +131,15 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 
 **실동작**: 시세표(검색·정렬·즐겨찾기) · 자동갱신 폴링(`/api/prices`, 60s, 탭 숨김 시 중단) · 서버상세 캔들차트(3분/1시간/일봉 + 이동평균선) · 24h 등락 · 매물수 표시 · 브라우저 가격알림(localStorage) · 즐겨찾기 대시보드 · SEO(페이지별 메타+sitemap+robots) · 임베드 위젯 · VND 환산(vi) · PWA manifest · umami(env로 켬) · 다크테마/한국색상 · **BJ 순위(치지직+SOOP+유튜브 라이브 통합·시청자순, 게임페이지 위젯)** · **인기 영상(치지직 영상 조회수순)** · **라이브 페이지(3플랫폼 인페이지 시청, `/live/[game]`)**.
 
-**스텁/대기**: 멀티거래소(🟢바로템+아이템베이 활성/클래식, 매니아·땡스·타게임은 후속) · 커뮤니티 위젯(빈 상태) · 텔레그램/디스코드 알림(워커 필요).
+**스텁/대기**: 멀티거래소(🟢바로템+아이템베이 활성/클래식·아이온2, 매니아·땡스·타게임은 후속) · 커뮤니티 위젯(빈 상태) · **🟢텔레그램 가격알림(라이브)** / 디스코드(후속).
 **선택 설정**: `GAMETICK_YT_API_KEY` — 라이브 유튜브 발견의 **폴백**(스크래핑이 빈 배열일 때만 Data API 사용). 평소엔 스크래핑(SOCS 쿠키로 안정, 무료)만 써서 쿼터 미사용. 현재 미설정이어도 정상 동작.
+
+### 🟢 #7 텔레그램 가격 알림 (2026-06-30, lc_vn `3c4eea5` / gametick `e232f48`, 라이브)
+- **무료**(텔레그램 Bot API). 봇 **@gamesise_alert_bot**, 토큰은 **lc_vn 서버 `.env.local` `TELEGRAM_BOT_TOKEN`**(코드/깃 X). VPS→telegram 접근 OK.
+- **백엔드(lc_vn `src/lib/telegram.ts`)**: `data/alerts.json` 구독저장 + `getUpdates` 폴러(`/start` 딥링크 등록, `/list`·`/clear`) + `checkAlerts`(매 tick, 활성 거래소 최저가 비교→조건 도달 시 발송→히스테리시스 재무장). instrumentation에서 폴러 시작+tick 훅. **토큰 없으면 전부 no-op**.
+- **UI(gametick `TelegramAlert.tsx`)**: 서버 상세에 "📲 텔레그램 알림" — 기준가/이하·이상 입력 → 딥링크 `t.me/gamesise_alert_bot?start={slug}_{serverId}_{price}_{b|a}`. 사용자가 [시작]만 누르면 등록.
+- **폴러 생존 확인법**: 외부에서 `getUpdates` 호출 시 **409 Conflict**면 서버 폴러 작동중(텔레그램은 getUpdates 단일 소비자만 허용). 절대 외부에서 getUpdates/webhook 걸지 말 것(폴러 깨짐).
+- **남음**: E2E는 실제 텔레그램 계정으로 봇 [시작]→알림 수신 확인 필요(사용자). 디스코드(웹훅 POST)는 후속.
 
 ## 8. 파일 가이드 (게임시세)
 
@@ -153,6 +160,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/i18n/{config,dictionaries}.ts` | ko/vi 로케일 + 카피 |
 | `src/components/Header,Footer,MarketTable,Sparkline,CandleChart,AlertButton,FavoritesView` | UI. MarketTable이 클라이언트(폴링·정렬·검색·즐겨찾기) |
 | `src/components/ExchangeOverlay.tsx` | 서버상세 거래소별 시세 비교 오버레이(멀티라인 SVG+범례). `market.getServerExchangeSeries` |
+| `src/components/TelegramAlert.tsx` | 서버상세 텔레그램 알림 딥링크 버튼. 백엔드는 lc_vn `lib/telegram.ts` |
 | `src/app/[locale]/[game]/page.tsx` | 시세표 페이지 |
 | `src/app/[locale]/[game]/[server]/page.tsx` | 서버 상세 + 캔들차트 |
 | `src/app/[locale]/favorites/page.tsx` | 즐겨찾기 대시보드 |
@@ -191,5 +199,6 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `ed91823` #5 멀티거래소 Phase 1: 바로템+아이템베이 최저가/스프레드 (배포·라이브 검증)
 - `27a5688` 멀티거래소: 아이템매니아·땡스 비활성(VPS 한국 외 차단)
 - `b18bfe3` 서버 상세 거래소별 시세 비교 오버레이 (배포·라이브 검증)
+- `e232f48` #7 텔레그램 알림 UI(딥링크) / (lc_vn) `3c4eea5` 텔레그램 알림 백엔드 (배포·라이브)
 - (lc_vn 레포) `fb8763e` 아이템베이 부품 / `317d16f` 아이템매니아 부품(보존·미사용) / `b77bed3` 수집기 타임아웃+매니아 훅 제거 / `73180da` 아이템베이 아이온2(44서버) 추가
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)

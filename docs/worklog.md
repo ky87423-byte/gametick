@@ -191,9 +191,15 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - `market.getServerExchangeSeries`(활성 거래소별 7d 시계열, 데이터 있는 곳만), `ExchangeOverlay.tsx`(멀티라인 SVG+범례, 1포인트는 점). 거래소 2곳+ 일 때만 표시.
 - 라이브 검증: 데포로쥬 상세에 바로템(빨강)+아이템베이(파랑) 선 2개+범례. (기존 데이터 재활용, 신규 수집 없음)
 
+### 26) #7 텔레그램 가격 알림 (lc_vn `3c4eea5` / gametick `e232f48`, 라이브)
+- 무료 텔레그램 Bot API. 봇 @gamesise_alert_bot(토큰=lc_vn 서버 .env.local). VPS→telegram OK.
+- lc_vn `telegram.ts`: alerts.json 구독 + getUpdates 폴러(/start 딥링크, /list/clear) + checkAlerts(tick, 최저가 비교·발송·재무장). gametick `TelegramAlert.tsx`: 서버상세 딥링크 버튼.
+- 폴러 생존 확인: 외부 getUpdates→409 Conflict(정상). 봇 명령어/설명 setMyCommands로 설정.
+- 검증: 빌드·배포·버튼 렌더·폴러 409 확인. **E2E(실제 봇 [시작]→알림 수신)는 사용자 테스트 필요**.
+
 ### 다음 세션 할 일
-- [ ] **#5 확장**: 다른 게임 아이템베이 매핑(가능 게임 한정 — 통합거래소/무데이터 게임은 제외).
-- [ ] (선택) KR 수집기/프록시 확보 시 아이템매니아 부활(코드 준비됨).
-- [ ] (선택) 유튜브 폴백 키(`GAMETICK_YT_API_KEY`), 게임별 `liveMatch` 튜닝.
+- [ ] **텔레그램 E2E 테스트**(사용자): 서버페이지 "텔레그램 알림"→기준가→[시작], 시세 도달 시 수신 확인.
+- [ ] (선택) **#7 디스코드**: 채널 웹훅 URL 입력받아 POST(폴러 불필요, 더 간단).
+- [ ] (선택) KR 수집기 확보 시 아이템매니아 부활(코드 준비됨), 유튜브 폴백 키, liveMatch 튜닝.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
