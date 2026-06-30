@@ -155,8 +155,14 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 치지직 단독이라 "비어 보이던" 게임 페이지 BJ 위젯을 `fetchAllLives` 상위5(치지직+SOOP+유튜브 통합·시청자순)로 교체. `RankItem.platform` + Y/S/C 배지, 랭킹 섹션에 "● 라이브 →" 전체보기 링크, `bjLive` 서브타이틀 3사 표기.
 - 검증: 로컬·프로덕션(리니지=유튜브 강세, 배지·외부링크·라이브링크 정상). 참고: 게임 페이지에도 유튜브 스크래핑이 매 로드(캐시 180s)에 걸림.
 
+### 20) 유튜브 라이브 안정화 (`2aaefc8`, 배포·라이브)
+- **측정**: SOCS consent 쿠키 적용 후 스크래퍼 6/6 안정(매번 videoRenderer 20, lockup 0). 데스크톱 UA에선 신형 lockupViewModel 미재현(쿠키 없이도 videoRenderer). 즉 이전 서버 0건은 lazy 정규식 절단·ytInitialData 오선택 버그였고 SOCS+균형파서로 해결됨.
+- **구조 변경**: `fetchYoutubeLives` = 스크래핑 1순위 → 빈 배열일 때만 `GAMETICK_YT_API_KEY` 있으면 Data API 폴백. 평소 쿼터 0, 폴백 캐시 15분.
+  - 이유: Data API 무료 1만 유닛/일·search=100유닛이라 14게임 3분캐시면 쿼터 폭발 → 폴백 전용이 정답.
+- 검증: 로컬·프로덕션 유튜브 11건 등 정상(배포 직후 콜드 첫 요청만 빈 상태, 워밍업 후 정상).
+
 ### 다음 세션 할 일
-- [ ] (선택) **유튜브 안정화** — `GAMETICK_YT_API_KEY`(Google Cloud, 무료) 발급해 서버 `.env.local`에 추가하면 라이브 유튜브가 Data API로 결정적. 없으면 스크래핑 best-effort.
+- [ ] (선택) 유튜브 폴백 강화하려면 `GAMETICK_YT_API_KEY`(Google Cloud, 무료) 발급해 서버 `.env.local`에 추가. 현재 스크래핑만으로 안정 동작 중이라 필수 아님.
 - [ ] (선택) 라이브 검색 **키워드 플랫폼별 튜닝**(`liveKeyword`).
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
