@@ -37,6 +37,17 @@ export function timeAgo(ms: number | null, locale: string): string {
   return ko ? `${d}일 전` : `${d} ngày trước`;
 }
 
+/** 시청자수 약식 (ko: 1234→1.2천, 12345→1.2만 / vi: 1.2K, 12.3K) */
+export function formatViewers(n: number, locale: string): string {
+  if (locale === "vi") {
+    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+    return String(n);
+  }
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}만`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}천`;
+  return String(n);
+}
+
 export function formatTime(ms: number | null, locale: string): string {
   if (ms === null) return "—";
   return new Date(ms).toLocaleString(locale === "ko" ? "ko-KR" : "vi-VN", {

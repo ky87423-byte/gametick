@@ -19,6 +19,8 @@ export interface GameInfo {
   unitAmount: number;
   /** 단위 라벨 (예: "만", "천만", "백만") */
   unitLabelKo: string;
+  /** 치지직 라이브 검색 키워드 (BJ 순위용). 없으면 nameKo 사용 */
+  chzzkKeyword?: string;
   servers: ServerInfo[];
 }
 
@@ -123,6 +125,7 @@ export const GAMES: GameInfo[] = [
     currency: "메소",
     unitAmount: 1_000_000,
     unitLabelKo: "백만",
+    chzzkKeyword: "메이플랜드",
     servers: [
       { id: "26192", nameKo: "메이플 플래닛", nameEn: "Maple Planet" },
       { id: "26208", nameKo: "메이플랜드", nameEn: "MapleLand" },
@@ -212,6 +215,7 @@ export const GAMES: GameInfo[] = [
     currency: "다이아",
     unitAmount: 1000,
     unitLabelKo: "천",
+    chzzkKeyword: "조선협객전",
     servers: [
       { id: "25153", nameKo: "한양", nameEn: "한양" },
       { id: "25154", nameKo: "강릉", nameEn: "강릉" },
@@ -323,6 +327,7 @@ export const GAMES: GameInfo[] = [
     currency: "다이아",
     unitAmount: 10000,
     unitLabelKo: "만",
+    chzzkKeyword: "RF온라인",
     servers: [
       { id: "14161", nameKo: "도일", nameEn: "도일" },
       { id: "14162", nameKo: "노바스", nameEn: "노바스" },
@@ -397,6 +402,7 @@ export const GAMES: GameInfo[] = [
     currency: "다이아",
     unitAmount: 1000,
     unitLabelKo: "천",
+    chzzkKeyword: "아키에이지",
     servers: [
       { id: "21840", nameKo: "베레타", nameEn: "베레타" },
       { id: "22162", nameKo: "뮤이나", nameEn: "뮤이나" },

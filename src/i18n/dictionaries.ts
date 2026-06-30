@@ -34,6 +34,8 @@ export interface Dictionary {
   rankingsTitle: string;
   namedTitle: string;
   bjTitle: string;
+  bjLive: string;
+  viewersSuffix: string;
   rankEmpty: string;
   reportNav: string;
   reportTitle: string;
@@ -103,6 +105,8 @@ const ko: Dictionary = {
   rankingsTitle: "랭킹",
   namedTitle: "네임드 순위",
   bjTitle: "BJ 순위",
+  bjLive: "실시간 · 치지직",
+  viewersSuffix: "시청",
   rankEmpty: "준비 중입니다",
   reportNav: "리포트",
   reportTitle: "시세 리포트",
@@ -169,6 +173,8 @@ const vi: Dictionary = {
   rankingsTitle: "Xếp hạng",
   namedTitle: "Xếp hạng nhân vật",
   bjTitle: "Xếp hạng BJ",
+  bjLive: "Trực tiếp · Chzzk",
+  viewersSuffix: "xem",
   rankEmpty: "Đang chuẩn bị",
   reportNav: "Báo cáo",
   reportTitle: "Báo cáo giá",

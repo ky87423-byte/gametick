@@ -6,6 +6,7 @@ import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
 import { getRankings } from "@/data/rankings";
+import { fetchLiveBjs, chzzkChannelUrl } from "@/lib/chzzk";
 import { faqItems, gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -16,7 +17,13 @@ import { TrendChart } from "@/components/TrendChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { Faq } from "@/components/Faq";
-import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
+import {
+  changeColor,
+  changeText,
+  formatKrw,
+  formatTime,
+  formatViewers,
+} from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -50,14 +57,25 @@ export default async function GamePage({
   if (!game) notFound();
 
   const dict = getDictionary(locale);
-  const [table, trend, trades] = await Promise.all([
+  const [table, trend, trades, liveBjs] = await Promise.all([
     getMarketTable(game),
     getGameTrend(game),
     readTrades(game.slug),
+    fetchLiveBjs(game.chzzkKeyword ?? game.nameKo, 5),
   ]);
   const summary = summarize(table);
   const { gainers, losers } = movers(table, 3);
-  const rankings = getRankings(game.slug);
+  const manualRankings = getRankings(game.slug);
+  const rankings = {
+    named: manualRankings.named,
+    bj: liveBjs.map((b, i) => ({
+      rank: i + 1,
+      name: b.channelName,
+      note: `${formatViewers(b.viewers, locale)} ${dict.viewersSuffix}`,
+      url: chzzkChannelUrl(b.channelId),
+      live: true,
+    })),
+  };
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
 
   const stat = (label: string, value: string, sub?: string) => (
@@ -182,6 +200,7 @@ export default async function GamePage({
             rankings={rankings}
             namedTitle={dict.namedTitle}
             bjTitle={dict.bjTitle}
+            bjSubtitle={rankings.bj.length > 0 ? dict.bjLive : undefined}
             empty={dict.rankEmpty}
           />
         </section>
