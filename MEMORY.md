@@ -85,6 +85,18 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **VPS(말레이시아)에서 api.chzzk.naver.com 접근 OK**(지역차단 없음, 200+데이터 확인). 라이브 검증 완료.
 - 키워드 보정: 메이플→메이플랜드, 조선협객전·RF온라인·아키에이지(나머지는 게임명).
 
+### ✅ 라이브 페이지 — 멀티플랫폼 인페이지 시청 (2026-06-30, `db57b4c`)
+- **gamebit `/live` 방식 1:1 + 우위.** `/[locale]/live/[game]`에서 게임별 라이브 방송을 사이트 안에서 **플레이어+채팅 임베드**로 시청. gamebit은 유튜브+SOOP, **우리는 치지직까지 3플랫폼**.
+- **핵심 인사이트**: 임베드(플레이어/채팅)는 전부 **무료 iframe**(API·쿼터 무관). 쿼터는 "발견(누가 라이브냐)"에만 해당. 그리고 **SOOP·치지직은 발견도 키리스** → 유튜브만 빼면 키 0.
+- `src/lib/live.ts` 발견+임베드:
+  - 치지직 `search/lives`(재사용) / SOOP `sch.sooplive.co.kr api.php?m=liveSearch`(키리스, `user_id`로 임베드) / 유튜브.
+  - **유튜브**: `GAMETICK_YT_API_KEY` 있으면 Data API(결정적·ToS 준수·권장), 없으면 검색결과 스크래핑 폴백. 스크래핑은 유튜브가 videoRenderer/lockupViewModel을 **A/B 비결정적**으로 내려줘 까다로웠음 → 해결: `SOCS` consent 쿠키로 classic 포맷 유도 + **중괄호 균형 파서**(lazy 정규식은 설명문 `};</script>`에서 절단됨) + `"videoRenderer":` 블록 직접 추출 + 라이브 감지 확대(overlay/badge/"시청 중").
+  - 임베드: 유튜브 `embed/{vid}`+`live_chat?v=&embed_domain={host}`, SOOP `play.sooplive.co.kr/{id}/embed`(채팅 미지원→안내), 치지직 `embed/player/{id}`+`embed/chat/{id}`.
+- `LivePlayer.tsx`(client): 플레이어+채팅+방송목록(시청자순) 전환. `embed_domain`은 `window` 대신 **서버 `headers()` host**를 prop으로(hydration 불일치 방지).
+- Header: "● 라이브" nav + `section="data"|"live"` 게임탭 토글. `/ko/live`→기본게임 redirect. sitemap 추가.
+- **검증**: 로컬·프로덕션 3플랫폼 렌더(리니지=유튜브 강세 쌈용 664, 메이플/아이온=SOOP·치지직 다수), 채팅 `embed_domain=gamesise.co.kr` 확인.
+- **남은 튜닝**: 라이브 검색 키워드가 `chzzkKeyword ?? nameKo` 공용이라 플랫폼별 최적이 아님(예: maple "메이플랜드"는 SOOP 대형 BJ "메이플"을 못 잡음). 게임/플랫폼별 `liveKeyword` 분리 여지.
+
 ### ✅ "네임드 순위" → "인기 영상"으로 전환 (2026-06-30)
 - **게임 내 네임드(캐릭터) 순위는 깔끔한 자동 소스 없음** — plaync 공식 랭킹은 JS/인증 장벽+게임마다 다름, 벤치마크 gamebit조차 네임드·BJ 둘 다 "준비 중"으로 비워둠. 수동 입력은 라이브에 검증 불가 stale 데이터라 기각.
 - **대안: 빈 네임드 슬롯을 치지직 인기 영상(조회수순)으로 채움**(실데이터). `chzzk.ts fetchPopularVideos`(`search/videos`, `revalidate:300`, 조회수 내림차순 상위5, videoNo dedupe). 위젯에 영상 제목+조회수+영상 링크(`chzzk.naver.com/video/{no}`)+"조회순·치지직" 서브타이틀.
@@ -100,9 +112,10 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 
 ## 7. 기능 인벤토리 (실동작 vs 스텁)
 
-**실동작**: 시세표(검색·정렬·즐겨찾기) · 자동갱신 폴링(`/api/prices`, 60s, 탭 숨김 시 중단) · 서버상세 캔들차트(3분/1시간/일봉 + 이동평균선) · 24h 등락 · 매물수 표시 · 브라우저 가격알림(localStorage) · 즐겨찾기 대시보드 · SEO(페이지별 메타+sitemap+robots) · 임베드 위젯 · VND 환산(vi) · PWA manifest · umami(env로 켬) · 다크테마/한국색상 · **BJ 순위(치지직 라이브 실시간)** · **인기 영상(치지직 영상 조회수순)**.
+**실동작**: 시세표(검색·정렬·즐겨찾기) · 자동갱신 폴링(`/api/prices`, 60s, 탭 숨김 시 중단) · 서버상세 캔들차트(3분/1시간/일봉 + 이동평균선) · 24h 등락 · 매물수 표시 · 브라우저 가격알림(localStorage) · 즐겨찾기 대시보드 · SEO(페이지별 메타+sitemap+robots) · 임베드 위젯 · VND 환산(vi) · PWA manifest · umami(env로 켬) · 다크테마/한국색상 · **BJ 순위(치지직 라이브 실시간)** · **인기 영상(치지직 영상 조회수순)** · **라이브 페이지(치지직+SOOP+유튜브 인페이지 시청, `/live/[game]`)**.
 
 **스텁/대기**: 멀티거래소(추상화만, barotem 1곳) · 커뮤니티 위젯(빈 상태) · 텔레그램/디스코드 알림(워커 필요).
+**선택 설정**: `GAMETICK_YT_API_KEY`(있으면 라이브 유튜브 발견이 Data API로 안정화, 없으면 스크래핑 best-effort).
 
 ## 8. 파일 가이드 (게임시세)
 
@@ -110,6 +123,9 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | --- | --- |
 | `src/data/games.ts` | 4게임 87서버 + 시세단위. slug는 lc_vn history 파일명과 일치 필수 |
 | `src/data/exchanges.ts` | 거래소(데이터 출처) 목록. barotem active, 나머지 false |
+| `src/lib/live.ts` | 멀티플랫폼 라이브 발견(치지직/SOOP/유튜브)+임베드 URL. 유튜브=Data API(키) 또는 스크래핑 폴백 |
+| `src/components/LivePlayer.tsx` | (client) 라이브 플레이어+채팅+방송목록 전환 위젯 |
+| `src/app/[locale]/live/[game]/page.tsx` | 멀티플랫폼 인페이지 시청 페이지 (`/live` = 기본게임 redirect) |
 | `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory`/`seriesFor`/`change24h`/`latestCount`/`downsample` |
 | `src/lib/market.ts` | 시세표(`getMarketTable`), `summarize`/`movers`, `getServerChart`, `listingCount` |
 | `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 |
@@ -136,6 +152,8 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 6. **next start는 한 번에 하나만** — 옛 인스턴스가 포트 점유 중이면 새 빌드가 안 뜨고 옛 빌드에 검사가 맞음. 재시작 전 포트 점유 프로세스 kill.
 8. **게임 추가법(검증됨)**: 바로템 메인 HTML의 게임메뉴 JSON에서 `{"title":"게임명","thread":"2382rXXX"}` = 그 게임의 머니 스레드(메뉴 순서=인기순). **서버 필터는 게임마다 opt1/opt2로 다름** — lists 페이지의 `<li data-title="optN" data-optN="ID"><p>서버명</p>`로 확인. lc_vn `GameInfo.serverParam`로 지정. (조사/생성 스크립트: `C:\Users\User\gen-games.py`, `gen-config.py`)
 9. 로컬 테스트: `cd C:\Users\User\gametick; npx next start -p 3212` (3000은 lc_info, 3001 lc_vn 등 점유 가능). 검증용 데이터는 lc_vn/data 또는 샘플.
+10. **유튜브 검색결과 스크래핑 함정(라이브 페이지)**: ① lazy 정규식(`{[\s\S]*?};</script>`)은 영상 설명문에 들어간 `};</script>`에서 조기 절단 → **중괄호 균형 파서** 써라. ② 유튜브가 `videoRenderer`(구형)/`lockupViewModel`(신형)을 **요청마다 A/B 비결정적**으로 내려줌(node는 구형, 서버 fetch는 랜덤) → `SOCS` consent 쿠키로 classic 유도하면 안정. ③ 라이브 감지는 overlay만 보지 말고 badge `LIVE_NOW`·viewText "시청 중"까지. ④ 근본 안정책은 `GAMETICK_YT_API_KEY`(Data API). **임베드(플레이어/채팅)는 무료 iframe이라 이 고생과 무관** — 쿼터/스크래핑은 "발견"에만.
+11. **iframe `embed_domain`은 `window`로 잡지 말 것**(SSR/CSR hydration 불일치) — 서버 `headers()`의 host를 prop으로 내려라. (유튜브 live_chat 임베드는 부모 도메인 HTTPS + embed_domain 일치 필요)
 
 ## 10. 커밋 히스토리 (2026-06-30, master)
 
@@ -146,4 +164,5 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `f39ea96` 리브랜딩 겜틱→게임시세/GameSise
 - `233fb84` BJ 순위 치지직 라이브 검색 실데이터 연동 (배포·라이브 검증 완료)
 - `16cb1c1` 네임드 슬롯 → 치지직 인기 영상(조회수순) 실데이터 연동
+- `db57b4c` 라이브 페이지 — 멀티플랫폼(치지직+SOOP+유튜브) 인페이지 시청 (배포·라이브 검증)
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)

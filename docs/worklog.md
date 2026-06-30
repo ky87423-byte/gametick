@@ -143,7 +143,17 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 검증: typecheck/build 통과, 로컬(3212) 렌더 확인(메이플랜드 인기영상5+BJ5 실데이터). 4게임 영상 데이터 실측 정상.
 - 결과: 랭킹 위젯 **양쪽 다 치지직 실데이터** → gamebit을 두 위젯 모두에서 앞섬.
 
+### 18) 라이브 페이지 — 멀티플랫폼 인페이지 시청 (`db57b4c`, 배포·라이브)
+- **동기**: gamebit `/live` 분석 → `/v2_get_bj_data.php`로 게임별 라이브 BJ 목록(유튜브+SOOP, **치지직 안 씀**)을 받아 사이트 안에서 플레이어+채팅 임베드. 우리 치지직 BJ 위젯은 이 게임들 시청자가 거의 없어(리니지 3명 vs 유튜브 688명) "비어 보임"이 문제였음.
+- **핵심 인사이트**: 임베드(플레이어/채팅)는 무료 iframe(쿼터 무관). 쿼터는 "발견"에만. SOOP·치지직은 발견도 키리스 → 유튜브 빼면 키 0.
+- 구현: `lib/live.ts`(치지직 search/lives + SOOP liveSearch + 유튜브 Data API 또는 스크래핑 폴백, 임베드 URL), `LivePlayer.tsx`(client, 플레이어+채팅+목록 전환), `/[locale]/live/[game]` 페이지(+`/live` redirect), Header "● 라이브" nav + data/live 토글, chzzk.ts thumbnail, sitemap, i18n.
+- **유튜브 스크래핑 디버깅**(node OK·서버 0): lazy 정규식 절단→중괄호 균형 파서, videoRenderer/lockupViewModel A/B→SOCS consent 쿠키, 라이브 감지 확대. 근본책은 `GAMETICK_YT_API_KEY`(Data API). `embed_domain`은 headers() host로(hydration).
+- 검증: tsc/build, 로컬·프로덕션 3플랫폼 렌더(리니지 유튜브 쌈용 664 / 메이플·아이온 SOOP·치지직 다수), 채팅 embed_domain=gamesise.co.kr.
+- **남은 튜닝**: 라이브 키워드가 `chzzkKeyword ?? nameKo` 공용 → 플랫폼별 최적 아님. 게임/플랫폼별 `liveKeyword` 분리 여지.
+
 ### 다음 세션 할 일
-- [ ] **배포** — `16cb1c1` 서버 반영(`cd /var/www/gamesise && git pull && npm ci && npm run build && pm2 reload gamesise`) + 라이브 검증.
+- [ ] (선택) **유튜브 안정화** — `GAMETICK_YT_API_KEY`(Google Cloud, 무료) 발급해 서버 `.env.local`에 추가하면 라이브 유튜브가 Data API로 결정적. 없으면 스크래핑 best-effort.
+- [ ] (선택) 라이브 검색 **키워드 플랫폼별 튜닝**(`liveKeyword`).
+- [ ] (선택) 게임 페이지 BJ 위젯도 멀티플랫폼(`fetchAllLives` 상위5)으로 업그레이드 + 라이브 페이지 링크.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
