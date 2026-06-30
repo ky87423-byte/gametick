@@ -123,7 +123,8 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | --- | --- |
 | `src/data/games.ts` | 4게임 87서버 + 시세단위. slug는 lc_vn history 파일명과 일치 필수 |
 | `src/data/exchanges.ts` | 거래소(데이터 출처) 목록. barotem active, 나머지 false |
-| `src/lib/live.ts` | 멀티플랫폼 라이브 발견(치지직/SOOP/유튜브)+임베드 URL. 유튜브=Data API(키) 또는 스크래핑 폴백 |
+| `src/lib/live.ts` | 멀티플랫폼 라이브 발견(치지직/SOOP/유튜브)+임베드 URL. `fetchAllLives(LiveQuery)`=검색+관련성필터(include/exclude). 유튜브=스크래핑 1순위/Data API 폴백 |
+| `src/data/games.ts` | …+ `liveKeywords`/`liveMatch`/`liveExclude` 필드 + `liveQuery(game)` 리졸버(라이브 검색 설정) |
 | `src/components/LivePlayer.tsx` | (client) 라이브 플레이어+채팅+방송목록 전환 위젯 |
 | `src/app/[locale]/live/[game]/page.tsx` | 멀티플랫폼 인페이지 시청 페이지 (`/live` = 기본게임 redirect) |
 | `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory`/`seriesFor`/`change24h`/`latestCount`/`downsample` |
@@ -154,6 +155,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 9. 로컬 테스트: `cd C:\Users\User\gametick; npx next start -p 3212` (3000은 lc_info, 3001 lc_vn 등 점유 가능). 검증용 데이터는 lc_vn/data 또는 샘플.
 10. **유튜브 검색결과 스크래핑 함정(라이브 페이지)**: ① lazy 정규식(`{[\s\S]*?};</script>`)은 영상 설명문에 들어간 `};</script>`에서 조기 절단 → **중괄호 균형 파서** 써라. ② 유튜브가 `videoRenderer`(구형)/`lockupViewModel`(신형)을 **요청마다 A/B 비결정적**으로 내려줌(node는 구형, 서버 fetch는 랜덤) → `SOCS` consent 쿠키로 classic 유도하면 안정. ③ 라이브 감지는 overlay만 보지 말고 badge `LIVE_NOW`·viewText "시청 중"까지. ④ 근본 안정책은 `GAMETICK_YT_API_KEY`(Data API). **임베드(플레이어/채팅)는 무료 iframe이라 이 고생과 무관** — 쿼터/스크래핑은 "발견"에만.
 11. **iframe `embed_domain`은 `window`로 잡지 말 것**(SSR/CSR hydration 불일치) — 서버 `headers()`의 host를 prop으로 내려라. (유튜브 live_chat 임베드는 부모 도메인 HTTPS + embed_domain 일치 필요)
+12. **라이브 검색은 세 플랫폼 다 느슨함** — SOOP `liveSearch`는 매물 적으면 인기 무관 방송을 끼워넣고, chzzk/youtube도 "클래식"·"메이플"·"아이온" 같은 부분일치로 타게임이 섞임. → `games.ts liveMatch`(제목에 토큰 하나는 포함) + `liveExclude`(타게임 토큰 제외)로 거른다(`live.ts`가 제목 정규화 후 전 플랫폼 적용). 이름이 포함관계인 경우(아이온⊂아이온2, 리니지 클래식/M/2M)는 exclude로 분리하되, "아이온"으로만 적은 아이온2 방송 등은 완전 분리 불가(감수).
 
 ## 10. 커밋 히스토리 (2026-06-30, master)
 
@@ -167,4 +169,5 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `db57b4c` 라이브 페이지 — 멀티플랫폼(치지직+SOOP+유튜브) 인페이지 시청 (배포·라이브 검증)
 - `7214783` 게임 페이지 BJ 위젯 멀티플랫폼화(`fetchAllLives` 상위5)+라이브 링크 (배포·라이브 검증)
 - `2aaefc8` 유튜브 라이브 안정화: 스크래핑 1순위 + Data API 폴백 (배포·라이브 검증)
+- `0a8f4a7` 라이브 키워드 튜닝: 플랫폼별 검색어 + 관련성 필터(포함/제외) (배포·라이브 검증)
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)
