@@ -25,6 +25,7 @@ export interface Dictionary {
   community: string;
   communityEmpty: string;
   trendTitle: string;
+  exchangeCompare: string;
   faqTitle: string;
   calcTitle: string;
   calcAmount: string;
@@ -105,6 +106,7 @@ const ko: Dictionary = {
   community: "실시간 거래·토론",
   communityEmpty: "준비 중입니다.",
   trendTitle: "평균 시세 추이 (24h)",
+  exchangeCompare: "거래소별 시세 비교",
   faqTitle: "자주 묻는 질문",
   calcTitle: "시세 계산기",
   calcAmount: "수량",
@@ -182,6 +184,7 @@ const vi: Dictionary = {
   community: "Giao dịch · thảo luận",
   communityEmpty: "Đang chuẩn bị.",
   trendTitle: "Xu hướng giá TB (24h)",
+  exchangeCompare: "So sánh giá theo sàn",
   faqTitle: "Câu hỏi thường gặp",
   calcTitle: "Máy tính giá",
   calcAmount: "Số lượng",

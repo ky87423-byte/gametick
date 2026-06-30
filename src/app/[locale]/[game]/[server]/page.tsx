@@ -3,12 +3,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, findServer } from "@/data/games";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
+import { getServerExchangeSeries } from "@/lib/market";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CandleChart } from "@/components/CandleChart";
+import { ExchangeOverlay } from "@/components/ExchangeOverlay";
 import { AlertButton } from "@/components/AlertButton";
 import { PriceCalc } from "@/components/PriceCalc";
 import { serverIntro } from "@/data/content";
@@ -59,10 +61,11 @@ export default async function ServerDetail({
     ? (tfParam as Timeframe)
     : "1h";
   const dict = getDictionary(locale);
-  const [data, rates, history] = await Promise.all([
+  const [data, rates, history, exchangeSeries] = await Promise.all([
     getServerCandles(game, server, tf),
     getRates(),
     readHistory(game.slug),
+    getServerExchangeSeries(game, server),
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
@@ -141,6 +144,14 @@ export default async function ServerDetail({
         </div>
 
         <CandleChart candles={data.candles} ma={data.ma} />
+
+        {/* 거래소별 시세 비교 오버레이 (활성 거래소 2곳 이상일 때) */}
+        {exchangeSeries.length >= 2 && (
+          <section className="mt-6">
+            <h2 className="mb-2 text-lg font-bold">{dict.exchangeCompare}</h2>
+            <ExchangeOverlay series={exchangeSeries} />
+          </section>
+        )}
 
         <div className="mt-6 max-w-md">
           <PriceCalc

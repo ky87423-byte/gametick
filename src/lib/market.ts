@@ -277,6 +277,45 @@ export async function getReport(
   };
 }
 
+export interface ExchangeSeries {
+  exchange: string;
+  name: string;
+  color: string;
+  points: { t: number; v: number }[];
+  current: number | null;
+}
+
+// 거래소 라인 색 (시세표 칩 배지와 통일감: 베이=파랑, 매니아=초록 …)
+const EXCHANGE_COLOR: Record<string, string> = {
+  barotem: "#f87171",
+  itembay: "#60a5fa",
+  itemmania: "#34d399",
+  itemthankyou: "#fbbf24",
+};
+
+/** 한 서버의 거래소별 시세 시계열 (오버레이 비교 차트용). 데이터 있는 거래소만. */
+export async function getServerExchangeSeries(
+  game: GameInfo,
+  server: ServerInfo,
+  rangeMs: number = 7 * 24 * 60 * 60 * 1000
+): Promise<ExchangeSeries[]> {
+  const since = Date.now() - rangeMs;
+  const out: ExchangeSeries[] = [];
+  for (const ex of ACTIVE_EXCHANGES) {
+    const hist = await readHistory(game.slug, ex.id);
+    const raw = seriesFor(hist, server.id, since);
+    if (raw.length === 0) continue;
+    out.push({
+      exchange: ex.id,
+      name: ex.name,
+      color: EXCHANGE_COLOR[ex.id] ?? "#a1a1aa",
+      points: downsample(raw, 80),
+      current: Math.round(raw[raw.length - 1].v),
+    });
+  }
+  return out;
+}
+
 export interface ServerChart {
   serverId: string;
   nameKo: string;
