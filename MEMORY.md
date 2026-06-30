@@ -28,6 +28,7 @@
 - **데이터 (A 방식)**: 직접 거래소 폴링 안 함. lc_vn 수집기가 만든 `history-{game}[-{exchange}].json`을 `GAMETICK_DATA_DIR` 경로로 **읽기 전용** 접근.
   - 로컬: `C:\Users\User\lc_vn\data` / 서버: `/var/www/lc_vn/data`
   - 이유: 같은 VPS IP에서 거래소를 두 번 긁으면 차단 위험 → 수집기 1개만 둠.
+  - **수집 주기**: 기본 300초(5분). 게임별 override = lc_vn `site.ts GameInfo.refreshSeconds` (리니지클래식·아이온2 = 180초/3분). 짧을수록 실시간↑·거래소 차단위험↑(돈/서버성능과 무관, 차단 회피용 의도적 텀).
   - **멀티거래소(Phase 1)**: 바로템=`history-{game}.json`(기본·시계열 기준), 아이템베이=`history-{game}-itembay.json`. 거래소 추가 시 파일만 늘어남. `market.ts`가 활성 거래소(`data/exchanges.ts`)를 다 읽어 서버별 **최저가/거래소칩/스프레드** 계산(등락·스파크·매물수는 바로템 기준 유지).
 - **표시**: 시세 정보 사이트라 매입가/할인 없음. 시장가(원/단위) 그대로 표시.
 - **시세 단위**: 아데나 만당 / 키나 천만당 / 메소 백만당 / 다이아 만당(미확정). `games.ts`의 `unitAmount`+`unitLabelKo`.

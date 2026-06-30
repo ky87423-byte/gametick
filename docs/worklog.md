@@ -207,6 +207,9 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **교훈**: satori(ImageResponse)는 한글 폰트 필수(시스템 폰트 없음), **ttf/otf/woff만**(woff2 X). 폰트는 @fontsource jsDelivr woff로 확보. 구형 UA Google Fonts는 EOT/라틴만 줌(주의).
 - 검증: 로컬·라이브 PNG 1200×630, og:image 메타 적용.
 
+### 29) 수집 주기 게임별 차등 (lc_vn `1f1db72`)
+- `GameInfo.refreshSeconds` 추가. 리니지클래식·아이온2 = 180초(3분), 나머지 300초(5분) 유지. barotem cacheSeconds·itembay 게이트에 적용. 주기 단축은 무료(설정)지만 거래소 차단위험 trade-off라 인기 2종만.
+
 ### 다음 세션 할 일
 - [ ] (선택) 게임/서버별 **동적 OG**(게임명·서버명·현재가 넣은 카드).
 - [ ] (선택) KR 수집기 확보 시 아이템매니아 부활(코드 준비됨), 유튜브 폴백 키, liveMatch 튜닝.
