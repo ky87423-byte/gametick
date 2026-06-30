@@ -199,7 +199,8 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ### 27) #7 디스코드 알림 추가 (lc_vn `60c51c3` / gametick `2516084`, 라이브)
 - 웹훅 방식(폴러 불필요). `AlertSub.webhook` + `sendDiscord`/`notify`/`addDiscordSub` + lc_vn `POST /api/alert`. gametick `DiscordAlert.tsx`(웹훅URL+기준가) → `/api/discord-alert` 프록시가 lc_vn(127.0.0.1:3001)로 서버측 전달(CORS 없음). alerts.json 단일 writer=lc_vn.
-- 검증: 버튼 렌더 + 프록시→lc_vn→검증에러 반환(체인 정상, 프로덕션). 실제 웹훅 수신은 사용자 테스트.
+- 검증: 버튼 렌더 + 프록시→lc_vn→검증에러 반환(체인 정상). **✅ 실제 웹훅 수신 확인 완료**(사용자, 2026-06-30).
+- → #7 알림 3종(브라우저·텔레그램·디스코드) 전부 E2E 완료.
 
 ### 다음 세션 할 일
 - [ ] (선택) KR 수집기 확보 시 아이템매니아 부활(코드 준비됨), 유튜브 폴백 키, liveMatch 튜닝.

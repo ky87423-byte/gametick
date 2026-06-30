@@ -140,7 +140,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **UI(gametick `TelegramAlert.tsx`)**: 서버 상세에 "📲 텔레그램 알림" — 기준가/이하·이상 입력 → 딥링크 `t.me/gamesise_alert_bot?start={slug}_{serverId}_{price}_{b|a}`. 사용자가 [시작]만 누르면 등록.
 - **폴러 생존 확인법**: 외부에서 `getUpdates` 호출 시 **409 Conflict**면 서버 폴러 작동중(텔레그램은 getUpdates 단일 소비자만 허용). 절대 외부에서 getUpdates/webhook 걸지 말 것(폴러 깨짐).
 - **✅ E2E 검증 완료**(2026-06-30, 실제 봇 [시작]→알림 수신 확인).
-- **🟢 디스코드 알림도 추가**(lc_vn `60c51c3`/gametick `2516084`): 웹훅 방식(폴러 불필요). `AlertSub.webhook`, `sendDiscord`/`notify`/`addDiscordSub`, lc_vn `POST /api/alert`. gametick `DiscordAlert.tsx`(웹훅URL+기준가) → `POST /api/discord-alert` **프록시**가 lc_vn 내부(`LC_VN_INTERNAL_URL`=`127.0.0.1:3001`)로 서버측 전달(브라우저는 gamesise만 호출, CORS 없음). alerts.json 단일 writer=lc_vn. 체인 프로덕션 검증(잘못된 웹훅→검증에러 반환). 실제 웹훅 수신은 사용자 테스트.
+- **🟢 디스코드 알림도 추가**(lc_vn `60c51c3`/gametick `2516084`): 웹훅 방식(폴러 불필요). `AlertSub.webhook`, `sendDiscord`/`notify`/`addDiscordSub`, lc_vn `POST /api/alert`. gametick `DiscordAlert.tsx`(웹훅URL+기준가) → `POST /api/discord-alert` **프록시**가 lc_vn 내부(`LC_VN_INTERNAL_URL`=`127.0.0.1:3001`)로 서버측 전달(브라우저는 gamesise만 호출, CORS 없음). alerts.json 단일 writer=lc_vn. 체인 프로덕션 검증 + **✅ 실제 웹훅 수신 확인 완료**(2026-06-30).
 
 ## 8. 파일 가이드 (게임시세)
 
