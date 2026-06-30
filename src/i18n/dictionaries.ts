@@ -39,6 +39,13 @@ export interface Dictionary {
   bjLive: string;
   viewersSuffix: string;
   rankEmpty: string;
+  liveNav: string;
+  dataNav: string;
+  liveDesc: string;
+  liveChat: string;
+  soopChatNotice: string;
+  watchOrigin: string;
+  liveEmpty: string;
   reportNav: string;
   reportTitle: string;
   reportDesc: string;
@@ -112,6 +119,13 @@ const ko: Dictionary = {
   bjLive: "실시간 · 치지직",
   viewersSuffix: "시청",
   rankEmpty: "준비 중입니다",
+  liveNav: "라이브",
+  dataNav: "시세",
+  liveDesc: "치지직·SOOP·유튜브 실시간 방송을 한 화면에서. 시청자수순.",
+  liveChat: "채팅",
+  soopChatNotice: "SOOP은 채팅 임베드를 지원하지 않습니다. '원본 보기'에서 시청하세요.",
+  watchOrigin: "원본 보기",
+  liveEmpty: "현재 진행 중인 방송이 없습니다.",
   reportNav: "리포트",
   reportTitle: "시세 리포트",
   reportDesc: "최근 기간 동안 게임별 평균 등락과 급등·급락 서버를 한눈에.",
@@ -182,6 +196,13 @@ const vi: Dictionary = {
   bjLive: "Trực tiếp · Chzzk",
   viewersSuffix: "xem",
   rankEmpty: "Đang chuẩn bị",
+  liveNav: "Trực tiếp",
+  dataNav: "Giá",
+  liveDesc: "Phát trực tiếp Chzzk·SOOP·YouTube trên một màn hình. Theo lượt xem.",
+  liveChat: "Trò chuyện",
+  soopChatNotice: "SOOP không hỗ trợ nhúng chat. Xem tại 'Nguồn gốc'.",
+  watchOrigin: "Xem nguồn",
+  liveEmpty: "Hiện không có buổi phát nào.",
   reportNav: "Báo cáo",
   reportTitle: "Báo cáo giá",
   reportDesc: "Biến động trung bình và máy chủ tăng/giảm mạnh theo từng game.",

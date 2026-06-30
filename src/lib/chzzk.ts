@@ -11,6 +11,7 @@ export interface LiveBj {
   liveTitle: string;
   viewers: number;
   category: string | null;
+  thumbnail: string;
 }
 
 interface ChzzkSearchResponse {
@@ -20,10 +21,12 @@ interface ChzzkSearchResponse {
         liveTitle?: string;
         concurrentUserCount?: number;
         liveCategoryValue?: string | null;
+        defaultThumbnailImageUrl?: string | null;
       };
       channel?: {
         channelId?: string;
         channelName?: string;
+        channelImageUrl?: string | null;
       };
     }>;
   };
@@ -61,6 +64,10 @@ export async function fetchLiveBjs(
         liveTitle: (row.live?.liveTitle ?? "").trim(),
         viewers: row.live?.concurrentUserCount ?? 0,
         category: row.live?.liveCategoryValue ?? null,
+        thumbnail:
+          row.live?.defaultThumbnailImageUrl ??
+          row.channel?.channelImageUrl ??
+          "",
       });
     }
     bjs.sort((a, b) => b.viewers - a.viewers);

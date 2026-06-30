@@ -1,16 +1,22 @@
 import Link from "next/link";
-import { GAMES } from "@/data/games";
+import { GAMES, DEFAULT_GAME_SLUG } from "@/data/games";
 import { Locale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 
 export function Header({
   locale,
   activeGame,
+  section = "data",
 }: {
   locale: Locale;
   activeGame?: string;
+  /** 게임 탭이 시세("data") 페이지로 갈지 라이브("live") 페이지로 갈지 */
+  section?: "data" | "live";
 }) {
   const dict = getDictionary(locale);
+  const gameHref = (slug: string) =>
+    section === "live" ? `/${locale}/live/${slug}` : `/${locale}/${slug}`;
+  const liveTarget = activeGame ?? DEFAULT_GAME_SLUG;
   return (
     <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
@@ -23,6 +29,16 @@ export function Header({
           </span>
         </Link>
         <nav className="flex items-center gap-3 text-xs text-zinc-400">
+          <Link
+            href={`/${locale}/live/${liveTarget}`}
+            className={
+              section === "live"
+                ? "font-semibold text-red-400"
+                : "hover:text-red-300"
+            }
+          >
+            ● {dict.liveNav}
+          </Link>
           <Link href={`/${locale}/report`} className="hover:text-zinc-200">
             {dict.reportNav}
           </Link>
@@ -55,7 +71,7 @@ export function Header({
             return (
               <Link
                 key={g.slug}
-                href={`/${locale}/${g.slug}`}
+                href={gameHref(g.slug)}
                 className={`rounded-full px-3 py-1 text-sm transition-colors ${
                   active
                     ? "bg-red-500 text-white"

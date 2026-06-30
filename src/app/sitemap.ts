@@ -32,6 +32,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly",
         priority: 0.9,
       });
+      out.push({
+        url: `${BASE}/${locale}/live/${g.slug}`,
+        changeFrequency: "always",
+        priority: 0.7,
+      });
       for (const s of g.servers) {
         out.push({
           url: `${BASE}/${locale}/${g.slug}/${s.id}`,
