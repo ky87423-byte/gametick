@@ -73,3 +73,74 @@ export async function fetchLiveBjs(
 export function chzzkChannelUrl(channelId: string): string {
   return `https://chzzk.naver.com/live/${channelId}`;
 }
+
+export interface PopularVideo {
+  videoNo: number;
+  title: string;
+  channelName: string;
+  readCount: number;
+}
+
+interface ChzzkVideoSearchResponse {
+  content?: {
+    data?: Array<{
+      video?: {
+        videoNo?: number;
+        videoTitle?: string;
+        readCount?: number;
+        categoryType?: string | null;
+      };
+      channel?: {
+        channelName?: string;
+      };
+    }>;
+  };
+}
+
+// 게임별 인기 영상(조회수순)을 치지직 영상 검색에서 가져온다.
+// 라이브 BJ와 달리 누적 인기 콘텐츠 — "네임드 캐릭터 순위"의 깔끔한 공개 소스가
+// 없어 그 자리를 실데이터로 채우는 용도. 실패 시 빈 배열 → 위젯 "준비 중".
+export async function fetchPopularVideos(
+  keyword: string,
+  limit = 5
+): Promise<PopularVideo[]> {
+  const url = `${SEARCH_URL.replace(
+    "/search/lives",
+    "/search/videos"
+  )}?keyword=${encodeURIComponent(keyword)}&offset=0&size=20`;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        Accept: "application/json",
+      },
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as ChzzkVideoSearchResponse;
+    const rows = json.content?.data ?? [];
+    const seen = new Set<number>();
+    const videos: PopularVideo[] = [];
+    for (const row of rows) {
+      const videoNo = row.video?.videoNo;
+      const title = (row.video?.videoTitle ?? "").trim();
+      if (!videoNo || !title || seen.has(videoNo)) continue;
+      seen.add(videoNo);
+      videos.push({
+        videoNo,
+        title,
+        channelName: row.channel?.channelName ?? "",
+        readCount: row.video?.readCount ?? 0,
+      });
+    }
+    videos.sort((a, b) => b.readCount - a.readCount);
+    return videos.slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+export function chzzkVideoUrl(videoNo: number): string {
+  return `https://chzzk.naver.com/video/${videoNo}`;
+}

@@ -5,8 +5,12 @@ import { findGame } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
-import { getRankings } from "@/data/rankings";
-import { fetchLiveBjs, chzzkChannelUrl } from "@/lib/chzzk";
+import {
+  fetchLiveBjs,
+  chzzkChannelUrl,
+  fetchPopularVideos,
+  chzzkVideoUrl,
+} from "@/lib/chzzk";
 import { faqItems, gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -57,25 +61,29 @@ export default async function GamePage({
   if (!game) notFound();
 
   const dict = getDictionary(locale);
-  const [table, trend, trades, liveBjs] = await Promise.all([
+  const keyword = game.chzzkKeyword ?? game.nameKo;
+  const [table, trend, trades, liveBjs, popularVideos] = await Promise.all([
     getMarketTable(game),
     getGameTrend(game),
     readTrades(game.slug),
-    fetchLiveBjs(game.chzzkKeyword ?? game.nameKo, 5),
+    fetchLiveBjs(keyword, 5),
+    fetchPopularVideos(keyword, 5),
   ]);
   const summary = summarize(table);
   const { gainers, losers } = movers(table, 3);
-  const manualRankings = getRankings(game.slug);
-  const rankings = {
-    named: manualRankings.named,
-    bj: liveBjs.map((b, i) => ({
-      rank: i + 1,
-      name: b.channelName,
-      note: `${formatViewers(b.viewers, locale)} ${dict.viewersSuffix}`,
-      url: chzzkChannelUrl(b.channelId),
-      live: true,
-    })),
-  };
+  const namedRanks = popularVideos.map((v, i) => ({
+    rank: i + 1,
+    name: v.title,
+    note: `${formatViewers(v.readCount, locale)} ${dict.videoViews}`,
+    url: chzzkVideoUrl(v.videoNo),
+  }));
+  const bjRanks = liveBjs.map((b, i) => ({
+    rank: i + 1,
+    name: b.channelName,
+    note: `${formatViewers(b.viewers, locale)} ${dict.viewersSuffix}`,
+    url: chzzkChannelUrl(b.channelId),
+    live: true,
+  }));
   const unitText = dict.perUnit(game.unitLabelKo, game.currency);
 
   const stat = (label: string, value: string, sub?: string) => (
@@ -197,10 +205,12 @@ export default async function GamePage({
         <section className="mt-8">
           <h2 className="mb-3 text-lg font-bold">{dict.rankingsTitle}</h2>
           <Rankings
-            rankings={rankings}
+            named={namedRanks}
+            bj={bjRanks}
             namedTitle={dict.namedTitle}
+            namedSubtitle={namedRanks.length > 0 ? dict.videoSub : undefined}
             bjTitle={dict.bjTitle}
-            bjSubtitle={rankings.bj.length > 0 ? dict.bjLive : undefined}
+            bjSubtitle={bjRanks.length > 0 ? dict.bjLive : undefined}
             empty={dict.rankEmpty}
           />
         </section>

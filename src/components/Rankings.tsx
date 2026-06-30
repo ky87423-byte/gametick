@@ -1,8 +1,8 @@
-// 네임드 / BJ 순위 위젯.
-// BJ는 치지직 실시간 데이터(채널 링크 + 방송중 표시), 네임드는 수동 큐레이션.
+// 인기 영상 / BJ 순위 위젯. 둘 다 치지직 실데이터.
+// BJ는 라이브(채널 링크 + 방송중 표시), 인기 영상은 조회수순(영상 링크).
 // 데이터가 없으면 "준비 중".
 
-import { GameRankings, RankItem } from "@/data/rankings";
+import { RankItem } from "@/data/rankings";
 
 function RankRow({ it }: { it: RankItem }) {
   const name = (
@@ -74,25 +74,34 @@ function RankList({
 }
 
 export function Rankings({
-  rankings,
+  named,
+  bj,
   namedTitle,
+  namedSubtitle,
   bjTitle,
   bjSubtitle,
   empty,
 }: {
-  rankings: GameRankings;
+  named: RankItem[];
+  bj: RankItem[];
   namedTitle: string;
+  namedSubtitle?: string;
   bjTitle: string;
   bjSubtitle?: string;
   empty: string;
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <RankList title={namedTitle} items={rankings.named} empty={empty} />
+      <RankList
+        title={namedTitle}
+        subtitle={namedSubtitle}
+        items={named}
+        empty={empty}
+      />
       <RankList
         title={bjTitle}
         subtitle={bjSubtitle}
-        items={rankings.bj}
+        items={bj}
         empty={empty}
       />
     </div>

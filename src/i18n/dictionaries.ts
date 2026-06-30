@@ -33,6 +33,8 @@ export interface Dictionary {
   tradesEmpty: string;
   rankingsTitle: string;
   namedTitle: string;
+  videoSub: string;
+  videoViews: string;
   bjTitle: string;
   bjLive: string;
   viewersSuffix: string;
@@ -103,7 +105,9 @@ const ko: Dictionary = {
   tradesTitle: "실시간 거래완료",
   tradesEmpty: "최근 거래완료 내역을 불러오는 중…",
   rankingsTitle: "랭킹",
-  namedTitle: "네임드 순위",
+  namedTitle: "인기 영상",
+  videoSub: "조회순 · 치지직",
+  videoViews: "조회",
   bjTitle: "BJ 순위",
   bjLive: "실시간 · 치지직",
   viewersSuffix: "시청",
@@ -171,7 +175,9 @@ const vi: Dictionary = {
   tradesTitle: "Giao dịch hoàn tất",
   tradesEmpty: "Đang tải giao dịch gần đây…",
   rankingsTitle: "Xếp hạng",
-  namedTitle: "Xếp hạng nhân vật",
+  namedTitle: "Video nổi bật",
+  videoSub: "Lượt xem · Chzzk",
+  videoViews: "xem",
   bjTitle: "Xếp hạng BJ",
   bjLive: "Trực tiếp · Chzzk",
   viewersSuffix: "xem",
