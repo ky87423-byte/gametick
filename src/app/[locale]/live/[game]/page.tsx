@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { findGame } from "@/data/games";
+import { findGame, liveQuery } from "@/data/games";
 import { fetchAllLives } from "@/lib/live";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -42,9 +42,8 @@ export default async function LivePage({
   if (!game) notFound();
 
   const dict = getDictionary(locale);
-  const keyword = game.chzzkKeyword ?? game.nameKo;
   const [streams, host] = await Promise.all([
-    fetchAllLives(keyword, 10),
+    fetchAllLives(liveQuery(game), 12),
     headers().then((h) => h.get("host") ?? "gamesise.co.kr"),
   ]);
 

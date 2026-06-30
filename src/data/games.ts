@@ -21,6 +21,13 @@ export interface GameInfo {
   unitLabelKo: string;
   /** 치지직 라이브 검색 키워드 (BJ 순위용). 없으면 nameKo 사용 */
   chzzkKeyword?: string;
+  /** 라이브 검색어를 플랫폼별로 다르게 줄 때(미지정 시 chzzkKeyword ?? nameKo) */
+  liveKeywords?: { chzzk?: string; soop?: string; youtube?: string };
+  /** 라이브 결과는 제목에 이 토큰 중 하나가 있어야 유지(미지정 시 게임명들).
+   *  검색이 느슨한 모든 플랫폼에 적용 — 약어·서브게임명을 넣어 정확도↑ */
+  liveMatch?: string[];
+  /** 제목에 이 토큰이 있으면 모든 플랫폼에서 제외(다른 게임 혼입 차단) */
+  liveExclude?: string[];
   servers: ServerInfo[];
 }
 
@@ -32,6 +39,7 @@ export const GAMES: GameInfo[] = [
     currency: "아데나",
     unitAmount: 10_000,
     unitLabelKo: "만",
+    liveExclude: ["리니지M", "리니지2M", "리니지W", "리마스터"],
     servers: [
       { id: "24487", nameKo: "데포로쥬", nameEn: "Deporoju" },
       { id: "24488", nameKo: "켄라우헬", nameEn: "Kenrauhel" },
@@ -71,6 +79,8 @@ export const GAMES: GameInfo[] = [
     currency: "키나",
     unitAmount: 10_000_000,
     unitLabelKo: "천만",
+    // 아이온2 방송은 그냥 "아이온"으로도 많이 씀 → 넓게 잡음(아이온 클래식은 소수라 감수)
+    liveMatch: ["아이온2", "아이온", "Aion2", "Aion"],
     servers: [
       { id: "23617", nameKo: "월드 거래소(천족)", nameEn: "World Exchange (Elyos)" },
       { id: "23618", nameKo: "월드 거래소(마족)", nameEn: "World Exchange (Asmodians)" },
@@ -126,6 +136,18 @@ export const GAMES: GameInfo[] = [
     unitAmount: 1_000_000,
     unitLabelKo: "백만",
     chzzkKeyword: "메이플랜드",
+    liveMatch: [
+      "메이플랜드",
+      "메랜",
+      "아르테일",
+      "메이플플래닛",
+      "빅토리메이플",
+      "로나월드",
+      "테스피아",
+      "큐플레이",
+      "메이플스타",
+      "메이플스토리월드",
+    ],
     servers: [
       { id: "26192", nameKo: "메이플 플래닛", nameEn: "Maple Planet" },
       { id: "26208", nameKo: "메이플랜드", nameEn: "MapleLand" },
@@ -160,6 +182,7 @@ export const GAMES: GameInfo[] = [
     currency: "다이아",
     unitAmount: 1000,
     unitLabelKo: "천",
+    liveExclude: ["리니지2M", "리니지W", "리니지 클래식", "리마스터"],
     servers: [
       { id: "337", nameKo: "데포", nameEn: "데포" },
       { id: "338", nameKo: "판도", nameEn: "판도" },
@@ -265,6 +288,7 @@ export const GAMES: GameInfo[] = [
     currency: "다이아",
     unitAmount: 10000,
     unitLabelKo: "만",
+    liveMatch: ["나이트크로우", "나크", "Night Crows", "nightcrows"],
     servers: [
       { id: "4370", nameKo: "가스파르", nameEn: "가스파르" },
       { id: "4371", nameKo: "브란트", nameEn: "브란트" },
@@ -382,6 +406,8 @@ export const GAMES: GameInfo[] = [
     currency: "키나",
     unitAmount: 10000000,
     unitLabelKo: "천만",
+    liveMatch: ["아이온", "Aion"],
+    liveExclude: ["아이온2", "Aion2"],
     servers: [
       { id: "2902", nameKo: "아이온-시엘", nameEn: "아이온-시엘" },
       { id: "23930", nameKo: "아이온-이스라펠", nameEn: "아이온-이스라펠" },
@@ -423,6 +449,26 @@ export const GAMES: GameInfo[] = [
 ];
 
 export const DEFAULT_GAME_SLUG = GAMES[0].slug;
+
+import type { LiveQuery } from "@/lib/live";
+
+// 게임 → 라이브 검색 설정(플랫폼별 키워드 + 관련성 필터 토큰).
+export function liveQuery(game: GameInfo): LiveQuery {
+  const base = game.chzzkKeyword ?? game.nameKo;
+  return {
+    keywords: {
+      chzzk: game.liveKeywords?.chzzk ?? base,
+      soop: game.liveKeywords?.soop ?? base,
+      youtube: game.liveKeywords?.youtube ?? base,
+    },
+    include:
+      game.liveMatch ??
+      [game.nameKo, game.nameEn, game.chzzkKeyword].filter(
+        (x): x is string => !!x
+      ),
+    exclude: game.liveExclude ?? [],
+  };
+}
 
 export function findGame(slug: string | null | undefined): GameInfo | null {
   return GAMES.find((g) => g.slug === slug) ?? null;

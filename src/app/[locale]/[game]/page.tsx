@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findGame } from "@/data/games";
+import { findGame, liveQuery } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
@@ -62,7 +62,7 @@ export default async function GamePage({
     getMarketTable(game),
     getGameTrend(game),
     readTrades(game.slug),
-    fetchAllLives(keyword, 5),
+    fetchAllLives(liveQuery(game), 5),
     fetchPopularVideos(keyword, 5),
   ]);
   const summary = summarize(table);

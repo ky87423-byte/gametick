@@ -281,18 +281,47 @@ async function fetchChzzkLives(
   }));
 }
 
-// ---- 통합 -----------------------------------------------------------------
+// ---- 통합 + 관련성 필터 ----------------------------------------------------
+
+// 게임별 라이브 검색 설정. 플랫폼마다 검색어가 다를 수 있고(이름 포함관계·약어),
+// SOOP은 검색이 느슨해 다른 게임이 섞이므로 토큰 기반으로 걸러낸다.
+export interface LiveQuery {
+  keywords: { chzzk: string; soop: string; youtube: string };
+  // 제목에 이 토큰 중 하나를 포함해야 유지. 세 플랫폼 모두 검색이 느슨해
+  // (chzzk·youtube도 "클래식"·"메이플" 등으로 타게임이 섞임) 전 플랫폼에 적용한다.
+  include: string[];
+  // 제목에 이 토큰이 있으면 제외(예: 아이온 페이지의 "아이온2" 혼입 차단).
+  exclude: string[];
+}
+
+// 비교용 정규화: 소문자 + 한글/영숫자만 (공백·기호·콜론 제거).
+const normToken = (s: string): string =>
+  s.toLowerCase().replace(/[^0-9a-z가-힣]/g, "");
 
 export async function fetchAllLives(
-  keyword: string,
-  limitPerPlatform = 10
+  q: LiveQuery,
+  limit = 10
 ): Promise<LiveStream[]> {
+  const POOL = 20; // 필터로 줄어들 것을 감안해 넉넉히 받아온다.
   const [chzzk, soop, youtube] = await Promise.all([
-    fetchChzzkLives(keyword, limitPerPlatform),
-    fetchSoopLives(keyword, limitPerPlatform),
-    fetchYoutubeLives(keyword, limitPerPlatform),
+    fetchChzzkLives(q.keywords.chzzk, POOL),
+    fetchSoopLives(q.keywords.soop, POOL),
+    fetchYoutubeLives(q.keywords.youtube, POOL),
   ]);
-  return [...chzzk, ...soop, ...youtube].sort((a, b) => b.viewers - a.viewers);
+
+  const inc = q.include.map(normToken).filter(Boolean);
+  const exc = q.exclude.map(normToken).filter(Boolean);
+  const keep = (s: LiveStream): boolean => {
+    const t = normToken(s.title);
+    if (exc.some((e) => t.includes(e))) return false;
+    if (inc.length > 0 && !inc.some((i) => t.includes(i))) return false;
+    return true;
+  };
+
+  return [...chzzk, ...soop, ...youtube]
+    .filter(keep)
+    .sort((a, b) => b.viewers - a.viewers)
+    .slice(0, limit);
 }
 
 // ---- 임베드 URL (전부 무료 iframe) ----------------------------------------
