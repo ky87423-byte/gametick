@@ -27,13 +27,21 @@ export interface HistoryPoint {
 
 const caches = new Map<string, { points: HistoryPoint[]; loadedAt: number }>();
 
-function historyPath(gameSlug: string): string {
-  return path.join(DATA_DIR, `history-${gameSlug}.json`);
+// 거래소별 파일: 바로템(기본)=history-{game}.json, 그 외=history-{game}-{exchange}.json
+function fileKey(gameSlug: string, exchange?: string): string {
+  return exchange && exchange !== "barotem" ? `${gameSlug}-${exchange}` : gameSlug;
 }
 
-async function readFromDisk(gameSlug: string): Promise<HistoryPoint[]> {
+function historyPath(gameSlug: string, exchange?: string): string {
+  return path.join(DATA_DIR, `history-${fileKey(gameSlug, exchange)}.json`);
+}
+
+async function readFromDisk(
+  gameSlug: string,
+  exchange?: string
+): Promise<HistoryPoint[]> {
   try {
-    const raw = await fs.readFile(historyPath(gameSlug), "utf8");
+    const raw = await fs.readFile(historyPath(gameSlug, exchange), "utf8");
     const parsed = JSON.parse(raw) as { points?: HistoryPoint[] };
     return Array.isArray(parsed.points) ? parsed.points : [];
   } catch {
@@ -41,12 +49,28 @@ async function readFromDisk(gameSlug: string): Promise<HistoryPoint[]> {
   }
 }
 
-export async function readHistory(gameSlug: string): Promise<HistoryPoint[]> {
-  const cached = caches.get(gameSlug);
+export async function readHistory(
+  gameSlug: string,
+  exchange?: string
+): Promise<HistoryPoint[]> {
+  const key = fileKey(gameSlug, exchange);
+  const cached = caches.get(key);
   if (cached && Date.now() - cached.loadedAt < READ_TTL_MS) return cached.points;
-  const points = await readFromDisk(gameSlug);
-  caches.set(gameSlug, { points, loadedAt: Date.now() });
+  const points = await readFromDisk(gameSlug, exchange);
+  caches.set(key, { points, loadedAt: Date.now() });
   return points;
+}
+
+/** 특정 서버의 최신 시세(원/단위) — p가 있는 가장 최근 포인트에서. 없으면 null */
+export function latestPrice(
+  history: HistoryPoint[],
+  serverId: string
+): number | null {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const v = history[i].p[serverId];
+    if (typeof v === "number" && v > 0) return v;
+  }
+  return null;
 }
 
 /** 특정 서버의 최신 매물 수 — c가 있는 가장 최근 포인트에서. 없으면 null */

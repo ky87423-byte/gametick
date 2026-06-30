@@ -6,11 +6,21 @@ import { Sparkline } from "@/components/Sparkline";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 import { checkAlerts } from "@/lib/alerts";
 
+export interface ExchangeQuote {
+  exchange: string;
+  name: string;
+  price: number;
+}
+
 export interface ServerRow {
   serverId: string;
   nameKo: string;
   nameEn: string;
   priceKrw: number | null;
+  /** 거래소별 현재가 (낮은가격순), 멀티거래소 칩용 */
+  quotes?: ExchangeQuote[];
+  /** 거래소 간 가격차(%) */
+  spreadPercent?: number | null;
   change24hPercent: number | null;
   spark: number[];
   listingCount: number | null;
@@ -241,8 +251,24 @@ export function MarketTable({
                   </button>
                 </td>
                 <td className="px-3 py-2 font-medium">{s.nameKo}</td>
-                <td className="px-3 py-2 text-right font-mono tabular-nums">
-                  {formatKrw(s.priceKrw)}
+                <td className="px-3 py-2 text-right">
+                  <div className="font-mono tabular-nums">
+                    {formatKrw(s.priceKrw)}
+                  </div>
+                  {s.quotes && s.quotes.length > 1 && (
+                    <div className="mt-0.5 flex flex-wrap justify-end gap-x-1.5 gap-y-0.5">
+                      {s.quotes.map((q, qi) => (
+                        <span
+                          key={q.exchange}
+                          className={`text-[10px] tabular-nums ${
+                            qi === 0 ? "text-amber-400" : "text-zinc-500"
+                          }`}
+                        >
+                          {q.name} {q.price.toLocaleString("ko-KR")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </td>
                 <td
                   className={`px-3 py-2 text-right font-mono ${changeColor(

@@ -2,25 +2,41 @@
 // 겜틱은 시세 정보 사이트이므로 매입가/할인 없이 시장가(바로템 최저가)를 그대로 보여준다.
 
 import { GameInfo, ServerInfo } from "@/data/games";
+import { ACTIVE_EXCHANGES } from "@/data/exchanges";
 import {
   change24h,
   downsample,
   latestCount,
+  latestPrice,
   readHistory,
   seriesFor,
+  HistoryPoint,
 } from "@/lib/history";
+
+/** 거래소별 현재가 (원/단위) */
+export interface ExchangeQuote {
+  exchange: string; // exchange id (barotem, itembay …)
+  name: string; // 표시명
+  price: number;
+}
 
 export interface ServerMarket {
   serverId: string;
   nameKo: string;
   nameEn: string;
-  /** 현재 시장가 (원/단위), 매물/이력 없으면 null */
+  /** 현재 최저가 (활성 거래소 통합, 원/단위), 없으면 null */
   priceKrw: number | null;
-  /** 24시간 전 대비 등락률(%) — 이력 부족 시 null */
+  /** 거래소별 현재가 (가격 있는 거래소만, 낮은가격순) */
+  quotes: ExchangeQuote[];
+  /** 최저가 거래소 id, 없으면 null */
+  lowestExchange: string | null;
+  /** 거래소 간 가격차 비율(%) = (최고-최저)/최저*100, 2곳 미만이면 null */
+  spreadPercent: number | null;
+  /** 24시간 전 대비 등락률(%) — 바로템 기준, 이력 부족 시 null */
   change24hPercent: number | null;
-  /** 최근 24시간 시세 스파크라인 (다운샘플, 원/단위) */
+  /** 최근 24시간 시세 스파크라인 (바로템, 다운샘플, 원/단위) */
   spark: number[];
-  /** 현재 매물 수 (거래가능물품 건수), 데이터 없으면 null */
+  /** 현재 매물 수 (바로템 거래가능물품 건수), 데이터 없으면 null */
   listingCount: number | null;
   /** 이 서버 마지막 갱신 시각 (epoch ms), 없으면 null */
   updatedAt: number | null;
@@ -41,24 +57,56 @@ export interface MarketTable {
 }
 
 export async function getMarketTable(game: GameInfo): Promise<MarketTable> {
+  // 바로템 = 기본 이력(시계열·등락·매물수의 기준), 나머지 거래소는 현재가만 합산.
   const history = await readHistory(game.slug);
+  // 활성 거래소별 이력을 한 번씩 읽어둔다(바로템 외).
+  const extra = await Promise.all(
+    ACTIVE_EXCHANGES.filter((e) => e.id !== "barotem").map(async (e) => ({
+      ex: e,
+      hist: await readHistory(game.slug, e.id),
+    }))
+  );
   const since24h = Date.now() - 24 * 60 * 60 * 1000;
   let latest: number | null = null;
+
+  const barotem = ACTIVE_EXCHANGES.find((e) => e.id === "barotem");
 
   const servers: ServerMarket[] = game.servers.map((s) => {
     const all = seriesFor(history, s.id, 0);
     const last = all.length > 0 ? all[all.length - 1] : null;
-    const price = last ? last.v : null;
+    const barotemPrice = last ? Math.round(last.v) : null;
     if (last && (latest === null || last.t > latest)) latest = last.t;
     const spark = downsample(seriesFor(history, s.id, since24h), 40).map(
       (p) => p.v
     );
+
+    // 거래소별 현재가 모으기
+    const quotes: ExchangeQuote[] = [];
+    if (barotem && barotemPrice !== null)
+      quotes.push({ exchange: "barotem", name: barotem.name, price: barotemPrice });
+    for (const { ex, hist } of extra) {
+      const p = latestPrice(hist as HistoryPoint[], s.id);
+      if (p !== null) quotes.push({ exchange: ex.id, name: ex.name, price: Math.round(p) });
+    }
+    quotes.sort((a, b) => a.price - b.price);
+
+    const lowest = quotes.length > 0 ? quotes[0] : null;
+    const highest = quotes.length > 0 ? quotes[quotes.length - 1] : null;
+    const spreadPercent =
+      lowest && highest && quotes.length >= 2 && lowest.price > 0
+        ? ((highest.price - lowest.price) / lowest.price) * 100
+        : null;
+
     return {
       serverId: s.id,
       nameKo: s.nameKo,
       nameEn: s.nameEn,
-      priceKrw: price !== null ? Math.round(price) : null,
-      change24hPercent: change24h(history, s.id, price),
+      priceKrw: lowest ? lowest.price : null,
+      quotes,
+      lowestExchange: lowest ? lowest.exchange : null,
+      spreadPercent,
+      // 등락·스파크·매물수는 바로템 이력 기준(시계열이 가장 길고 안정적)
+      change24hPercent: change24h(history, s.id, barotemPrice),
       spark,
       listingCount: latestCount(history, s.id),
       updatedAt: last ? last.t : null,

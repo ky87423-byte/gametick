@@ -11,8 +11,8 @@ export interface Exchange {
 
 export const EXCHANGES: Exchange[] = [
   { id: "barotem", name: "바로템", active: true },
+  { id: "itembay", name: "아이템베이", active: true },
   { id: "itemmania", name: "아이템매니아", active: false },
-  { id: "itembay", name: "아이템베이", active: false },
 ];
 
 export const ACTIVE_EXCHANGES = EXCHANGES.filter((e) => e.active);

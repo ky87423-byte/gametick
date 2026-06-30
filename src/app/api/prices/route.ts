@@ -23,6 +23,8 @@ export async function GET(req: NextRequest) {
       nameKo: s.nameKo,
       nameEn: s.nameEn,
       priceKrw: s.priceKrw,
+      quotes: s.quotes,
+      spreadPercent: s.spreadPercent,
       change24hPercent: s.change24hPercent,
       spark: s.spark,
       listingCount: s.listingCount,
