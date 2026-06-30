@@ -75,7 +75,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - 실시간 거래완료 피드(바로템 display=3 실데이터), 평균 추이 차트, 게임 소개·FAQ, 시세 계산기, 네임드/BJ 순위 위젯(데이터 비어 "준비중").
 
 ### 1~7 추천작업: ✅#1 SEO · ✅#2 리포트 · ✅#3 가이드 · ✅#4 게임확대 · ✅#6 약관/정책 / 남음:
-- **#5 멀티 거래소**: 🟢**Phase 1 완료**(바로템+아이템베이, 리니지클래식, 라이브). 남은 Phase: 2)아이템매니아(`gamemoney_servers.xml.php?gamecode=`로 게임당 1콜·전서버 XML) 3)땡스아이템(`itemthankyou.com` 매물 파싱, 깔끔한 시세API 없음) 4)나머지 게임 매핑+서버상세 거래소 오버레이.
+- **#5 멀티 거래소**: 🟢**바로템+아이템베이 라이브**(리니지클래식). ⛔**아이템매니아·땡스는 VPS(말레이시아)에서 한국 외 차단** → 현재 인프라론 수집 불가(아래 §6 박스). 남은: 나머지 게임 itembay 매핑 + 서버상세 거래소 오버레이 + (KR 수집기 확보 시) 매니아/땡스.
 - **#7 텔레그램/디스코드 알림**: 별도 워커(봇 토큰) 필요.
 
 ### ✅ #5 멀티거래소 Phase 1 — 바로템+아이템베이 (2026-06-30, gametick `ed91823` / lc_vn `fb8763e`)
@@ -83,6 +83,13 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **수집(lc_vn)**: `src/lib/itembay.ts`(부품 모듈, 매핑 내장: 클래식 iGameSeq=3828) → `collectItembay`가 서버별 최저가를 우리 단위로 정규화해 `history-{game}-itembay.json` 기록. instrumentation tick에 추가(게임당 priceRevalidateSeconds 주기, 서버 호출 150ms 딜레이, try-catch 격리). **lc_vn은 gmhm365 라이브 사이트라 변경 주의**.
 - **계산/표시(gametick)**: `market.ts`가 최저가·스프레드 계산, 시세표에 최저가+거래소칩(최저=앰버). 라이브 검증: 22/29서버, 서버마다 최저 거래소 다름(데포로쥬 베이1220<바로템1300, 이실로테 바로템1100<베이1180).
 - **다음 거래소 추가법**: `data/exchanges.ts`에 active=true, lc_vn에 `{exchange}.ts` 부품(매핑) 작성+instrumentation 훅. gametick은 자동 합산.
+
+### ⛔ 아이템매니아·땡스 — VPS 한국 외 차단(중요)
+- **정찰은 성공**: 아이템매니아 시세 XML `_xml/gamemoney_servers.xml.php?gamecode=`(게임당 1콜 전서버, 단가=price/multiple, 클래식 gamecode=5913, 서버명 매핑). 땡스(`itemthankyou.com`)는 EUC-KR 매물목록+총액(수량 범위)이라 단가 산출 불안정.
+- **그러나 둘 다 말레이시아 VPS에서 차단**: 매니아=연결 타임아웃(http 000, ~134s), 땡스=403. 로컬(한국)은 됨. → **현재 서버에선 수집 불가**.
+- 대응: lc_vn `itemmania.ts`는 보존(향후 KR 수집기/프록시 확보 시 instrumentation에 훅 다시 추가). 땡스 모듈은 미작성. `exchanges.ts`에서 둘 다 active=false.
+- **교훈(수집기)**: 외부 fetch엔 반드시 `AbortSignal.timeout` — 무타임아웃이면 차단 사이트가 instrumentation tick을 134초 행시킴(바로템/베이 수집까지 지연). itembay/itemmania에 8s 타임아웃 적용.
+- VPS 가용성 요약: 바로템✅ 아이템베이✅ chzzk✅ SOOP✅ 유튜브✅ / 아이템매니아❌ 땡스❌.
 
 ### ✅ BJ 순위 실데이터 연동 (2026-06-30, `233fb84`)
 - **BJ 순위 = 치지직 공개 라이브 검색 API 자동화**. `src/lib/chzzk.ts`가 게임별
@@ -178,5 +185,6 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `2aaefc8` 유튜브 라이브 안정화: 스크래핑 1순위 + Data API 폴백 (배포·라이브 검증)
 - `0a8f4a7` 라이브 키워드 튜닝: 플랫폼별 검색어 + 관련성 필터(포함/제외) (배포·라이브 검증)
 - `ed91823` #5 멀티거래소 Phase 1: 바로템+아이템베이 최저가/스프레드 (배포·라이브 검증)
-- (lc_vn 레포) `fb8763e` 멀티거래소 수집: 아이템베이 부품 모듈 (배포 완료)
+- `27a5688` 멀티거래소: 아이템매니아·땡스 비활성(VPS 한국 외 차단)
+- (lc_vn 레포) `fb8763e` 아이템베이 부품 / `317d16f` 아이템매니아 부품(보존·미사용) / `b77bed3` 수집기 타임아웃+매니아 훅 제거
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)
