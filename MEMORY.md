@@ -88,7 +88,17 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - **계산/표시(gametick)**: `market.ts`가 최저가·스프레드 계산, 시세표에 최저가+거래소칩(최저=앰버). 라이브 검증: 22/29서버, 서버마다 최저 거래소 다름(데포로쥬 베이1220<바로템1300, 이실로테 바로템1100<베이1180).
 - **다음 거래소 추가법**: `data/exchanges.ts`에 active=true, lc_vn에 `{exchange}.ts` 부품(매핑) 작성+instrumentation 훅. gametick은 자동 합산.
 
-### ⛔ 아이템매니아·땡스 — VPS 한국 외 차단(중요)
+### 🟢 아이템매니아 — 한국 프록시 경유로 부활 (2026-07-01)
+- 아이템매니아는 한국 외 차단이라 **한국 Vultr 서버(서울)에 tinyproxy**를 띄우고 lc_vn이 그걸 경유해 수집.
+- **KR 프록시 인프라**: Vultr 서울 `158.247.239.183`, tinyproxy 포트 `8888`, **ufw로 말레이시아 VPS(111.90.148.135)만 허용**(오픈프록시 아님). lc_vn 서버 `.env.local`에 `KR_PROXY_URL=http://158.247.239.183:8888`. (KR박스 비번은 비밀; SSH는 말레이시아에서 sshpass 경유로 설정함)
+- **lc_vn 코드**: `itemmania.ts`가 `undici` `ProxyAgent`로 **그 fetch만** 프록시 경유(바로템/베이/텔레는 직접). `KR_PROXY_URL` 없으면 자동 skip. 라이브 검증: 클래식 27/27 수집 → gametick 3거래소(바로템·베이·매니아).
+- **남은 확장**: `itemmania.ts ITEMMANIA`에 게임별 gamecode 추가하면 그 게임도 매니아 합류(현재 클래식=5913만). 아이온2 등은 gamecode 찾아 추가.
+- ⚠️ **KR박스 비용**: Vultr 월 ~$5. 끄면 매니아 수집 중단(바로템·베이는 영향 없음).
+
+### ⛔ 땡스아이템 — 데이터센터 IP까지 차단
+- 땡스(`itemthankyou.com`)는 한국 프록시(Vultr 데이터센터 IP)로도 **403(WAF)**. 한국 IP여도 데이터센터면 막힘 + 데이터 품질도 낮음(총액·수량범위) → **보류**. (살리려면 residential proxy 필요)
+
+### ⛔ (구) VPS 한국 외 차단 메모
 - **정찰은 성공**: 아이템매니아 시세 XML `_xml/gamemoney_servers.xml.php?gamecode=`(게임당 1콜 전서버, 단가=price/multiple, 클래식 gamecode=5913, 서버명 매핑). 땡스(`itemthankyou.com`)는 EUC-KR 매물목록+총액(수량 범위)이라 단가 산출 불안정.
 - **그러나 둘 다 말레이시아 VPS에서 차단**: 매니아=연결 타임아웃(http 000, ~134s), 땡스=403. 로컬(한국)은 됨. → **현재 서버에선 수집 불가**.
 - 대응: lc_vn `itemmania.ts`는 보존(향후 KR 수집기/프록시 확보 시 instrumentation에 훅 다시 추가). 땡스 모듈은 미작성. `exchanges.ts`에서 둘 다 active=false.
@@ -204,5 +214,6 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `27a5688` 멀티거래소: 아이템매니아·땡스 비활성(VPS 한국 외 차단)
 - `b18bfe3` 서버 상세 거래소별 시세 비교 오버레이 (배포·라이브 검증)
 - `e232f48` #7 텔레그램 알림 UI(딥링크) / (lc_vn) `3c4eea5` 텔레그램 알림 백엔드 (배포·라이브)
+- `dad0251` OG 썸네일 / `2516084` 디스코드 알림 UI(+lc_vn `60c51c3`) / `44fefb8` 아이템매니아 활성(한국 프록시) / (lc_vn) `1ebf919` 매니아 프록시 수집·`1f1db72` 게임별 주기
 - (lc_vn 레포) `fb8763e` 아이템베이 부품 / `317d16f` 아이템매니아 부품(보존·미사용) / `b77bed3` 수집기 타임아웃+매니아 훅 제거 / `73180da` 아이템베이 아이온2(44서버) 추가
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)
