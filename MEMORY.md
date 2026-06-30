@@ -152,6 +152,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/lib/format.ts` | 한국식 색상(상승빨강/하락파랑)·포맷 |
 | `src/i18n/{config,dictionaries}.ts` | ko/vi 로케일 + 카피 |
 | `src/components/Header,Footer,MarketTable,Sparkline,CandleChart,AlertButton,FavoritesView` | UI. MarketTable이 클라이언트(폴링·정렬·검색·즐겨찾기) |
+| `src/components/ExchangeOverlay.tsx` | 서버상세 거래소별 시세 비교 오버레이(멀티라인 SVG+범례). `market.getServerExchangeSeries` |
 | `src/app/[locale]/[game]/page.tsx` | 시세표 페이지 |
 | `src/app/[locale]/[game]/[server]/page.tsx` | 서버 상세 + 캔들차트 |
 | `src/app/[locale]/favorites/page.tsx` | 즐겨찾기 대시보드 |
@@ -189,5 +190,6 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - `0a8f4a7` 라이브 키워드 튜닝: 플랫폼별 검색어 + 관련성 필터(포함/제외) (배포·라이브 검증)
 - `ed91823` #5 멀티거래소 Phase 1: 바로템+아이템베이 최저가/스프레드 (배포·라이브 검증)
 - `27a5688` 멀티거래소: 아이템매니아·땡스 비활성(VPS 한국 외 차단)
+- `b18bfe3` 서버 상세 거래소별 시세 비교 오버레이 (배포·라이브 검증)
 - (lc_vn 레포) `fb8763e` 아이템베이 부품 / `317d16f` 아이템매니아 부품(보존·미사용) / `b77bed3` 수집기 타임아웃+매니아 훅 제거 / `73180da` 아이템베이 아이온2(44서버) 추가
 - (lc_vn 레포) `7275900` 수집기 listingCount 저장 (서버 미배포)
