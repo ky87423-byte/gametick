@@ -131,7 +131,19 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **네임드 순위는 그대로 수동 큐레이션**(`rankings.ts` RANKINGS, 비면 "준비 중"). 깔끔한 자동 소스 없음.
 - **검증**: 로컬(메이플 24/9/8…), **VPS(말레이시아)에서 api.chzzk.naver.com 200+데이터**(지역차단 없음), 배포 후 https://gamesise.co.kr/ko/maplestory-world BJ 5채널 렌더(27/10/6/6/2 시청) 확인.
 
+### 17) "네임드 순위" → 치지직 인기 영상으로 전환 (`16cb1c1`)
+- **조사 결론**: 게임 내 네임드(캐릭터) 순위는 깔끔한 자동 소스가 없음.
+  - 치지직 라이브/영상/채널 검색은 다 되지만 전부 *스트리머*(캐릭터 아님).
+  - 리니지 plaync 공식 랭킹은 JS/인증 장벽 + 게임마다 달라 14게임 스크래핑은 깨지기 쉬움.
+  - **벤치마크 gamebit조차 네임드·BJ 둘 다 "준비 중"**으로 비워둠(따라 할 실데이터 없음).
+  - 수동 입력은 라이브에 검증 불가 stale 데이터 → 기각.
+- **결정(사용자 승인)**: 빈 네임드 슬롯을 **치지직 인기 영상(조회수순)** 실데이터로 채움.
+- 구현: `chzzk.ts fetchPopularVideos`(`search/videos`, `revalidate:300`, 조회수 내림차순 상위5, videoNo dedupe) + `chzzkVideoUrl`. 위젯에 영상 제목+조회수+영상 링크+"조회순·치지직" 서브.
+  `data/rankings.ts`는 RankItem 타입만 남김(RANKINGS/getRankings 제거). i18n namedTitle "인기 영상" 등.
+- 검증: typecheck/build 통과, 로컬(3212) 렌더 확인(메이플랜드 인기영상5+BJ5 실데이터). 4게임 영상 데이터 실측 정상.
+- 결과: 랭킹 위젯 **양쪽 다 치지직 실데이터** → gamebit을 두 위젯 모두에서 앞섬.
+
 ### 다음 세션 할 일
-- [ ] (선택) **네임드 순위 채우기** — 게임 랭킹사이트 스크래핑 or 수동 입력.
+- [ ] **배포** — `16cb1c1` 서버 반영(`cd /var/www/gamesise && git pull && npm ci && npm run build && pm2 reload gamesise`) + 라이브 검증.
 - [ ] #5 멀티 거래소(아이템매니아/베이) · #7 텔레/디스코드 알림(봇 토큰 필요).
 - [ ] 차트 누적 모니터링, (선택) gametick→gamesise 리네이밍.
