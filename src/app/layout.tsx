@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
   description:
     "리니지 클래식 아데나, 메이플 메소, 아이온2 키나 등 게임머니 서버별 실시간 시세·차트. 게임시세(GameSise).",
+  // 검색엔진 소유권 확인 (네이버 서치어드바이저 / 구글 서치콘솔)
+  verification: {
+    other: {
+      "naver-site-verification": "87746d893972d82774124c0515e62212098cc218",
+    },
+  },
 };
 
 export const viewport: Viewport = {
