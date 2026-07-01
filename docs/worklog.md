@@ -225,6 +225,16 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 게임별 수집 주기(games.ts refreshSeconds, 클래식·아이온2 3분/나머지 5분) 기준 "다음 갱신 m:ss" 1초 카운트다운. updatedAt+interval 지나면 "갱신 중". MarketTable 내 분리 컴포넌트(UpdateCountdown)로 그것만 리렌더.
 - 라이브 확인: "다음 갱신 2:50" 등 정상(검증 시 카운트다운 숫자가 태그로 쪼개져 grep 주의).
 
+## 2026-07-02 — SEO / 검색엔진 색인 등록 (세션)
+
+### 33) 구글·네이버 서치콘솔 등록 + 색인 준비
+- **진단**: `site:gamesise.co.kr` 결과 0개 → 구글 미색인. 원인은 코드가 아니라 **신규 도메인(이틀 전 라이브) + 서치콘솔 미등록**. 기술 SEO는 정상(robots Allow, sitemap 576 URL 200, title O, noindex 없음, `/`→`/ko` 307, 게임페이지 canonical O).
+- **네이버 서치어드바이저**: 소유확인 = **메타태그**(`layout.tsx` metadata.verification.other `naver-site-verification`, 커밋 `3e6a45e` 배포). 사이트맵 제출 완료. robots.txt "없음" 표시는 **네이버 Yeti 미방문(신규)** 탓 — robots는 200·text/plain·Yeti 200 정상 확인, 수집되면 채워짐.
+- **구글 서치콘솔**: 소유확인 = **DNS TXT**(`google-site-verification=cIEw5v1aglRSrVpxB2Zb2u_yNjOu4ImQ2iG7gqDZdZ0`, 구글/CF DNS 전파 확인 → 코드 불필요). 사이트맵 제출 완료. 도메인 속성이라 전 서브도메인 커버.
+- **URL 색인요청(구글)/웹페이지 수집(네이버)**: 대표 페이지(홈·리니지클래식·아이온2·메이플·리니지M·report·guide) 수동 요청 = 색인 가속(하루 ~10개 할당).
+- **.com → .co.kr 301 확인**: `gamesise.com`/`www`/`http`/경로 전부 301 → `gamesise.co.kr`(경로 보존). 정식 도메인 = **gamesise.co.kr**로 일원화. 서치콘솔은 .co.kr만 등록하면 됨.
+- 결론: 등록 완료, **실제 노출까지 며칠~2주 대기**(신규 도메인 정상). 코드 변경 없음(네이버 메타만).
+
 ---
 
 ## 📌 세션 요약 (2026-06-30 ~ 07-01) — #16~#32
@@ -240,6 +250,7 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ## 다음 세션 할 일 (우선순위)
 
+0. **(운영·모니터링) 색인 상태 확인** — 며칠 뒤 구글 서치콘솔 "색인 생성" 리포트 + `site:gamesise.co.kr`로 색인 페이지 수 증가 확인. 네이버 서치어드바이저 "검색 노출/수집" 현황도. 색인 지연/오류(예: 제외 사유) 있으면 대응. 대표 URL 색인요청 추가(하루 할당 재충전).
 1. **(선택·SEO) 게임/서버별 동적 OG** — "오렌 아데나 1,220원" 카드. 폰트(`src/assets/BlackHanSans.woff`)·`opengraph-image.tsx` 패턴 이미 있음 → `[locale]/[game]/opengraph-image.tsx`, `.../[server]/opengraph-image.tsx` 추가.
 2. **(선택·안정) 유튜브 Data API 키** — `GAMETICK_YT_API_KEY`(Google Cloud 무료) 발급해 서버 `.env.local`(gamesise) 추가 시 라이브 유튜브가 결정적. 현재 스크래핑으로도 동작.
 3. **(선택·UX) 매니아 칩 구분** — 아이템매니아는 "최저가"가 아니라 "대표 시세"라 칩에 표식(예: "매니아 ~") 고려. (사용자 질문 있었음)

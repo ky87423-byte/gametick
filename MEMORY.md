@@ -1,6 +1,6 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-07-01 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> 마지막 갱신: 2026-07-02 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
 > **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
 
 ## 0. 한 줄 요약
@@ -66,7 +66,15 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 - [x] 인증서 1장으로 4도메인 SAN 커버(`live/gamesise.co.kr/`), 자동갱신, 만료 2026-09-27.
 - [x] **.co.kr → 앱(3003) 서빙 / .com → .co.kr 301 리다이렉트** (정식=.co.kr).
 - nginx 설정은 내가 직접 작성(certbot --nginx 아님): `/etc/nginx/conf.d/gamesise.conf` = 3개 server 블록(:80 챌린지+리다이렉트 / :443 .co.kr 프록시 / :443 .com 301). 인증서 갱신은 webroot(`/var/www/html`).
-- 로컬 사본: `C:\Users\User\gamesise.conf` (scp 원본).
+- 로컬 사본: `C:\Users\User\gamesise.conf` (scp 원본). .com→.co.kr 301 정상(www/http/경로 보존) 재확인(2026-07-02).
+
+### 5.1 검색엔진 색인 (2026-07-02 등록, 노출 대기)
+- **정식 도메인 = gamesise.co.kr** (서치콘솔은 .co.kr만 등록. .com은 301로 흡수).
+- **구글 서치콘솔**: 소유확인 **DNS TXT**(`google-site-verification=cIEw5v1aglRSrVpxB2Zb2u_yNjOu4ImQ2iG7gqDZdZ0`, 전파 확인) + 사이트맵 제출 완료. 도메인 속성.
+- **네이버 서치어드바이저**: 소유확인 **메타태그**(`app/layout.tsx` metadata.verification.other `naver-site-verification`) + 사이트맵 제출. 네이버 "robots.txt 없음"은 Yeti 미방문(신규)일 뿐, robots는 정상(200/text-plain/Yeti 200).
+- 기술 SEO 정상: robots Allow(+`/embed/` disallow), `sitemap.xml` 576 URL, 게임/서버/가이드 페이지 canonical·메타, noindex 없음. (홈 `/ko` canonical만 미설정 — 경미)
+- **상태**: 등록 끝, **실검색 노출까지 며칠~2주 대기**(신규 도메인). 색인 진행은 서치콘솔 리포트로 모니터링.
+- 구글 인증코드를 메타로도 넣고 싶으면 `layout.tsx` verification.google에 추가(현재 DNS라 불필요).
 
 ## 6. 현재 상태 & 다음 작업
 
