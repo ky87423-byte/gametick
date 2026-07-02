@@ -83,16 +83,6 @@ export default async function GamePage({
   }));
   const unitText = dict.perUnit(game.unitAmount, game.currency);
 
-  const stat = (label: string, value: string, sub?: string) => (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
-      <div className="text-xs text-zinc-500">{label}</div>
-      <div className="mt-0.5 font-mono text-lg font-semibold tabular-nums">
-        {value}
-      </div>
-      {sub && <div className="text-xs text-zinc-500">{sub}</div>}
-    </div>
-  );
-
   return (
     <>
       <Header locale={locale} activeGame={game.slug} />
@@ -104,25 +94,40 @@ export default async function GamePage({
             {dict.updatedAt}: {formatTime(table.updatedAt, locale)}
           </span>
         </div>
-        <p className="mb-5 text-sm text-zinc-500">
+        <p className="mb-1 text-sm text-zinc-500">
           {unitText} · {dict.source}: {SOURCE_LABEL}
         </p>
-
-        {/* 요약 카드 */}
-        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stat(dict.avgPrice, formatKrw(summary.avg))}
-          {stat(
-            dict.highest,
-            summary.high ? formatKrw(summary.high.price) : "—",
-            summary.high?.name
-          )}
-          {stat(
-            dict.lowest,
-            summary.low ? formatKrw(summary.low.price) : "—",
-            summary.low?.name
-          )}
-          {stat(dict.serverCount, `${summary.activeCount}/${table.servers.length}`)}
-        </div>
+        {/* 요약: 평균/최고/최저/서버 — 작은 텍스트 한 줄 */}
+        <p className="mb-5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-500">
+          <span>
+            {dict.avgPrice}{" "}
+            <span className="font-mono text-zinc-300">{formatKrw(summary.avg)}</span>
+          </span>
+          <span>
+            {dict.highest}{" "}
+            <span className="font-mono text-zinc-300">
+              {summary.high ? formatKrw(summary.high.price) : "—"}
+            </span>
+            {summary.high && (
+              <span className="text-zinc-600"> {summary.high.name}</span>
+            )}
+          </span>
+          <span>
+            {dict.lowest}{" "}
+            <span className="font-mono text-zinc-300">
+              {summary.low ? formatKrw(summary.low.price) : "—"}
+            </span>
+            {summary.low && (
+              <span className="text-zinc-600"> {summary.low.name}</span>
+            )}
+          </span>
+          <span>
+            {dict.serverCount}{" "}
+            <span className="font-mono text-zinc-300">
+              {summary.activeCount}/{table.servers.length}
+            </span>
+          </span>
+        </p>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
           {/* 시세표 */}
