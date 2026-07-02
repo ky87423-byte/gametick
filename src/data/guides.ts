@@ -487,13 +487,47 @@ function priceGuide(locale: Locale, g: GameInfo): Guide {
   };
 }
 
+// 공통 FAQ 페이지 (본문은 Faq 컴포넌트로 렌더 → 문서엔 제목·인트로만)
+const FAQ_META: Record<Locale, { title: string; summary: string; intro: string }> =
+  {
+    ko: {
+      title: "자주 묻는 질문",
+      summary: "시세·단위·매물·알림·거래 관련 자주 묻는 질문",
+      intro: "게임시세 이용과 게임머니 거래에 대해 자주 묻는 질문을 모았습니다.",
+    },
+    en: {
+      title: "FAQ",
+      summary: "Prices, units, listings, alerts, and trading",
+      intro: "Frequently asked questions about using GameSise and trading game currency.",
+    },
+    zh: {
+      title: "常见问题",
+      summary: "行情、单位、在售、提醒与交易相关",
+      intro: "关于使用 GameSise 及游戏币交易的常见问题。",
+    },
+    vi: {
+      title: "Câu hỏi thường gặp",
+      summary: "Giá, đơn vị, tin đăng, cảnh báo và giao dịch",
+      intro: "Các câu hỏi thường gặp khi dùng GameSise và giao dịch tiền game.",
+    },
+  };
+
+function faqGuide(locale: Locale): Guide {
+  const M = FAQ_META[locale] ?? FAQ_META.ko;
+  return {
+    slug: "faq",
+    summary: M.summary,
+    doc: { title: M.title, intro: M.intro, sections: [] },
+  };
+}
+
 export function guideList(locale: Locale): Guide[] {
   const base =
     locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
   const priceGuides = GAMES.filter((g) => GAME_META[g.slug]).map((g) =>
     priceGuide(locale, g)
   );
-  return [...base, gameInfoGuide(locale), ...priceGuides];
+  return [...base, faqGuide(locale), gameInfoGuide(locale), ...priceGuides];
 }
 
 export function getGuide(locale: Locale, slug: string): Guide | null {

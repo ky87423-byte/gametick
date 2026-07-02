@@ -4,14 +4,9 @@ import { FaqItem } from "@/data/content";
 
 export function Faq({ title, items }: { title: string; items: FaqItem[] }) {
   return (
-    <details className="group/faq mt-8">
-      <summary className="flex cursor-pointer list-none items-center gap-2 text-lg font-bold marker:content-none">
-        {title}
-        <span className="text-sm text-zinc-500 transition-transform group-open/faq:rotate-180">
-          ▾
-        </span>
-      </summary>
-      <div className="mt-3 divide-y divide-zinc-800 overflow-hidden rounded-xl border border-zinc-800">
+    <section className="mt-8">
+      <h2 className="mb-3 text-lg font-bold">{title}</h2>
+      <div className="divide-y divide-zinc-800 overflow-hidden rounded-xl border border-zinc-800">
         {items.map((it, i) => (
           <details key={i} className="group bg-zinc-900/40">
             <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-200 marker:content-none hover:bg-zinc-800/50">
@@ -24,6 +19,6 @@ export function Faq({ title, items }: { title: string; items: FaqItem[] }) {
           </details>
         ))}
       </div>
-    </details>
+    </section>
   );
 }

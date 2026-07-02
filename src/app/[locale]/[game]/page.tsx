@@ -7,7 +7,7 @@ import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
-import { faqItems, gameIntro } from "@/data/content";
+import { gameIntro } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
@@ -16,7 +16,6 @@ import { MarketTable } from "@/components/MarketTable";
 import { TrendChart } from "@/components/TrendChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
-import { Faq } from "@/components/Faq";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import {
   changeColor,
@@ -83,16 +82,6 @@ export default async function GamePage({
     platform: s.platform,
   }));
   const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
-  const faqs = faqItems(locale, game);
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
   const crumbLd = breadcrumbLd([
     { name: "GameSise", url: `${SITE}/${locale}` },
     {
@@ -250,9 +239,6 @@ export default async function GamePage({
           </p>
         </section>
 
-        {/* FAQ */}
-        <Faq title={dict.faqTitle} items={faqs} />
-        <JsonLd data={faqLd} />
         <JsonLd data={crumbLd} />
       </main>
 

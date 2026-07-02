@@ -38,6 +38,44 @@ export interface FaqItem {
   a: string;
 }
 
+// 게임 공통 FAQ (전용 FAQ 페이지용, 게임 무관)
+export function generalFaq(locale: Locale): FaqItem[] {
+  if (locale === "en") {
+    return [
+      { q: "How are prices calculated?", a: "We collect the lowest tradable asking price from external exchanges (Barotem, Itembay, Itemmania) per server and refresh periodically. For reference only." },
+      { q: "What does the price unit mean?", a: "The KRW price per a fixed amount of game currency (e.g., per 10,000 Adena, per 10,000,000 Kinah). Each game page shows it like \"per 10,000 Adena\"." },
+      { q: "What is the listings count?", a: "The number of tradable listings on that server — more means higher liquidity." },
+      { q: "How do price alerts work?", a: "Set a target price on a server page to get alerts via Telegram, Discord, or browser notification." },
+      { q: "Do you broker trades?", a: "No. We only provide reference prices; we do not broker trades and are not liable for any transaction." },
+    ];
+  }
+  if (locale === "zh") {
+    return [
+      { q: "行情如何计算？", a: "采集外部交易所（바로템·아이템베이·아이템매니아）可交易挂单中的最低售价，按服务器定期更新。仅供参考。" },
+      { q: "价格单位是什么意思？", a: "每一定数量游戏币的韩元价格（如每 10,000 阿德纳、每 10,000,000 基纳）。各游戏页面会显示为“每 10,000 …”。" },
+      { q: "在售（数量）是什么？", a: "该服务器当前可交易挂单数量，越多表示流动性越高。" },
+      { q: "价格提醒怎么用？", a: "在服务器详情页设置目标价格，可通过 Telegram·Discord·浏览器接收提醒。" },
+      { q: "你们居间交易吗？", a: "不。仅提供参考行情，不居间交易，也不承担交易责任。" },
+    ];
+  }
+  if (locale === "vi") {
+    return [
+      { q: "Giá được tính thế nào?", a: "Thu thập giá bán thấp nhất từ các sàn ngoài (Barotem, Itembay, Itemmania) theo máy chủ và cập nhật định kỳ. Chỉ tham khảo." },
+      { q: "Đơn vị giá nghĩa là gì?", a: "Giá KRW cho một lượng tiền game cố định (vd mỗi 10.000 Adena, mỗi 10.000.000 Kinah). Mỗi trang game hiển thị như \"mỗi 10.000 …\"." },
+      { q: "Cột tin (số lượng) là gì?", a: "Số tin có thể giao dịch của máy chủ đó — càng nhiều thì thanh khoản càng cao." },
+      { q: "Cảnh báo giá dùng thế nào?", a: "Đặt giá mục tiêu ở trang máy chủ để nhận cảnh báo qua Telegram, Discord hoặc thông báo trình duyệt." },
+      { q: "Có trung gian giao dịch không?", a: "Không. Chỉ cung cấp giá tham khảo, không trung gian và không chịu trách nhiệm giao dịch." },
+    ];
+  }
+  return [
+    { q: "시세는 어떻게 산정되나요?", a: "외부 거래소(바로템·아이템베이·아이템매니아)의 거래가능 매물 중 최저 판매가를 서버별로 수집해 주기적으로 갱신합니다. 단순 참고용 정보입니다." },
+    { q: "가격 단위는 무슨 뜻인가요?", a: "게임머니 일정 수량당 원화 가격입니다. 예를 들어 아데나는 1만당, 키나는 1천만당 기준이며, 각 게임 페이지에 \"10,000 아데나 기준\"처럼 표시됩니다." },
+    { q: "매물(건수)은 무엇인가요?", a: "해당 서버의 현재 거래가능 매물 수입니다. 많을수록 거래가 활발하고 유동성이 높습니다." },
+    { q: "가격 알림은 어떻게 쓰나요?", a: "서버 상세 페이지에서 목표 가격을 설정하면 텔레그램·디스코드·브라우저로 알림을 받을 수 있습니다." },
+    { q: "직접 거래나 중개를 하나요?", a: "아니요. 시세 정보만 제공하며 직접 거래를 중개하지 않고, 거래로 인한 책임을 지지 않습니다." },
+  ];
+}
+
 export function faqItems(locale: Locale, game: GameInfo): FaqItem[] {
   if (locale === "en") {
     return [

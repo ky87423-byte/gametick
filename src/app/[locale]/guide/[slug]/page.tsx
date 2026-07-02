@@ -9,6 +9,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Prose } from "@/components/Prose";
 import { GameInfoTable } from "@/components/GameInfoTable";
+import { Faq } from "@/components/Faq";
+import { generalFaq } from "@/data/content";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 
 const CTA_LABEL: Record<string, string> = {
@@ -61,6 +63,26 @@ export default async function GuideArticle({
       />
       <Prose doc={guide.doc} />
       {slug === "game-info" && <GameInfoTable locale={locale} />}
+      {slug === "faq" &&
+        (() => {
+          const faqs = generalFaq(locale);
+          return (
+            <div className="mx-auto w-full max-w-3xl px-4 pb-8">
+              <Faq title={dict.faqTitle} items={faqs} />
+              <JsonLd
+                data={{
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: faqs.map((f) => ({
+                    "@type": "Question",
+                    name: f.q,
+                    acceptedAnswer: { "@type": "Answer", text: f.a },
+                  })),
+                }}
+              />
+            </div>
+          );
+        })()}
       {slug.startsWith("price-") &&
         (() => {
           const g = findGame(slug.replace("price-", ""));

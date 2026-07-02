@@ -44,6 +44,9 @@ export function Footer({ locale }: { locale: Locale }) {
           <Link href={`/${locale}/guide`} className="hover:text-zinc-300">
             {dict.guideNav}
           </Link>
+          <Link href={`/${locale}/guide/faq`} className="hover:text-zinc-300">
+            {dict.faqTitle}
+          </Link>
           <Link href={`/${locale}/about`} className="hover:text-zinc-300">
             {getLegal(locale, "about").title}
           </Link>
