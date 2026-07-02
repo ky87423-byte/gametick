@@ -32,6 +32,7 @@ export function TradeFeed({
   locale,
   volTitle,
   currency,
+  serverNames = [],
   max = 12,
 }: {
   trades: Trade[];
@@ -40,18 +41,19 @@ export function TradeFeed({
   locale: string;
   volTitle?: string;
   currency?: string;
+  serverNames?: string[];
   max?: number;
 }) {
   const [tab, setTab] = useState<"vol" | "trades">("vol");
 
+  // 게임의 모든 서버를 0으로 초기화 후 거래량 합산 → 전 서버 포함 랭킹
   const volMap = new Map<string, number>();
+  for (const name of serverNames) volMap.set(name, 0);
   for (const t of trades) {
     const v = parseQty(t.quantity);
     if (v > 0) volMap.set(t.server, (volMap.get(t.server) ?? 0) + v);
   }
-  const ranking = [...volMap.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  const ranking = [...volMap.entries()].sort((a, b) => b[1] - a[1]);
   const list = trades.slice(0, max);
 
   const tabBtn = (key: "vol" | "trades", label: string) => (
@@ -79,7 +81,7 @@ export function TradeFeed({
         ranking.length === 0 ? (
           <p className="text-xs text-zinc-600">{empty}</p>
         ) : (
-          <ul className="space-y-1">
+          <ul className="max-h-72 space-y-1 overflow-y-auto pr-1">
             {ranking.map(([sv, v], i) => (
               <li
                 key={sv}
@@ -95,9 +97,13 @@ export function TradeFeed({
                 <span className="min-w-0 flex-1 truncate font-medium text-zinc-200">
                   {sv}
                 </span>
-                <span className="shrink-0 font-mono text-zinc-300">
+                <span
+                  className={`shrink-0 font-mono ${
+                    v > 0 ? "text-zinc-300" : "text-zinc-600"
+                  }`}
+                >
                   {fmtQty(v)}
-                  {currency && (
+                  {currency && v > 0 && (
                     <span className="ml-0.5 text-[10px] text-zinc-500">
                       {currency}
                     </span>

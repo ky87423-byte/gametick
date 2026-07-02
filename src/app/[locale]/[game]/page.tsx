@@ -185,6 +185,7 @@ export default async function GamePage({
               locale={locale}
               volTitle={dict.tradeVolume}
               currency={currencyOf(game, locale)}
+              serverNames={table.servers.map((s) => s.nameKo)}
             />
             <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-zinc-800 text-xs text-zinc-600">
               {dict.adSlot}
