@@ -32,13 +32,21 @@ export function Header({
         <nav className="flex items-center gap-3 text-xs text-zinc-400">
           <Link
             href={`/${locale}/live/${liveTarget}`}
-            className={
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-bold ${
               section === "live"
-                ? "font-semibold text-red-400"
-                : "hover:text-red-300"
-            }
+                ? "border-red-500 bg-red-500 text-white"
+                : "border-red-500/40 bg-red-500/15 text-red-400 hover:bg-red-500/25"
+            }`}
           >
-            ● {dict.liveNav}
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+              <span
+                className={`relative inline-flex h-1.5 w-1.5 rounded-full ${
+                  section === "live" ? "bg-white" : "bg-red-500"
+                }`}
+              />
+            </span>
+            {dict.liveNav}
           </Link>
           {/* 리포트·가이드는 상단 메뉴에서 숨김(UX 정리). 페이지·sitemap·푸터 링크는 유지해 SEO 값 보존 */}
           <Link href={`/${locale}/favorites`} className="hover:text-amber-300">
