@@ -38,10 +38,7 @@ export function Header({
           >
             ● {dict.liveNav}
           </Link>
-          <Link href={`/${locale}/report`} className="hover:text-zinc-200">
-            {dict.reportNav}
-          </Link>
-          {/* 가이드는 상단 메뉴에서 숨김(UX 정리). 페이지·sitemap·푸터 링크는 유지해 SEO 값 보존 */}
+          {/* 리포트·가이드는 상단 메뉴에서 숨김(UX 정리). 페이지·sitemap·푸터 링크는 유지해 SEO 값 보존 */}
           <Link href={`/${locale}/favorites`} className="hover:text-amber-300">
             {dict.favoritesNav}
           </Link>
