@@ -27,7 +27,7 @@ export function GameNav({
   return (
     <div className="flex items-start gap-2">
       <nav
-        className={`flex flex-1 flex-wrap gap-2 overflow-hidden sm:max-h-none ${
+        className={`flex flex-1 flex-wrap gap-2 overflow-hidden ${
           open ? "max-h-none" : "max-h-8"
         }`}
       >
@@ -51,7 +51,7 @@ export function GameNav({
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="shrink-0 rounded-full bg-zinc-800 px-2.5 py-1 text-sm text-zinc-300 hover:bg-zinc-700 sm:hidden"
+        className="shrink-0 rounded-full bg-zinc-800 px-2.5 py-1 text-sm text-zinc-300 hover:bg-zinc-700"
       >
         {open ? `${lessLabel} ▴` : `${moreLabel} ▾`}
       </button>
