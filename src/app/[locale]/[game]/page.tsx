@@ -135,6 +135,24 @@ export default async function GamePage({
               {summary.activeCount}/{table.servers.length}
             </span>
           </span>
+          {gainers[0] && gainers[0].change24hPercent !== null && (
+            <span>
+              {gainers[0].nameKo}{" "}
+              <span className="font-semibold text-red-400">
+                ({dict.rise})
+              </span>
+            </span>
+          )}
+          {losers[0] &&
+            losers[0].change24hPercent !== null &&
+            losers[0].change24hPercent < 0 && (
+              <span>
+                {losers[0].nameKo}{" "}
+                <span className="font-semibold text-blue-400">
+                  ({dict.fall})
+                </span>
+              </span>
+            )}
         </p>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
@@ -174,20 +192,8 @@ export default async function GamePage({
             }}
           />
 
-          {/* 사이드: 급등/급락 */}
+          {/* 사이드 */}
           <aside className="space-y-4">
-            <MoversCard
-              title={dict.topGainers}
-              items={gainers}
-              locale={locale}
-              gameSlug={game.slug}
-            />
-            <MoversCard
-              title={dict.topLosers}
-              items={losers}
-              locale={locale}
-              gameSlug={game.slug}
-            />
             {/* 실시간 거래완료 피드 (바로템 display=3 실데이터) */}
             <TradeFeed
               trades={trades}
@@ -251,46 +257,3 @@ export default async function GamePage({
   );
 }
 
-function MoversCard({
-  title,
-  items,
-  locale,
-  gameSlug,
-}: {
-  title: string;
-  items: {
-    serverId: string;
-    nameKo: string;
-    priceKrw: number | null;
-    change24hPercent: number | null;
-  }[];
-  locale: string;
-  gameSlug: string;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
-      <h3 className="mb-2 text-sm font-semibold text-zinc-300">{title}</h3>
-      {items.length === 0 ? (
-        <p className="text-xs text-zinc-600">—</p>
-      ) : (
-        <ul className="space-y-1">
-          {items.map((s) => (
-            <li key={s.serverId}>
-              <Link
-                href={`/${locale}/${gameSlug}/${s.serverId}`}
-                className="flex items-center justify-between rounded px-1 py-1 text-sm hover:bg-zinc-800"
-              >
-                <span>{s.nameKo}</span>
-                <span
-                  className={`font-mono ${changeColor(s.change24hPercent)}`}
-                >
-                  {changeText(s.change24hPercent)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}

@@ -70,6 +70,8 @@ export interface Dictionary {
   // 급등/급락
   topGainers: string;
   topLosers: string;
+  rise: string;
+  fall: string;
   // 상세
   currentPrice: string;
   high: string;
@@ -153,6 +155,8 @@ const ko: Dictionary = {
   serverCount: "서버",
   topGainers: "급등 TOP",
   topLosers: "급락 TOP",
+  rise: "급등",
+  fall: "급락",
   currentPrice: "현재가",
   high: "최고",
   low: "최저",
@@ -235,6 +239,8 @@ const vi: Dictionary = {
   serverCount: "Máy chủ",
   topGainers: "Tăng mạnh",
   topLosers: "Giảm mạnh",
+  rise: "Tăng",
+  fall: "Giảm",
   currentPrice: "Giá hiện tại",
   high: "Cao",
   low: "Thấp",
@@ -319,6 +325,8 @@ const en: Dictionary = {
   serverCount: "Servers",
   topGainers: "Top gainers",
   topLosers: "Top losers",
+  rise: "Rise",
+  fall: "Fall",
   currentPrice: "Price",
   high: "High",
   low: "Low",
@@ -402,6 +410,8 @@ const zh: Dictionary = {
   serverCount: "服务器",
   topGainers: "涨幅榜",
   topLosers: "跌幅榜",
+  rise: "涨",
+  fall: "跌",
   currentPrice: "现价",
   high: "最高",
   low: "最低",
