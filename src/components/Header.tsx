@@ -2,6 +2,8 @@ import Link from "next/link";
 import { GAMES, DEFAULT_GAME_SLUG } from "@/data/games";
 import { Locale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { NoticeBar } from "@/components/NoticeBar";
+import { NOTICE } from "@/data/notice";
 
 export function Header({
   locale,
@@ -17,8 +19,18 @@ export function Header({
   const gameHref = (slug: string) =>
     section === "live" ? `/${locale}/live/${slug}` : `/${locale}/${slug}`;
   const liveTarget = activeGame ?? DEFAULT_GAME_SLUG;
+  const notice = NOTICE[locale] ?? NOTICE.ko;
   return (
-    <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
+    <>
+      {NOTICE.enabled && (
+        <NoticeBar
+          id={NOTICE.id}
+          text={notice.text}
+          cta={notice.cta}
+          href={NOTICE.href ? `/${locale}/${NOTICE.href}` : undefined}
+        />
+      )}
+      <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href={`/${locale}`} className="flex items-baseline gap-2">
           <span className="text-xl font-extrabold tracking-tight text-red-400">
@@ -84,6 +96,7 @@ export function Header({
           })}
         </nav>
       </div>
-    </header>
+      </header>
+    </>
   );
 }
