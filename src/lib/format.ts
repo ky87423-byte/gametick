@@ -71,6 +71,7 @@ const TIME_LOCALE: Record<string, string> = {
 export function formatTime(ms: number | null, locale: string): string {
   if (ms === null) return "—";
   return new Date(ms).toLocaleString(TIME_LOCALE[locale] ?? "ko-KR", {
+    timeZone: "Asia/Seoul", // 한국 시세 → 항상 KST 고정(서버 시간대 무관)
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

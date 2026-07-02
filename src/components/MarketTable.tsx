@@ -256,7 +256,7 @@ export function MarketTable({
                 live ? "bg-emerald-400" : "bg-zinc-600"
               }`}
             />
-            {labels.live} {formatTime(updatedAt, locale)}
+            {labels.live} · {labels.updatedAt} {formatTime(updatedAt, locale)}
             <UpdateCountdown
               updatedAt={updatedAt}
               intervalSeconds={updateIntervalSeconds}

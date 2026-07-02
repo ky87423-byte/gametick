@@ -22,7 +22,6 @@ import {
   changeColor,
   changeText,
   formatKrw,
-  formatTime,
   formatViewers,
 } from "@/lib/format";
 
@@ -107,14 +106,9 @@ export default async function GamePage({
       <Header locale={locale} activeGame={game.slug} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
-        <div className="mb-1 flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {gameNameOf(game, locale)}
-          </h1>
-          <span className="text-xs text-zinc-500">
-            {dict.updatedAt}: {formatTime(table.updatedAt, locale)}
-          </span>
-        </div>
+        <h1 className="mb-1 text-2xl font-bold tracking-tight">
+          {gameNameOf(game, locale)}
+        </h1>
         <p className="mb-1 text-sm text-zinc-500">
           {unitText} · {dict.source}: {SOURCE_LABEL}
         </p>
