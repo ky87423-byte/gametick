@@ -1,13 +1,20 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-07-02 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> 마지막 갱신: 2026-07-03 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
 > **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
+>
+> **최근 세션(2026-07-03) 요약** — 상세는 worklog "2026-07-02~03" 섹션:
+> - i18n **4개 언어**(ko/en/zh/vi) — 통화 영문화(Adena/Kinah/Meso/Dia), 언어별 시간대, `LangSwitch`.
+> - **라이트/다크 테마 토글**(`html.light` zinc 반전), 게임 메뉴 1줄+선택 게임 고정, 시세표 정렬/급등락 표기, 거래 카드 탭화(거래량 랭킹+거래완료).
+> - SEO: 구조화데이터(FAQPage·BreadcrumbList·Organization), 게임별 시세가이드 14편·게임정보표·공통 FAQ(`/guide/faq`), 구글·네이버 서치콘솔 등록.
+> - **파비콘 GS 로고**, 광고 배너 삽입(대리육성), 푸터 CTA 제거, 차트 가격/날짜축.
+> - 🔴 **솔인챈트 단위 오류 수정**(만→천, 양쪽 레포) — §9 교훈 참고.
 
 ## 0. 한 줄 요약
 
 한국 게임머니 **서버별 실시간 시세·차트·가격알림 플랫폼** (gamebit.co.kr 벤치마크, 더 좋게).
 - 시세 자체는 수집하지 않고 **자매 프로젝트 lc_vn의 수집기가 쌓은 데이터를 공유해서 읽기만** 함(A 방식).
-- 한국어(메인) + 베트남어(보조) i18n. 수익은 광고배너 + 자사 CTA(하이브리드).
+- i18n **4개 언어**: 한국어(메인)·영어·중국어·베트남어. 수익은 광고배너(대리육성 등). 라이트/다크 테마.
 
 ## 1. ⚠️ 이름/경로 혼동 주의 (가장 먼저 알아야 할 것)
 
@@ -206,6 +213,9 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 10. **유튜브 검색결과 스크래핑 함정(라이브 페이지)**: ① lazy 정규식(`{[\s\S]*?};</script>`)은 영상 설명문에 들어간 `};</script>`에서 조기 절단 → **중괄호 균형 파서** 써라. ② 유튜브가 `videoRenderer`(구형)/`lockupViewModel`(신형)을 **요청마다 A/B 비결정적**으로 내려줌(node는 구형, 서버 fetch는 랜덤) → `SOCS` consent 쿠키로 classic 유도하면 안정. ③ 라이브 감지는 overlay만 보지 말고 badge `LIVE_NOW`·viewText "시청 중"까지. ④ 근본 안정책은 `GAMETICK_YT_API_KEY`(Data API). **임베드(플레이어/채팅)는 무료 iframe이라 이 고생과 무관** — 쿼터/스크래핑은 "발견"에만.
 11. **iframe `embed_domain`은 `window`로 잡지 말 것**(SSR/CSR hydration 불일치) — 서버 `headers()`의 host를 prop으로 내려라. (유튜브 live_chat 임베드는 부모 도메인 HTTPS + embed_domain 일치 필요)
 12. **라이브 검색은 세 플랫폼 다 느슨함** — SOOP `liveSearch`는 매물 적으면 인기 무관 방송을 끼워넣고, chzzk/youtube도 "클래식"·"메이플"·"아이온" 같은 부분일치로 타게임이 섞임. → `games.ts liveMatch`(제목에 토큰 하나는 포함) + `liveExclude`(타게임 토큰 제외)로 거른다(`live.ts`가 제목 정규화 후 전 플랫폼 적용). 이름이 포함관계인 경우(아이온⊂아이온2, 리니지 클래식/M/2M)는 exclude로 분리하되, "아이온"으로만 적은 아이온2 방송 등은 완전 분리 불가(감수).
+13. **게임 단위(unitAmount)는 바로템 실단위와 반드시 일치** — 바로템은 단위를 페이지에서 자동감지해 **원시 가격 그대로 저장**(정규화 안 함). gametick `games.ts unitAmount`/lc_vn `site.ts fallbackUnit`가 실단위와 어긋나면 표시가 배수만큼 틀림(솔인챈트: 만↔천 10배 오류 사례). 검증: 바로템 `productTable/{thread}?display=2&orderby=3&{opt}={sid}` 응답 `rows[0].unit_price`의 "천당/만당"(헤더 `X-Requested-With: XMLHttpRequest`+`Referer` 필요). 양쪽 레포 같이 고칠 것.
+14. **Next ICO 파비콘은 내부 PNG가 RGBA여야** 빌드 통과(`sharp...ensureAlpha().png()`). RGB면 "Ico: PNG is not in RGBA format" 빌드 에러. `app/icon.png`·`apple-icon.png`도 자동 파비콘.
+15. **라이트/다크 테마**: `html.light`에서 Tailwind v4 zinc CSS변수(`--color-zinc-*`) 반전으로 전체 전환(컴포넌트 수정 없음). 새 색은 zinc 계열 쓰면 자동 대응, 강조색(red/blue 등)은 양쪽 공용. 시각 시간은 `format.ts`가 로케일별 TZ 적용.
 
 ## 10. 커밋 히스토리 (2026-06-30, master)
 

@@ -248,15 +248,46 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 상세는 위 #16~#32 + MEMORY.md §6 박스 참고.
 
+## 2026-07-02~03 — 대규모 UX·SEO·i18n·수익화 세션
+
+### SEO / 검색엔진 (신규)
+- 네이버 서치어드바이저(메타 소유확인)+사이트맵, 구글 서치콘솔(DNS TXT)+사이트맵 등록 완료(색인 대기).
+- **구조화 데이터(JSON-LD)**: 게임=FAQPage, 게임·서버·가이드=BreadcrumbList, 루트 layout=Organization+WebSite. (`components/JsonLd.tsx`의 `JsonLd`/`breadcrumbLd`/`SITE`)
+- **가이드 확장**: 게임 정보 총정리 `/guide/game-info`(`data/gamemeta.ts`+`GameInfoTable`, 출처 나무위키) · 게임별 시세 가이드 14편 `/guide/price-{game}`(게임×통화 키워드, ×4언어=56p, 하단 실시간시세 CTA) · 공통 FAQ `/guide/faq`(`generalFaq`)+푸터 링크. **FAQ는 게임 페이지에서 제거**(56p 중복 정리, JSON-LD는 faq 페이지로).
+
+### i18n — 영어·중국어 추가 (ko/en/zh/vi)
+- `i18n/config.ts` 로케일 4종. `dictionaries.ts` en/zh 전체 UI. `content.ts`(소개·FAQ)·`guides.ts`·`legal.ts` en/zh. `exchange.ts` 보조통화(en=$, zh=¥, +cny). `format.ts` **언어별 시간대**(ko KST·zh UTC+8·vi UTC+7·en UTC, GMT±N 표기) + 시각 KST 고정(서버가 UTC라 9h 어긋나던 것 수정).
+- **통화 영문화**: `games.ts` `currencyOf`(아데나→Adena·키나→Kinah·메소→Meso·다이아→Dia)·`gameNameOf`. 제목·단위·H1·메타에 적용.
+- 언어 스위처 `LangSwitch`(드롭다운·국기+원어명). 브랜드는 고유명사라 전 언어 **"GameSise"**(로고 고정, ZH 번역 원복).
+
+### UI / UX
+- **라이트/다크 테마 토글**(☀️/🌙, 즐겨찾기 옆): `html.light`에서 zinc CSS변수 반전(globals.css) → 컴포넌트 수정 없이 전체 전환. `ThemeToggle`+layout 선적용 스크립트. `.themed-scroll`.
+- **게임 메뉴 `GameNav`**: 기본 1줄+"더보기"(PC·모바일), **선택 게임 맨 앞 고정**(URL+localStorage `gamesise:primaryGame`).
+- **시세표 `MarketTable`**: 정렬 기본 현재가 desc+헤더 클릭 토글(현재가·등락·매물). **급등/급락=서버명 옆** (급등)빨강·(급락)파랑(rows에서 max/min 계산). 요약카드→작은 텍스트, 게임명 삭제(sr-only h1), 단위 폰트↑, 데이터출처 줄바꿈, 업데이트 시각을 실시간 옆으로 이동.
+- **라이브 메뉴** 강조(빨간 알약+ping 점). 모바일 가로넘침 방지(html·body `overflow-x-clip`), 매물·추이 열 모바일 숨김, 매니아 칩 "~" 표기.
+- **거래 카드 탭화 `TradeFeed`**(gamebit 참고, 클라이언트화): ①서버 거래량(전 서버 메달 랭킹·스크롤) ②최근 거래완료(서버수만큼). 수량 파싱 `parseQty`.
+- **차트 `CandleChart`**: 가격축(Y)·날짜축(X, KST) 라벨 추가. ※이벤트 마커·크로스헤어 툴팁은 미구현(자체 SVG라 라이브러리 없음).
+
+### 수익화 / 브랜딩
+- **파비콘 GS 로고**: `app/icon.png`(512)·`apple-icon.png`(180)·`favicon.ico`(48). sharp로 정사각 크롭. ※Next ICO 디코더는 **내부 PNG가 RGBA**여야 함(`ensureAlpha`).
+- **광고 배너**: `public/ads/boost-ad.jpg`(대리육성) 사이드 슬롯에 `next/image`+`rel=sponsored`(→gameboostforge). 푸터 자사 CTA 박스(매입·대리육성 버튼) 제거.
+
+### 🔴 데이터 정합성 수정 (중요·교훈)
+- **솔인챈트 단위 오류 수정**: 만(10,000)→**천(1,000)**. 바로템 실단위가 "천당"인데 설정만 10,000이라 표시가 10배 틀림. gametick `games.ts` unitAmount + lc_vn `site.ts fallbackUnit` **양쪽** 수정. **전 14게임 바로템 실단위 대조 완료**(나머지 정상: 나크·RF는 만당 맞음).
+- 교훈: **바로템은 단위를 원시 저장(정규화 안 함)** → gametick `unitAmount`는 반드시 바로템 실단위와 일치해야 함. 검증법: 바로템 productTable `rows[0].unit_price`의 "천당/만당" 확인(헤더 `X-Requested-With: XMLHttpRequest`+Referer 필요).
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
 0. **(운영·모니터링) 색인 상태 확인** — 며칠 뒤 구글 서치콘솔 "색인 생성" 리포트 + `site:gamesise.co.kr`로 색인 페이지 수 증가 확인. 네이버 서치어드바이저 "검색 노출/수집" 현황도. 색인 지연/오류(예: 제외 사유) 있으면 대응. 대표 URL 색인요청 추가(하루 할당 재충전).
-1. **(선택·SEO) 게임/서버별 동적 OG** — "오렌 아데나 1,220원" 카드. 폰트(`src/assets/BlackHanSans.woff`)·`opengraph-image.tsx` 패턴 이미 있음 → `[locale]/[game]/opengraph-image.tsx`, `.../[server]/opengraph-image.tsx` 추가.
-2. **(선택·안정) 유튜브 Data API 키** — `GAMETICK_YT_API_KEY`(Google Cloud 무료) 발급해 서버 `.env.local`(gamesise) 추가 시 라이브 유튜브가 결정적. 현재 스크래핑으로도 동작.
-3. **(선택·UX) 매니아 칩 구분** — 아이템매니아는 "최저가"가 아니라 "대표 시세"라 칩에 표식(예: "매니아 ~") 고려. (사용자 질문 있었음)
-4. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크 있어 신중(배포경로·CI 영향).
-5. **(운영·주의) KR 프록시 모니터링** — Vultr `158.247.239.183`(tinyproxy:8888) 꺼지면 **아이템매니아만 중단**(바로템·베이 무관). 월 ~$5. 차트 누적도 며칠 관찰.
-6. **(데이터·기회) 멀티거래소 확장** — 새 게임이 거래소 시세피드에 등록되면 추가: 아이템베이=`itembay.ts ITEMBAY`에 `iGameSeq`+서버seq, 아이템매니아=`itemmania.ts ITEMMANIA`에 gamecode. (현 한계: 리니지M/2M=통합거래소, 솔인챈트/나크 등 신생=시세 미운영)
+1. **(선택·차트) 차트 강화** — 사용자가 gamebit 대비 지적함. 옵션: (a) **이벤트 마커**(`data/events.ts` 수동 큐레이션 or 우리 데이터로 급등락 자동 마커), (b) **크로스헤어 툴팁**(마우스 값 표시, 자체 SVG에 추가), (c) **lightweight-charts 교체**(gamebit 수준, 의존성↑·재작성). ※가격/날짜축 라벨은 이미 추가함.
+4. **(선택·i18n) 일본어·태국어·필리핀어 추가** — 구조 완성됨(ko/en/zh/vi). `config.ts` locales + `dictionaries.ts`·`content.ts`·`guides.ts`·`legal.ts`·`format.ts` TZ·`LangSwitch`에 각 언어 추가하면 됨. (사용자가 "ja/th/tl은 나중" 요청)
+5. **(수익화) 광고 배너 링크/확장** — 현재 배너 링크=gameboostforge(임시). 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
+6. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크(배포경로·CI).
+7. **(운영·주의) KR 프록시 모니터링** — Vultr `158.247.239.183`(tinyproxy:8888) 꺼지면 아이템매니아만 중단. 월 ~$5.
+8. **(데이터·기회) 멀티거래소 확장** — 새 게임 거래소 등록 시 `itembay.ts`/`itemmania.ts`에 매핑 추가. (한계: 리니지M/2M=통합거래소, 신생=시세 미운영)
+9. **(선택) 동적 OG**(게임/서버 카드) · **유튜브 Data API 키**(`GAMETICK_YT_API_KEY`, 라이브 결정성↑).
 
 ### ⚠️ 다음 세션 진입 전 확인
 - 양쪽 레포 푸시 완료(gametick·lc_vn). 서버 라이브 정상.
