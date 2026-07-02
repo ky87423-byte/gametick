@@ -42,6 +42,8 @@ export interface TableLabels {
   nextUpdate: string;
   updatingSoon: string;
   live: string;
+  rise: string;
+  fall: string;
 }
 
 // 다음 시세 갱신까지 남은 시간 카운트다운(1초 단위). 테이블 본체와 분리해 이것만 리렌더.
@@ -218,6 +220,27 @@ export function MarketTable({
     return sorted;
   }, [rows, query, sortKey, sortDir, favs]);
 
+  // 최고 등락(급등)·최저 등락(급락) 서버 — 표 안 서버명 옆에 표시
+  const { gainerId, loserId } = useMemo(() => {
+    let g: string | null = null;
+    let l: string | null = null;
+    let gv = 0;
+    let lv = 0;
+    for (const s of rows) {
+      const c = s.change24hPercent;
+      if (c == null) continue;
+      if (c > gv) {
+        gv = c;
+        g = s.serverId;
+      }
+      if (c < lv) {
+        lv = c;
+        l = s.serverId;
+      }
+    }
+    return { gainerId: g, loserId: l };
+  }, [rows]);
+
   // tick 표시용(리렌더 트리거)
   void tickRef;
 
@@ -306,7 +329,19 @@ export function MarketTable({
                     {favs.has(s.serverId) ? "★" : "☆"}
                   </button>
                 </td>
-                <td className="px-3 py-2 font-medium">{s.nameKo}</td>
+                <td className="px-3 py-2 font-medium">
+                  {s.nameKo}
+                  {s.serverId === gainerId && (
+                    <span className="ml-1 text-xs font-semibold text-red-400">
+                      ({labels.rise})
+                    </span>
+                  )}
+                  {s.serverId === loserId && (
+                    <span className="ml-1 text-xs font-semibold text-blue-400">
+                      ({labels.fall})
+                    </span>
+                  )}
+                </td>
                 <td className="px-3 py-2 text-right">
                   <div className="font-mono tabular-nums">
                     {formatKrw(s.priceKrw)}

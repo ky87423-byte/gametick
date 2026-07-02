@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
+import { getGameTrend, getMarketTable, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
@@ -66,7 +66,6 @@ export default async function GamePage({
     fetchPopularVideos(keyword, 5),
   ]);
   const summary = summarize(table);
-  const { gainers, losers } = movers(table, 3);
   const namedRanks = popularVideos.map((v, i) => ({
     rank: i + 1,
     name: v.title,
@@ -135,24 +134,6 @@ export default async function GamePage({
               {summary.activeCount}/{table.servers.length}
             </span>
           </span>
-          {gainers[0] && gainers[0].change24hPercent !== null && (
-            <span>
-              {gainers[0].nameKo}{" "}
-              <span className="font-semibold text-red-400">
-                ({dict.rise})
-              </span>
-            </span>
-          )}
-          {losers[0] &&
-            losers[0].change24hPercent !== null &&
-            losers[0].change24hPercent < 0 && (
-              <span>
-                {losers[0].nameKo}{" "}
-                <span className="font-semibold text-blue-400">
-                  ({dict.fall})
-                </span>
-              </span>
-            )}
         </p>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
@@ -189,6 +170,8 @@ export default async function GamePage({
               nextUpdate: dict.nextUpdate,
               updatingSoon: dict.updatingSoon,
               live: dict.live,
+              rise: dict.rise,
+              fall: dict.fall,
             }}
           />
 
