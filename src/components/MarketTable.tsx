@@ -94,9 +94,11 @@ export function MarketTable({
   const router = useRouter();
   const [query, setQuery] = useState("");
   // 기본: 현재가 높은순(desc). 현재가 헤더 클릭 시 낮은순(asc) 토글.
-  const [sortKey, setSortKey] = useState<"price" | "change">("price");
+  const [sortKey, setSortKey] = useState<"price" | "change" | "listings">(
+    "price"
+  );
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const sortBy = (key: "price" | "change") => {
+  const sortBy = (key: "price" | "change" | "listings") => {
     if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
     else {
       setSortKey(key);
@@ -194,7 +196,11 @@ export function MarketTable({
           s.nameEn.toLowerCase().includes(q)
       );
     const val = (s: ServerRow) =>
-      sortKey === "price" ? s.priceKrw : s.change24hPercent;
+      sortKey === "price"
+        ? s.priceKrw
+        : sortKey === "change"
+          ? s.change24hPercent
+          : s.listingCount;
     const sorted = [...l].sort((a, b) => {
       const av = val(a);
       const bv = val(b);
@@ -216,8 +222,12 @@ export function MarketTable({
   void tickRef;
 
   // 정렬 가능한 컬럼 헤더(우측정렬). 활성 컬럼은 ▲/▼, 비활성은 ↕ 힌트.
-  const sortableHeader = (key: "price" | "change", label: string) => (
-    <th className="px-3 py-2 text-right font-medium">
+  const sortableHeader = (
+    key: "price" | "change" | "listings",
+    label: string,
+    extra = ""
+  ) => (
+    <th className={`px-3 py-2 text-right font-medium ${extra}`}>
       <button
         onClick={() => sortBy(key)}
         className="inline-flex items-center gap-0.5 hover:text-zinc-200"
@@ -265,9 +275,7 @@ export function MarketTable({
               <th className="px-3 py-2 text-left font-medium">{labels.server}</th>
               {sortableHeader("price", labels.price)}
               {sortableHeader("change", labels.change24h)}
-              <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
-                {labels.listings}
-              </th>
+              {sortableHeader("listings", labels.listings, "hidden sm:table-cell")}
               <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
                 {labels.chart}
               </th>
