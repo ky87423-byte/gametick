@@ -120,6 +120,79 @@ const vi: Record<LegalKey, Doc> = {
   },
 };
 
+const en: Record<LegalKey, Doc> = {
+  about: {
+    title: "About GameSise",
+    intro:
+      "GameSise provides real-time, per-server prices for Korean game currencies.",
+    sections: [
+      {
+        paragraphs: [
+          "We collect the lowest asking price from external exchanges to provide per-server prices, 24h change, candle charts, price alerts, and a recent-trades feed.",
+          "Advertising inquiries: ad@gamesise.co.kr",
+        ],
+      },
+    ],
+  },
+  terms: {
+    title: "Terms of Service",
+    sections: [
+      {
+        paragraphs: [
+          "GameSise provides price information for reference only, does not guarantee its accuracy, and does not broker trades. Users are responsible for their own transactions.",
+        ],
+      },
+    ],
+  },
+  privacy: {
+    title: "Privacy Policy",
+    sections: [
+      {
+        paragraphs: [
+          "GameSise requires no sign-up and does not collect personal information. Favorites and price-alert settings are stored only in your browser.",
+        ],
+      },
+    ],
+  },
+};
+
+const zh: Record<LegalKey, Doc> = {
+  about: {
+    title: "关于游戏币行情",
+    intro: "游戏币行情（GameSise）提供韩国游戏币各服务器的实时行情信息。",
+    sections: [
+      {
+        paragraphs: [
+          "我们采集外部交易所的最低售价，提供各服务器行情、24小时涨跌、K线图、价格提醒和最近成交动态。",
+          "广告合作：ad@gamesise.co.kr",
+        ],
+      },
+    ],
+  },
+  terms: {
+    title: "使用条款",
+    sections: [
+      {
+        paragraphs: [
+          "本站仅提供参考性行情信息，不保证其准确性，且不居间交易。用户须对自身交易自行负责。",
+        ],
+      },
+    ],
+  },
+  privacy: {
+    title: "隐私政策",
+    sections: [
+      {
+        paragraphs: [
+          "本站无需注册，也不收集个人信息。收藏与价格提醒设置仅保存在您的浏览器中。",
+        ],
+      },
+    ],
+  },
+};
+
 export function getLegal(locale: Locale, key: LegalKey): Doc {
-  return (locale === "vi" ? vi : ko)[key];
+  const set =
+    locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
+  return set[key];
 }

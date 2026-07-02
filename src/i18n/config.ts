@@ -1,5 +1,5 @@
-// 지원 로케일 — 한국(메인) + 베트남(보조)
-export const locales = ["ko", "vi"] as const;
+// 지원 로케일 — 한국(메인) + 영어·중국어·베트남 (일본·태국·필리핀은 추후)
+export const locales = ["ko", "en", "zh", "vi"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "ko";
 

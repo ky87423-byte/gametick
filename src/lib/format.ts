@@ -23,23 +23,36 @@ export function trendStroke(data: number[]): string {
   return data[data.length - 1] >= data[0] ? "#f87171" : "#60a5fa";
 }
 
+const TIME_AGO: Record<
+  string,
+  { now: string; m: (n: number) => string; h: (n: number) => string; d: (n: number) => string }
+> = {
+  ko: { now: "방금", m: (n) => `${n}분 전`, h: (n) => `${n}시간 전`, d: (n) => `${n}일 전` },
+  en: { now: "just now", m: (n) => `${n}m ago`, h: (n) => `${n}h ago`, d: (n) => `${n}d ago` },
+  zh: { now: "刚刚", m: (n) => `${n}分钟前`, h: (n) => `${n}小时前`, d: (n) => `${n}天前` },
+  vi: {
+    now: "vừa xong",
+    m: (n) => `${n} phút trước`,
+    h: (n) => `${n} giờ trước`,
+    d: (n) => `${n} ngày trước`,
+  },
+};
+
 export function timeAgo(ms: number | null, locale: string): string {
   if (ms === null) return "";
+  const t = TIME_AGO[locale] ?? TIME_AGO.ko;
   const diff = Date.now() - ms;
-  const ko = locale !== "vi";
-  if (diff < 0) return ko ? "방금" : "vừa xong";
   const min = Math.floor(diff / 60000);
-  if (min < 1) return ko ? "방금" : "vừa xong";
-  if (min < 60) return ko ? `${min}분 전` : `${min} phút trước`;
+  if (diff < 0 || min < 1) return t.now;
+  if (min < 60) return t.m(min);
   const hr = Math.floor(min / 60);
-  if (hr < 24) return ko ? `${hr}시간 전` : `${hr} giờ trước`;
-  const d = Math.floor(hr / 24);
-  return ko ? `${d}일 전` : `${d} ngày trước`;
+  if (hr < 24) return t.h(hr);
+  return t.d(Math.floor(hr / 24));
 }
 
-/** 시청자수 약식 (ko: 1234→1.2천, 12345→1.2만 / vi: 1.2K, 12.3K) */
+/** 시청자수 약식 (ko: 1234→1.2천, 12345→1.2만 / 그 외: 1.2K) */
 export function formatViewers(n: number, locale: string): string {
-  if (locale === "vi") {
+  if (locale !== "ko") {
     if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
     return String(n);
   }
@@ -48,9 +61,16 @@ export function formatViewers(n: number, locale: string): string {
   return String(n);
 }
 
+const TIME_LOCALE: Record<string, string> = {
+  ko: "ko-KR",
+  en: "en-US",
+  zh: "zh-CN",
+  vi: "vi-VN",
+};
+
 export function formatTime(ms: number | null, locale: string): string {
   if (ms === null) return "—";
-  return new Date(ms).toLocaleString(locale === "ko" ? "ko-KR" : "vi-VN", {
+  return new Date(ms).toLocaleString(TIME_LOCALE[locale] ?? "ko-KR", {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

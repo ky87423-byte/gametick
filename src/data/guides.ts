@@ -142,8 +142,104 @@ const vi: Guide[] = [
   },
 ];
 
+const en: Guide[] = [
+  {
+    slug: "how-to-read",
+    summary: "How to read prices, change, and charts",
+    doc: {
+      title: "How to read game currency prices",
+      sections: [
+        {
+          paragraphs: [
+            "Displayed prices are in KRW per unit (per 10,000 / 10,000,000 / 1,000,000 depending on the game). Rising = red, falling = blue (Korean convention). Tap a server to see candle charts and price alerts.",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "safe-trade",
+    summary: "Rules for safe trading",
+    doc: {
+      title: "Safe trading guide",
+      sections: [
+        {
+          paragraphs: [
+            "Check the price on GameSise first, use reputable exchanges with escrow, and be wary of listings that are unusually cheap or ask for payment upfront.",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "fraud-prevention",
+    summary: "Avoiding scams",
+    doc: {
+      title: "Game currency fraud prevention",
+      sections: [
+        {
+          paragraphs: [
+            "Common scams: taking payment then vanishing, cheap bait listings, luring to external messengers or fake payment pages. Use escrow, check seller reputation, and compare prices.",
+          ],
+        },
+      ],
+    },
+  },
+];
+
+const zh: Guide[] = [
+  {
+    slug: "how-to-read",
+    summary: "如何看价格、涨跌和图表",
+    doc: {
+      title: "如何查看游戏币行情",
+      sections: [
+        {
+          paragraphs: [
+            "显示价格为每单位韩元（视游戏为每 10,000 / 10,000,000 / 1,000,000）。上涨=红，下跌=蓝（韩国惯例）。点击服务器可查看K线图和价格提醒。",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "safe-trade",
+    summary: "安全交易守则",
+    doc: {
+      title: "安全交易指南",
+      sections: [
+        {
+          paragraphs: [
+            "先在本站核对行情，使用信誉良好的交易所与担保交易（第三方托管），警惕异常便宜的挂单和要求先付款的直接交易。",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "fraud-prevention",
+    summary: "防范诈骗",
+    doc: {
+      title: "游戏币防诈骗",
+      sections: [
+        {
+          paragraphs: [
+            "常见骗术：收款后失联、低价诱饵挂单、诱导至外部通讯或假支付页面。请使用担保交易、核实卖家信誉并对比行情。",
+          ],
+        },
+      ],
+    },
+  },
+];
+
 export function guideList(locale: Locale): Guide[] {
-  return locale === "vi" ? vi : ko;
+  return locale === "en"
+    ? en
+    : locale === "zh"
+      ? zh
+      : locale === "vi"
+        ? vi
+        : ko;
 }
 
 export function getGuide(locale: Locale, slug: string): Guide | null {

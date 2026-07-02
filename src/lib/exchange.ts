@@ -4,9 +4,10 @@
 interface Rates {
   vnd: number;
   usd: number;
+  cny: number;
 }
 
-const FALLBACK: Rates = { vnd: 17.1, usd: 0.00072 };
+const FALLBACK: Rates = { vnd: 17.1, usd: 0.00072, cny: 0.0052 };
 let cache: { rates: Rates; at: number } | null = null;
 const TTL_MS = 60 * 60 * 1000;
 
@@ -19,13 +20,16 @@ export async function getRates(): Promise<Rates> {
     if (!res.ok) throw new Error("rate fetch failed");
     const data = (await res.json()) as {
       result?: string;
-      rates?: { VND?: number; USD?: number };
+      rates?: { VND?: number; USD?: number; CNY?: number };
     };
+    const ok = data.result === "success";
     const vnd = data.rates?.VND;
     const usd = data.rates?.USD;
+    const cny = data.rates?.CNY;
     const rates: Rates = {
-      vnd: data.result === "success" && vnd && vnd > 0 ? vnd : FALLBACK.vnd,
-      usd: data.result === "success" && usd && usd > 0 ? usd : FALLBACK.usd,
+      vnd: ok && vnd && vnd > 0 ? vnd : FALLBACK.vnd,
+      usd: ok && usd && usd > 0 ? usd : FALLBACK.usd,
+      cny: ok && cny && cny > 0 ? cny : FALLBACK.cny,
     };
     cache = { rates, at: Date.now() };
     return rates;
@@ -43,6 +47,18 @@ export function secondaryCurrency(
   if (krw === null) return null;
   if (locale === "vi") {
     return `≈ ${Math.round(krw * rates.vnd).toLocaleString("vi-VN")}₫`;
+  }
+  if (locale === "en") {
+    return `≈ $${(krw * rates.usd).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+  if (locale === "zh") {
+    return `≈ ¥${(krw * rates.cny).toLocaleString("zh-CN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   }
   return null; // ko는 원화만 표시
 }

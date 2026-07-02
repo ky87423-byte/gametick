@@ -4,6 +4,12 @@ import { Locale } from "@/i18n/config";
 import { GameInfo } from "@/data/games";
 
 export function gameIntro(locale: Locale, game: GameInfo): string {
+  if (locale === "en") {
+    return `Real-time ${game.currency} prices by server for ${game.nameEn}. We collect the lowest asking price among tradable listings on external exchanges, normalized per ${game.unitAmount.toLocaleString("en-US")} ${game.currency} (KRW), and update automatically. Tap a server for candle charts, 24h change, and price alerts. Prices are for reference only and may differ from actual trades.`;
+  }
+  if (locale === "zh") {
+    return `${game.nameEn} 各服务器 ${game.currency} 实时行情。我们采集外部交易所可交易挂单中的最低售价，按每 ${game.unitAmount.toLocaleString("en-US")} ${game.currency}（韩元）计算并自动更新。点击服务器可查看K线图、24小时涨跌和价格提醒。价格仅供参考，可能与实际成交价不同。`;
+  }
   if (locale === "vi") {
     return `Giá ${game.currency} theo máy chủ ${game.nameEn} theo thời gian thực. Chúng tôi thu thập giá bán thấp nhất của các tin đang giao dịch trên sàn bên ngoài, quy theo mỗi ${game.unitLabelKo} ${game.currency} (KRW) và tự động cập nhật. Giá chỉ mang tính tham khảo.`;
   }
@@ -15,6 +21,12 @@ export function serverIntro(
   game: GameInfo,
   serverName: string
 ): string {
+  if (locale === "en") {
+    return `Real-time ${game.currency} prices for ${game.nameEn} server ${serverName}. Provides the lowest price per ${game.unitAmount.toLocaleString("en-US")} ${game.currency}, 24h change, candle charts (3m/1h/1d), and price alerts. Prices are aggregated from external exchange listings and are for reference only.`;
+  }
+  if (locale === "zh") {
+    return `${game.nameEn} ${serverName} 服务器 ${game.currency} 实时行情。提供每 ${game.unitAmount.toLocaleString("en-US")} ${game.currency} 最低售价、24小时涨跌、K线图（3分/1小时/日线）和价格提醒。行情基于外部交易所可交易挂单自动更新，仅供参考。`;
+  }
   if (locale === "vi") {
     return `Giá ${game.currency} máy chủ ${serverName} của ${game.nameEn} theo thời gian thực. Cung cấp giá thấp nhất mỗi ${game.unitLabelKo} ${game.currency}, biến động 24h, biểu đồ nến (3 phút/1 giờ/ngày) và cảnh báo giá. Giá chỉ mang tính tham khảo.`;
   }
@@ -27,6 +39,54 @@ export interface FaqItem {
 }
 
 export function faqItems(locale: Locale, game: GameInfo): FaqItem[] {
+  if (locale === "en") {
+    return [
+      {
+        q: "How are prices calculated?",
+        a: `We collect the lowest ${game.currency} asking price among tradable listings on external exchanges, updated per server. Reference only.`,
+      },
+      {
+        q: `What does the price unit (per ${game.unitAmount.toLocaleString("en-US")}) mean?`,
+        a: `The KRW price per ${game.unitAmount.toLocaleString("en-US")} ${game.currency}. For example, "1,500" means ${game.unitAmount.toLocaleString("en-US")} ${game.currency} = 1,500 KRW.`,
+      },
+      {
+        q: "What is the listings count?",
+        a: "The number of tradable listings on that server. More listings means higher liquidity.",
+      },
+      {
+        q: "How do price alerts work?",
+        a: "On a server page, set a target price (below/above) and we'll send a browser notification when the price meets it.",
+      },
+      {
+        q: "Do you broker trades?",
+        a: "No. We only provide reference price information; we do not broker trades and are not liable for any transaction.",
+      },
+    ];
+  }
+  if (locale === "zh") {
+    return [
+      {
+        q: "行情如何计算？",
+        a: `采集外部交易所可交易挂单中的 ${game.currency} 最低售价，按服务器定期更新。仅供参考。`,
+      },
+      {
+        q: `价格单位（每 ${game.unitAmount.toLocaleString("en-US")}）是什么意思？`,
+        a: `每 ${game.unitAmount.toLocaleString("en-US")} ${game.currency} 的韩元价格。例如“1,500”表示 ${game.unitAmount.toLocaleString("en-US")} ${game.currency} = 1,500 韩元。`,
+      },
+      {
+        q: "在售（数量）是什么？",
+        a: "该服务器当前可交易的挂单数量。越多表示交易越活跃、流动性越高。",
+      },
+      {
+        q: "价格提醒怎么用？",
+        a: "在服务器详情页设置目标价格（低于/高于），当行情达到条件时发送浏览器通知。",
+      },
+      {
+        q: "你们居间交易吗？",
+        a: "不。我们只提供参考行情信息，不居间交易，也不对交易承担责任。",
+      },
+    ];
+  }
   if (locale === "vi") {
     return [
       {

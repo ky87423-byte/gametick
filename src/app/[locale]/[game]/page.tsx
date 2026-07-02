@@ -36,8 +36,9 @@ export async function generateMetadata({
   const game = findGame(slug);
   if (!game || !isLocale(locale)) return {};
   const dict = getDictionary(locale as Locale);
-  const title = `${dict.priceTitle(game.nameKo, game.currency)} | ${dict.brand}`;
-  const description = `${game.nameKo} ${game.currency} 서버별 실시간 시세·등락·차트. ${dict.brand}.`;
+  const gameName = locale === "ko" ? game.nameKo : game.nameEn;
+  const title = `${dict.priceTitle(gameName, game.currency)} | ${dict.brand}`;
+  const description = gameIntro(locale as Locale, game);
   return {
     title,
     description,

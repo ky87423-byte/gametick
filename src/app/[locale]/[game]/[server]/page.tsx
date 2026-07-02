@@ -34,8 +34,9 @@ export async function generateMetadata({
   const server = findServer(game, sid);
   if (!server) return {};
   const dict = getDictionary(locale as Locale);
-  const title = `${server.nameKo} ${game.currency} 시세 | ${dict.brand}`;
-  const description = `${game.nameKo} ${server.nameKo} 서버 ${game.currency} 실시간 시세·24h 등락·캔들 차트.`;
+  const gameName = locale === "ko" ? game.nameKo : game.nameEn;
+  const title = `${server.nameKo} · ${gameName} ${game.currency} | ${dict.brand}`;
+  const description = serverIntro(locale as Locale, game, server.nameKo);
   return {
     title,
     description,
