@@ -2,6 +2,8 @@
 
 import { Locale } from "@/i18n/config";
 import { Doc } from "@/components/Prose";
+import { GAMES, gameNameOf } from "@/data/games";
+import { GAME_META } from "@/data/gamemeta";
 
 export interface Guide {
   slug: string;
@@ -232,14 +234,106 @@ const zh: Guide[] = [
   },
 ];
 
+// 게임별 기본 정보 가이드 — GAME_META에서 생성(출처: 나무위키)
+const META_LABELS: Record<
+  Locale,
+  {
+    title: string;
+    summary: string;
+    intro: string;
+    release: string;
+    company: string;
+    genre: string;
+    platform: string;
+    countries: string;
+    multiClient: string;
+    minSpec: string;
+    recSpec: string;
+  }
+> = {
+  ko: {
+    title: "게임 정보 총정리",
+    summary: "게임별 출시·회사·장르·플랫폼·사양·서비스 국가",
+    intro:
+      "게임시세에 등록된 게임들의 기본 정보입니다. (출처: 나무위키) PC 최소·권장 사양과 다중 클라이언트는 공식 표기가 있는 경우만 기재하며, 대부분 모바일 기반이라 '—'로 표시됩니다.",
+    release: "출시",
+    company: "개발/유통",
+    genre: "장르",
+    platform: "플랫폼",
+    countries: "서비스 국가",
+    multiClient: "다중 클라이언트",
+    minSpec: "최소사양",
+    recSpec: "권장사양",
+  },
+  en: {
+    title: "Game info overview",
+    summary: "Release, company, genre, platform, specs by game",
+    intro:
+      "Basic info for games listed on GameSise. (Source: Namuwiki) PC min/recommended specs and multi-client are shown only where officially listed; most are mobile-based, marked '—'.",
+    release: "Release",
+    company: "Company",
+    genre: "Genre",
+    platform: "Platform",
+    countries: "Countries",
+    multiClient: "Multi-client",
+    minSpec: "Min spec",
+    recSpec: "Rec spec",
+  },
+  zh: {
+    title: "游戏信息总览",
+    summary: "各游戏上市 / 公司 / 类型 / 平台 / 配置",
+    intro:
+      "GameSise 收录游戏的基本信息。（来源：Namuwiki）PC 最低/推荐配置与多开仅在官方标注时列出，多数为手游，标记为“—”。",
+    release: "上市",
+    company: "开发/发行",
+    genre: "类型",
+    platform: "平台",
+    countries: "服务地区",
+    multiClient: "多开",
+    minSpec: "最低配置",
+    recSpec: "推荐配置",
+  },
+  vi: {
+    title: "Tổng quan thông tin game",
+    summary: "Phát hành, công ty, thể loại, nền tảng theo game",
+    intro:
+      "Thông tin cơ bản của các game trên GameSise. (Nguồn: Namuwiki) Cấu hình PC và đa client chỉ hiển thị khi có công bố chính thức; đa số là game mobile, ghi '—'.",
+    release: "Phát hành",
+    company: "Công ty",
+    genre: "Thể loại",
+    platform: "Nền tảng",
+    countries: "Quốc gia",
+    multiClient: "Đa client",
+    minSpec: "Cấu hình tối thiểu",
+    recSpec: "Cấu hình đề nghị",
+  },
+};
+
+function gameInfoGuide(locale: Locale): Guide {
+  const L = META_LABELS[locale] ?? META_LABELS.ko;
+  const sections = GAMES.filter((g) => GAME_META[g.slug]).map((g) => {
+    const m = GAME_META[g.slug];
+    return {
+      heading: gameNameOf(g, locale),
+      paragraphs: [
+        `${L.release}: ${m.release} · ${L.company}: ${m.company}`,
+        `${L.genre}: ${m.genre} · ${L.platform}: ${m.platform}`,
+        `${L.countries}: ${m.countries} · ${L.multiClient}: ${m.multiClient}`,
+        `${L.minSpec}: ${m.minSpec} · ${L.recSpec}: ${m.recSpec}`,
+      ],
+    };
+  });
+  return {
+    slug: "game-info",
+    summary: L.summary,
+    doc: { title: L.title, intro: L.intro, sections },
+  };
+}
+
 export function guideList(locale: Locale): Guide[] {
-  return locale === "en"
-    ? en
-    : locale === "zh"
-      ? zh
-      : locale === "vi"
-        ? vi
-        : ko;
+  const base =
+    locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
+  return [...base, gameInfoGuide(locale)];
 }
 
 export function getGuide(locale: Locale, slug: string): Guide | null {
