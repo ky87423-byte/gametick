@@ -22,7 +22,7 @@ export function Header({
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href={`/${locale}`} className="flex items-baseline gap-2">
           <span className="text-xl font-extrabold tracking-tight text-red-400">
-            {dict.brand}
+            GameSise
           </span>
           <span className="hidden text-xs text-zinc-500 sm:inline">
             {dict.tagline}
