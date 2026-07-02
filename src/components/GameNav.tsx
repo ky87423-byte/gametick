@@ -4,7 +4,7 @@
 // PC(sm+)는 항상 전체 표시(버튼 숨김).
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GAMES } from "@/data/games";
 
 export function GameNav({
@@ -21,6 +21,26 @@ export function GameNav({
   lessLabel: string;
 }) {
   const [open, setOpen] = useState(false);
+  // 선택(활성) 게임을 맨 앞으로 고정. 활성 게임이 있으면 저장하고, 없으면 저장값 사용.
+  const [primary, setPrimary] = useState<string | undefined>(activeGame);
+  useEffect(() => {
+    try {
+      if (activeGame) {
+        localStorage.setItem("gamesise:primaryGame", activeGame);
+        setPrimary(activeGame);
+      } else {
+        const saved = localStorage.getItem("gamesise:primaryGame");
+        if (saved) setPrimary(saved);
+      }
+    } catch {}
+  }, [activeGame]);
+
+  const ordered = useMemo(() => {
+    const idx = primary ? GAMES.findIndex((g) => g.slug === primary) : -1;
+    if (idx <= 0) return GAMES;
+    return [GAMES[idx], ...GAMES.slice(0, idx), ...GAMES.slice(idx + 1)];
+  }, [primary]);
+
   const href = (slug: string) =>
     section === "live" ? `/${locale}/live/${slug}` : `/${locale}/${slug}`;
 
@@ -31,7 +51,7 @@ export function GameNav({
           open ? "max-h-none" : "max-h-8"
         }`}
       >
-        {GAMES.map((g) => {
+        {ordered.map((g) => {
           const active = g.slug === activeGame;
           return (
             <Link
