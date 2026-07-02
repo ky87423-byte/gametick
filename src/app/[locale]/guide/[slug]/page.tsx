@@ -7,6 +7,7 @@ import { getGuide } from "@/data/guides";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Prose } from "@/components/Prose";
+import { GameInfoTable } from "@/components/GameInfoTable";
 
 export async function generateMetadata({
   params,
@@ -43,6 +44,7 @@ export default async function GuideArticle({
         </Link>
       </div>
       <Prose doc={guide.doc} />
+      {slug === "game-info" && <GameInfoTable locale={locale} />}
       <Footer locale={locale} />
     </>
   );

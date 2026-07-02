@@ -2,8 +2,6 @@
 
 import { Locale } from "@/i18n/config";
 import { Doc } from "@/components/Prose";
-import { GAMES, gameNameOf } from "@/data/games";
-import { GAME_META } from "@/data/gamemeta";
 
 export interface Guide {
   slug: string;
@@ -309,24 +307,13 @@ const META_LABELS: Record<
   },
 };
 
+// game-info는 표(GameInfoTable)로 렌더 → 문서엔 제목·인트로만.
 function gameInfoGuide(locale: Locale): Guide {
   const L = META_LABELS[locale] ?? META_LABELS.ko;
-  const sections = GAMES.filter((g) => GAME_META[g.slug]).map((g) => {
-    const m = GAME_META[g.slug];
-    return {
-      heading: gameNameOf(g, locale),
-      paragraphs: [
-        `${L.release}: ${m.release} · ${L.company}: ${m.company}`,
-        `${L.genre}: ${m.genre} · ${L.platform}: ${m.platform}`,
-        `${L.countries}: ${m.countries} · ${L.multiClient}: ${m.multiClient}`,
-        `${L.minSpec}: ${m.minSpec} · ${L.recSpec}: ${m.recSpec}`,
-      ],
-    };
-  });
   return {
     slug: "game-info",
     summary: L.summary,
-    doc: { title: L.title, intro: L.intro, sections },
+    doc: { title: L.title, intro: L.intro, sections: [] },
   };
 }
 
