@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
+import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
 import { getServerExchangeSeries } from "@/lib/market";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
@@ -74,6 +75,17 @@ export default async function ServerDetail({
   const count = latestCount(history, server.id);
   const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
   const secondary = secondaryCurrency(data.current, locale, rates);
+  const crumbLd = breadcrumbLd([
+    { name: "GameSise", url: `${SITE}/${locale}` },
+    {
+      name: `${gameNameOf(game, locale)} ${currencyOf(game, locale)}`,
+      url: `${SITE}/${locale}/${game.slug}`,
+    },
+    {
+      name: server.nameKo,
+      url: `${SITE}/${locale}/${game.slug}/${server.id}`,
+    },
+  ]);
 
   const tfTab = (t: Timeframe) => (
     <Link
@@ -101,6 +113,7 @@ export default async function ServerDetail({
   return (
     <>
       <Header locale={locale} activeGame={game.slug} />
+      <JsonLd data={crumbLd} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
         <Link

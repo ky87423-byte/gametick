@@ -17,7 +17,7 @@ import { TrendChart } from "@/components/TrendChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { Faq } from "@/components/Faq";
-import { JsonLd } from "@/components/JsonLd";
+import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import {
   changeColor,
   changeText,
@@ -94,6 +94,13 @@ export default async function GamePage({
       acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   };
+  const crumbLd = breadcrumbLd([
+    { name: "GameSise", url: `${SITE}/${locale}` },
+    {
+      name: `${gameNameOf(game, locale)} ${currencyOf(game, locale)}`,
+      url: `${SITE}/${locale}/${game.slug}`,
+    },
+  ]);
 
   return (
     <>
@@ -252,6 +259,7 @@ export default async function GamePage({
         {/* FAQ */}
         <Faq title={dict.faqTitle} items={faqs} />
         <JsonLd data={faqLd} />
+        <JsonLd data={crumbLd} />
       </main>
 
       <Footer locale={locale} />

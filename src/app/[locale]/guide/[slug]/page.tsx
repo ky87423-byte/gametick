@@ -9,6 +9,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Prose } from "@/components/Prose";
 import { GameInfoTable } from "@/components/GameInfoTable";
+import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 
 const CTA_LABEL: Record<string, string> = {
   ko: "실시간 시세 보기",
@@ -51,6 +52,13 @@ export default async function GuideArticle({
           ← {dict.guideNav}
         </Link>
       </div>
+      <JsonLd
+        data={breadcrumbLd([
+          { name: "GameSise", url: `${SITE}/${locale}` },
+          { name: dict.guideNav, url: `${SITE}/${locale}/guide` },
+          { name: guide.doc.title, url: `${SITE}/${locale}/guide/${slug}` },
+        ])}
+      />
       <Prose doc={guide.doc} />
       {slug === "game-info" && <GameInfoTable locale={locale} />}
       {slug.startsWith("price-") &&

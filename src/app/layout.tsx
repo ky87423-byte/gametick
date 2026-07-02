@@ -49,6 +49,26 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-clip antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-clip">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  name: "GameSise",
+                  url: "https://gamesise.co.kr",
+                },
+                {
+                  "@type": "WebSite",
+                  name: "GameSise",
+                  url: "https://gamesise.co.kr",
+                },
+              ],
+            }),
+          }}
+        />
         {children}
         {UMAMI_SRC && UMAMI_ID && (
           <Script
