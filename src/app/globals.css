@@ -15,6 +15,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* 라이트 모드 — html.light 에서 zinc 스케일을 반전(다크 표면 번호↔밝은 값,
+   밝은 텍스트 번호↔어두운 값)해 컴포넌트 수정 없이 전체 테마 전환.
+   Tailwind v4 유틸리티가 var(--color-zinc-*)를 참조하므로 변수만 덮으면 됨. */
+html.light {
+  --background: #ffffff;
+  --foreground: #18181b;
+  --color-zinc-950: #ffffff;
+  --color-zinc-900: #f4f4f5;
+  --color-zinc-800: #e4e4e7;
+  --color-zinc-700: #d4d4d8;
+  --color-zinc-600: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-400: #52525b;
+  --color-zinc-300: #3f3f46;
+  --color-zinc-200: #27272a;
+  --color-zinc-100: #18181b;
+  --color-zinc-50: #09090b;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

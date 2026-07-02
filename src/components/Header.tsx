@@ -4,6 +4,7 @@ import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { GameNav } from "@/components/GameNav";
 import { LangSwitch } from "@/components/LangSwitch";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Header({
   locale,
@@ -43,6 +44,7 @@ export function Header({
           <Link href={`/${locale}/favorites`} className="hover:text-amber-300">
             {dict.favoritesNav}
           </Link>
+          <ThemeToggle />
           <span className="text-zinc-700">|</span>
           <LangSwitch locale={locale} activeGame={activeGame} />
         </nav>

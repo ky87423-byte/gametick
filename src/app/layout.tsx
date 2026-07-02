@@ -50,6 +50,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col overflow-x-clip">
         <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')}catch(e){}`,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
