@@ -262,7 +262,9 @@ export function MarketTable({
               <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
                 {labels.listings}
               </th>
-              <th className="px-3 py-2 text-right font-medium">{labels.chart}</th>
+              <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
+                {labels.chart}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -300,11 +302,18 @@ export function MarketTable({
                       {s.quotes.map((q, qi) => (
                         <span
                           key={q.exchange}
+                          title={
+                            q.exchange === "itemmania"
+                              ? "아이템매니아는 최저가가 아닌 대표 시세"
+                              : undefined
+                          }
                           className={`text-[10px] tabular-nums ${
                             qi === 0 ? "text-amber-400" : "text-zinc-500"
                           }`}
                         >
-                          {q.name} {q.price.toLocaleString("ko-KR")}
+                          {q.name}{" "}
+                          {q.exchange === "itemmania" ? "~" : ""}
+                          {q.price.toLocaleString("ko-KR")}
                         </span>
                       ))}
                     </div>
@@ -320,7 +329,7 @@ export function MarketTable({
                 <td className="hidden px-3 py-2 text-right font-mono tabular-nums text-zinc-400 sm:table-cell">
                   {s.listingCount === null ? "—" : s.listingCount.toLocaleString("ko-KR")}
                 </td>
-                <td className="px-3 py-2">
+                <td className="hidden px-3 py-2 sm:table-cell">
                   <div className="flex justify-end">
                     <Sparkline data={s.spark} />
                   </div>
