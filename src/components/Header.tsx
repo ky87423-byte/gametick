@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { DEFAULT_GAME_SLUG } from "@/data/games";
-import { Locale, locales } from "@/i18n/config";
+import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { GameNav } from "@/components/GameNav";
+import { LangSwitch } from "@/components/LangSwitch";
 
 export function Header({
   locale,
@@ -43,19 +44,7 @@ export function Header({
             {dict.favoritesNav}
           </Link>
           <span className="text-zinc-700">|</span>
-          {locales.map((l) => (
-            <Link
-              key={l}
-              href={`/${l}${activeGame ? `/${activeGame}` : ""}`}
-              className={
-                l === locale
-                  ? "font-semibold text-zinc-100"
-                  : "hover:text-zinc-200"
-              }
-            >
-              {l.toUpperCase()}
-            </Link>
-          ))}
+          <LangSwitch locale={locale} activeGame={activeGame} />
         </nav>
       </div>
       <div className="mx-auto max-w-5xl px-4 pb-2">

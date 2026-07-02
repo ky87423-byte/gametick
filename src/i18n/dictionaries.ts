@@ -337,7 +337,7 @@ const en: Dictionary = {
 };
 
 const zh: Dictionary = {
-  brand: "游戏币行情",
+  brand: "GameSise",
   tagline: "各服务器游戏币实时行情",
   rank: "#",
   server: "服务器",
@@ -416,7 +416,7 @@ const zh: Dictionary = {
   adSlot: "广告位",
   adInquiry: "广告合作",
   footerNote:
-    "本行情为汇总外部交易所数据的参考信息，可能与实际成交价不同。游戏币行情（GameSise）不居间交易，不对交易承担责任。",
+    "本行情为汇总外部交易所数据的参考信息，可能与实际成交价不同。GameSise 不居间交易，不对交易承担责任。",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ko, en, zh, vi };

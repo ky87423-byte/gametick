@@ -483,7 +483,7 @@ const CURRENCY_EN: Record<string, string> = {
   아데나: "Adena",
   키나: "Kinah",
   메소: "Meso",
-  다이아: "Diamond",
+  다이아: "Dia",
 };
 
 /** 로케일별 통화 표기 — en/zh는 영문, 그 외는 원 통화명 */

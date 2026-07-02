@@ -158,8 +158,8 @@ const en: Record<LegalKey, Doc> = {
 
 const zh: Record<LegalKey, Doc> = {
   about: {
-    title: "关于游戏币行情",
-    intro: "游戏币行情（GameSise）提供韩国游戏币各服务器的实时行情信息。",
+    title: "关于 GameSise",
+    intro: "GameSise 提供韩国游戏币各服务器的实时行情信息。",
     sections: [
       {
         paragraphs: [
