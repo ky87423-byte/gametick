@@ -74,8 +74,6 @@ function UpdateCountdown({
   );
 }
 
-type SortMode = "default" | "price" | "change";
-
 export function MarketTable({
   locale,
   gameSlug,
@@ -95,7 +93,16 @@ export function MarketTable({
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<SortMode>("default");
+  // 기본: 현재가 높은순(desc). 현재가 헤더 클릭 시 낮은순(asc) 토글.
+  const [sortKey, setSortKey] = useState<"price" | "change">("price");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const sortBy = (key: "price" | "change") => {
+    if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  };
   const [favs, setFavs] = useState<Set<string>>(new Set());
   const [rows, setRows] = useState<ServerRow[]>(servers);
   const [updatedAt, setUpdatedAt] = useState<number | null>(initialUpdatedAt);
@@ -186,35 +193,41 @@ export function MarketTable({
           s.nameKo.toLowerCase().includes(q) ||
           s.nameEn.toLowerCase().includes(q)
       );
-    const sorted = [...l];
-    if (sort === "price")
-      sorted.sort((a, b) => (b.priceKrw ?? -1) - (a.priceKrw ?? -1));
-    else if (sort === "change")
-      sorted.sort(
-        (a, b) =>
-          (b.change24hPercent ?? -Infinity) - (a.change24hPercent ?? -Infinity)
-      );
+    const val = (s: ServerRow) =>
+      sortKey === "price" ? s.priceKrw : s.change24hPercent;
+    const sorted = [...l].sort((a, b) => {
+      const av = val(a);
+      const bv = val(b);
+      // 값 없는 서버는 항상 맨 아래
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      return sortDir === "asc" ? av - bv : bv - av;
+    });
+    // 즐겨찾기는 항상 상단
     sorted.sort(
       (a, b) =>
         (favs.has(b.serverId) ? 1 : 0) - (favs.has(a.serverId) ? 1 : 0)
     );
     return sorted;
-  }, [rows, query, sort, favs]);
+  }, [rows, query, sortKey, sortDir, favs]);
 
   // tick 표시용(리렌더 트리거)
   void tickRef;
 
-  const sortBtn = (mode: SortMode, label: string) => (
-    <button
-      onClick={() => setSort(mode)}
-      className={`rounded px-2 py-1 text-xs transition-colors ${
-        sort === mode
-          ? "bg-zinc-100 text-zinc-900"
-          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-      }`}
-    >
-      {label}
-    </button>
+  // 정렬 가능한 컬럼 헤더(우측정렬). 활성 컬럼은 ▲/▼, 비활성은 ↕ 힌트.
+  const sortableHeader = (key: "price" | "change", label: string) => (
+    <th className="px-3 py-2 text-right font-medium">
+      <button
+        onClick={() => sortBy(key)}
+        className="inline-flex items-center gap-0.5 hover:text-zinc-200"
+      >
+        {label}
+        <span className="text-[10px] text-zinc-500">
+          {sortKey === key ? (sortDir === "asc" ? "▲" : "▼") : "↕"}
+        </span>
+      </button>
+    </th>
   );
 
   return (
@@ -242,11 +255,6 @@ export function MarketTable({
             />
           </span>
         </div>
-        <div className="flex gap-1">
-          {sortBtn("default", labels.sortDefault)}
-          {sortBtn("price", labels.sortPrice)}
-          {sortBtn("change", labels.sortChange)}
-        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-800">
@@ -255,10 +263,8 @@ export function MarketTable({
             <tr>
               <th className="w-8 px-2 py-2"></th>
               <th className="px-3 py-2 text-left font-medium">{labels.server}</th>
-              <th className="px-3 py-2 text-right font-medium">{labels.price}</th>
-              <th className="px-3 py-2 text-right font-medium">
-                {labels.change24h}
-              </th>
+              {sortableHeader("price", labels.price)}
+              {sortableHeader("change", labels.change24h)}
               <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
                 {labels.listings}
               </th>
