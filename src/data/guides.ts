@@ -2,6 +2,8 @@
 
 import { Locale } from "@/i18n/config";
 import { Doc } from "@/components/Prose";
+import { GAMES, GameInfo, gameNameOf, currencyOf } from "@/data/games";
+import { GAME_META, GameMeta } from "@/data/gamemeta";
 
 export interface Guide {
   slug: string;
@@ -317,10 +319,181 @@ function gameInfoGuide(locale: Locale): Guide {
   };
 }
 
+// 게임별 시세 가이드 — 게임×통화 키워드 타겟, 실데이터 기반 자동 생성.
+interface PriceTpl {
+  summary: (game: string, cur: string) => string;
+  doc: (
+    game: string,
+    cur: string,
+    unit: string,
+    servers: number,
+    m: GameMeta
+  ) => Doc;
+}
+
+const PRICE_TPL: Record<Locale, PriceTpl> = {
+  ko: {
+    summary: (game, cur) =>
+      `${game} ${cur} 서버별 실시간 시세와 단위·등락 보는 법, 안전 거래 요령`,
+    doc: (game, cur, unit, servers, m) => ({
+      title: `${game} ${cur} 시세 보는 법 · 현금화 가이드`,
+      intro: `${game}의 게임머니 ${cur} 실시간 시세를 서버별로 확인하는 방법과 거래 시 주의점을 정리했습니다.`,
+      sections: [
+        {
+          heading: `${cur} 시세, 어디서 보나요?`,
+          paragraphs: [
+            `게임시세에서 ${game} ${cur}의 서버별 최저 시세를 실시간으로 볼 수 있습니다. 현재 약 ${servers}개 서버를 지원하며, 외부 거래소(바로템·아이템베이 등)의 거래가능 매물 중 최저 판매가를 수집해 자동 갱신합니다.`,
+          ],
+        },
+        {
+          heading: `가격 단위와 보는 법`,
+          paragraphs: [
+            `시세는 ${unit} ${cur} 기준(원)으로 표시됩니다. 예를 들어 "${unit} ${cur} = 1,500원"이면 ${unit} ${cur}의 가격이 1,500원이라는 뜻입니다.`,
+            `24시간 등락률(상승 빨강·하락 파랑), 매물 수(유동성), 거래소별 최저가 비교(스프레드)를 함께 제공하며, 서버를 누르면 캔들 차트와 가격 알림도 볼 수 있습니다.`,
+          ],
+        },
+        {
+          heading: `안전하게 거래하려면`,
+          paragraphs: [
+            `시세보다 지나치게 싼 매물은 사기(미끼)일 수 있습니다. 안전결제(에스크로)를 사용하고, 판매자 평판을 확인하며, 게임시세로 적정 시세를 먼저 대조하세요.`,
+          ],
+        },
+        {
+          heading: `${game} 정보`,
+          paragraphs: [
+            `출시 ${m.release} · 개발/유통 ${m.company} · 장르 ${m.genre} · 플랫폼 ${m.platform}.`,
+          ],
+        },
+      ],
+    }),
+  },
+  en: {
+    summary: (game, cur) =>
+      `Real-time ${game} ${cur} prices by server, how to read units/change, and safe trading`,
+    doc: (game, cur, unit, servers, m) => ({
+      title: `${game} ${cur} price guide — how to read & cash out`,
+      intro: `How to check real-time ${game} ${cur} prices per server, and what to watch out for when trading.`,
+      sections: [
+        {
+          heading: `Where to check ${cur} prices`,
+          paragraphs: [
+            `On GameSise you can see the lowest ${game} ${cur} price per server in real time. About ${servers} servers are supported, collected from the lowest tradable listings on external exchanges and updated automatically.`,
+          ],
+        },
+        {
+          heading: `Price unit & how to read it`,
+          paragraphs: [
+            `Prices are shown per ${unit} ${cur} (in KRW). For example, "${unit} ${cur} = 1,500" means ${unit} ${cur} costs 1,500 KRW.`,
+            `We also show 24h change (red up, blue down — Korean convention), listing count (liquidity), and per-exchange lowest price (spread). Tap a server for candle charts and price alerts.`,
+          ],
+        },
+        {
+          heading: `Trading safely`,
+          paragraphs: [
+            `Listings far cheaper than the market may be scams. Use escrow, check seller reputation, and compare against GameSise prices first.`,
+          ],
+        },
+        {
+          heading: `About ${game}`,
+          paragraphs: [
+            `Release ${m.release} · Company ${m.company} · Genre ${m.genre} · Platform ${m.platform}.`,
+          ],
+        },
+      ],
+    }),
+  },
+  zh: {
+    summary: (game, cur) =>
+      `${game} ${cur} 各服务器实时行情、单位与涨跌看法、安全交易`,
+    doc: (game, cur, unit, servers, m) => ({
+      title: `${game} ${cur} 行情查看与变现指南`,
+      intro: `如何按服务器查看 ${game} ${cur} 实时行情，以及交易时的注意事项。`,
+      sections: [
+        {
+          heading: `在哪查看 ${cur} 行情？`,
+          paragraphs: [
+            `在 GameSise 可实时查看 ${game} ${cur} 各服务器最低行情。目前支持约 ${servers} 个服务器，采集外部交易所可交易挂单中的最低售价并自动更新。`,
+          ],
+        },
+        {
+          heading: `价格单位与看法`,
+          paragraphs: [
+            `行情按每 ${unit} ${cur}（韩元）显示。例如“${unit} ${cur} = 1,500”表示 ${unit} ${cur} 价格为 1,500 韩元。`,
+            `同时提供 24 小时涨跌（涨红跌蓝，韩国惯例）、挂单数（流动性）、各交易所最低价对比（价差）。点击服务器可查看 K 线图与价格提醒。`,
+          ],
+        },
+        {
+          heading: `如何安全交易`,
+          paragraphs: [
+            `远低于行情的挂单可能是骗局。请使用担保交易、核实卖家信誉，并先用 GameSise 对照合理行情。`,
+          ],
+        },
+        {
+          heading: `${game} 信息`,
+          paragraphs: [
+            `上市 ${m.release} · 开发/发行 ${m.company} · 类型 ${m.genre} · 平台 ${m.platform}。`,
+          ],
+        },
+      ],
+    }),
+  },
+  vi: {
+    summary: (game, cur) =>
+      `Giá ${cur} ${game} theo máy chủ, cách đọc đơn vị/biến động, giao dịch an toàn`,
+    doc: (game, cur, unit, servers, m) => ({
+      title: `Hướng dẫn xem giá & quy đổi ${cur} ${game}`,
+      intro: `Cách xem giá ${cur} của ${game} theo máy chủ theo thời gian thực và những lưu ý khi giao dịch.`,
+      sections: [
+        {
+          heading: `Xem giá ${cur} ở đâu?`,
+          paragraphs: [
+            `Trên GameSise bạn có thể xem giá thấp nhất của ${game} ${cur} theo từng máy chủ theo thời gian thực. Hỗ trợ khoảng ${servers} máy chủ, lấy từ tin đăng có thể giao dịch giá thấp nhất trên sàn bên ngoài và tự động cập nhật.`,
+          ],
+        },
+        {
+          heading: `Đơn vị giá & cách đọc`,
+          paragraphs: [
+            `Giá hiển thị theo mỗi ${unit} ${cur} (KRW). Ví dụ "${unit} ${cur} = 1.500" nghĩa là ${unit} ${cur} có giá 1.500 KRW.`,
+            `Ngoài ra có biến động 24h (tăng đỏ, giảm xanh — quy ước Hàn Quốc), số tin (thanh khoản) và so sánh giá thấp nhất theo sàn. Nhấn máy chủ để xem biểu đồ nến và cảnh báo giá.`,
+          ],
+        },
+        {
+          heading: `Giao dịch an toàn`,
+          paragraphs: [
+            `Tin rẻ bất thường có thể là lừa đảo. Hãy dùng escrow, kiểm tra uy tín người bán và đối chiếu giá trên GameSise trước.`,
+          ],
+        },
+        {
+          heading: `Về ${game}`,
+          paragraphs: [
+            `Phát hành ${m.release} · Công ty ${m.company} · Thể loại ${m.genre} · Nền tảng ${m.platform}.`,
+          ],
+        },
+      ],
+    }),
+  },
+};
+
+function priceGuide(locale: Locale, g: GameInfo): Guide {
+  const game = gameNameOf(g, locale);
+  const cur = currencyOf(g, locale);
+  const unit = g.unitAmount.toLocaleString(locale === "ko" ? "ko-KR" : "en-US");
+  const m = GAME_META[g.slug];
+  const T = PRICE_TPL[locale] ?? PRICE_TPL.ko;
+  return {
+    slug: `price-${g.slug}`,
+    summary: T.summary(game, cur),
+    doc: T.doc(game, cur, unit, g.servers.length, m),
+  };
+}
+
 export function guideList(locale: Locale): Guide[] {
   const base =
     locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
-  return [...base, gameInfoGuide(locale)];
+  const priceGuides = GAMES.filter((g) => GAME_META[g.slug]).map((g) =>
+    priceGuide(locale, g)
+  );
+  return [...base, gameInfoGuide(locale), ...priceGuides];
 }
 
 export function getGuide(locale: Locale, slug: string): Guide | null {
