@@ -71,7 +71,7 @@ export default async function ServerDetail({
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
-  const unitText = dict.perUnit(game.unitLabelKo, game.currency);
+  const unitText = dict.perUnit(game.unitAmount, game.currency);
   const secondary = secondaryCurrency(data.current, locale, rates);
 
   const tfTab = (t: Timeframe) => (

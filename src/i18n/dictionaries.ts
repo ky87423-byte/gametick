@@ -12,7 +12,7 @@ export interface Dictionary {
   change24h: string;
   listings: string;
   chart: string;
-  perUnit: (label: string, currency: string) => string;
+  perUnit: (amount: number, currency: string) => string;
   noData: string;
   updatedAt: string;
   nextUpdate: string;
@@ -97,7 +97,7 @@ const ko: Dictionary = {
   change24h: "24h 등락",
   listings: "매물",
   chart: "추이",
-  perUnit: (label, currency) => `${label} ${currency}당 (원)`,
+  perUnit: (amount, currency) => `${amount.toLocaleString("ko-KR")} ${currency} 기준`,
   noData: "데이터 없음",
   updatedAt: "업데이트",
   nextUpdate: "다음 갱신",
@@ -179,7 +179,7 @@ const vi: Dictionary = {
   change24h: "24h",
   listings: "Tin",
   chart: "Xu hướng",
-  perUnit: (label, currency) => `mỗi ${label} ${currency} (KRW)`,
+  perUnit: (amount, currency) => `Theo ${amount.toLocaleString("en-US")} ${currency} (KRW)`,
   noData: "Không có dữ liệu",
   updatedAt: "Cập nhật",
   nextUpdate: "Cập nhật sau",

@@ -81,7 +81,7 @@ export default async function GamePage({
     live: true,
     platform: s.platform,
   }));
-  const unitText = dict.perUnit(game.unitLabelKo, game.currency);
+  const unitText = dict.perUnit(game.unitAmount, game.currency);
 
   const stat = (label: string, value: string, sub?: string) => (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
@@ -99,9 +99,7 @@ export default async function GamePage({
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
         <div className="mb-1 flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {dict.priceTitle(game.nameKo, game.currency)}
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">{game.nameKo}</h1>
           <span className="text-xs text-zinc-500">
             {dict.updatedAt}: {formatTime(table.updatedAt, locale)}
           </span>
