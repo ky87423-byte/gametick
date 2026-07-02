@@ -95,11 +95,15 @@ export default async function GamePage({
       <Header locale={locale} activeGame={game.slug} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
-        <h1 className="mb-1 text-2xl font-bold tracking-tight">
-          {gameNameOf(game, locale)}
+        {/* 게임명은 SEO/접근성용으로만 유지(화면 비표시) */}
+        <h1 className="sr-only">
+          {gameNameOf(game, locale)} {currencyOf(game, locale)}
         </h1>
-        <p className="mb-1 text-sm text-zinc-500">
-          {unitText} · {dict.source}: {SOURCE_LABEL}
+        <p className="text-xl font-bold tracking-tight text-zinc-100">
+          {unitText}
+        </p>
+        <p className="mb-1 text-xs text-zinc-500">
+          {dict.source}: {SOURCE_LABEL}
         </p>
         {/* 요약: 평균/최고/최저/서버 — 작은 텍스트 한 줄 */}
         <p className="mb-5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-500">
