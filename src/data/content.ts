@@ -47,6 +47,10 @@ export function generalFaq(locale: Locale): FaqItem[] {
       { q: "What is the listings count?", a: "The number of tradable listings on that server — more means higher liquidity." },
       { q: "How do price alerts work?", a: "Set a target price on a server page to get alerts via Telegram, Discord, or browser notification." },
       { q: "Do you broker trades?", a: "No. We only provide reference prices; we do not broker trades and are not liable for any transaction." },
+      { q: "Where does the server price come from and how is it decided?", a: "We collect 'tradable' listings per server from external exchanges (Barotem, Itembay, Itemmania). The lowest asking price among them becomes the current price, shown in KRW per the game's base unit (e.g., per 10,000 Adena). It auto-refreshes every 3–5 minutes and is for reference only." },
+      { q: "What does the listings count measure?", a: "The number of 'tradable' sell listings for that server on Barotem at collection time. A higher number means more active trading and liquidity." },
+      { q: "Are the completed trades real?", a: "Yes — they are actual settled trades collected from Barotem's 'completed' records (server, quantity, settled total, time), newest first. Not fabricated." },
+      { q: "How is trade volume calculated?", a: "It sums the quantities of recently collected completed trades per server, then ranks all servers of the game by that total. It reflects the recent feed window, so it may differ from an all-time total." },
     ];
   }
   if (locale === "zh") {
@@ -56,6 +60,10 @@ export function generalFaq(locale: Locale): FaqItem[] {
       { q: "在售（数量）是什么？", a: "该服务器当前可交易挂单数量，越多表示流动性越高。" },
       { q: "价格提醒怎么用？", a: "在服务器详情页设置目标价格，可通过 Telegram·Discord·浏览器接收提醒。" },
       { q: "你们居间交易吗？", a: "不。仅提供参考行情，不居间交易，也不承担交易责任。" },
+      { q: "服务器现价从哪来，如何确定？", a: "从外部交易所（바로템·아이템베이·아이템매니아）按服务器采集“可交易”挂单，取其中最低售价作为现价，以每个游戏的基准数量（如每 10,000 阿德纳）的韩元计价。每 3–5 分钟自动更新，仅供参考。" },
+      { q: "在售数量统计的是什么？", a: "采集时该服务器在 바로템 上“可交易”的卖出挂单数量。数值越大表示交易越活跃、流动性越高。" },
+      { q: "实时成交是真实交易吗？", a: "是。取自 바로템 的“成交完成”记录，为真实成交数据（服务器、数量、成交总额、时间），最新在前，并非我们编造。" },
+      { q: "成交量如何计算？", a: "把最近采集到的成交记录按服务器汇总数量，再对该游戏所有服务器按此总量排序。基于最近的数据窗口，与历史累计总量可能不同。" },
     ];
   }
   if (locale === "vi") {
@@ -65,6 +73,10 @@ export function generalFaq(locale: Locale): FaqItem[] {
       { q: "Cột tin (số lượng) là gì?", a: "Số tin có thể giao dịch của máy chủ đó — càng nhiều thì thanh khoản càng cao." },
       { q: "Cảnh báo giá dùng thế nào?", a: "Đặt giá mục tiêu ở trang máy chủ để nhận cảnh báo qua Telegram, Discord hoặc thông báo trình duyệt." },
       { q: "Có trung gian giao dịch không?", a: "Không. Chỉ cung cấp giá tham khảo, không trung gian và không chịu trách nhiệm giao dịch." },
+      { q: "Giá máy chủ lấy từ đâu và được xác định thế nào?", a: "Chúng tôi thu thập tin 'có thể giao dịch' theo máy chủ từ các sàn ngoài (Barotem, Itembay, Itemmania). Giá thấp nhất trong đó là giá hiện tại, tính bằng KRW theo đơn vị cơ sở của game (vd mỗi 10.000 Adena). Tự cập nhật mỗi 3–5 phút, chỉ để tham khảo." },
+      { q: "Số tin (listings) đo cái gì?", a: "Số tin bán 'có thể giao dịch' của máy chủ đó trên Barotem tại thời điểm thu thập. Càng nhiều thì giao dịch càng sôi động, thanh khoản càng cao." },
+      { q: "Giao dịch hoàn tất có thật không?", a: "Có — là dữ liệu giao dịch thật lấy từ mục 'đã hoàn tất' của Barotem (máy chủ, số lượng, tổng giá, thời gian), mới nhất trước. Không phải dữ liệu tự tạo." },
+      { q: "Khối lượng giao dịch tính thế nào?", a: "Cộng số lượng của các giao dịch hoàn tất thu thập gần đây theo máy chủ, rồi xếp hạng toàn bộ máy chủ của game theo tổng đó. Dựa trên khung dữ liệu gần đây nên có thể khác tổng tích lũy." },
     ];
   }
   return [
@@ -73,6 +85,10 @@ export function generalFaq(locale: Locale): FaqItem[] {
     { q: "매물(건수)은 무엇인가요?", a: "해당 서버의 현재 거래가능 매물 수입니다. 많을수록 거래가 활발하고 유동성이 높습니다." },
     { q: "가격 알림은 어떻게 쓰나요?", a: "서버 상세 페이지에서 목표 가격을 설정하면 텔레그램·디스코드·브라우저로 알림을 받을 수 있습니다." },
     { q: "직접 거래나 중개를 하나요?", a: "아니요. 시세 정보만 제공하며 직접 거래를 중개하지 않고, 거래로 인한 책임을 지지 않습니다." },
+    { q: "서버 현재가는 어디서 오고 어떻게 정해지나요?", a: "바로템·아이템베이·아이템매니아 등 외부 거래소의 '거래가능' 매물을 서버별로 수집해, 그중 가장 낮은 판매가(최저가)를 현재가로 표시합니다. 게임별 기준 수량(예: 10,000 아데나)당 원화이며, 게임마다 3~5분 간격으로 자동 갱신됩니다. 참고용이며 실제 체결가와 다를 수 있습니다." },
+    { q: "매물 수는 무엇을 세는 건가요?", a: "바로템에서 해당 서버의 '거래가능' 상태 판매 매물 건수입니다(수집 시점 기준). 숫자가 많을수록 거래가 활발하고 유동성이 높다는 뜻입니다." },
+    { q: "실시간 거래완료는 실제 거래인가요?", a: "네. 바로템의 '거래완료' 내역을 그대로 수집한 실제 체결 데이터입니다. 서버·수량·체결가(총액)·시간을 최근 건부터 보여주며, 임의로 만든 데이터가 아닙니다." },
+    { q: "거래량은 어떻게 계산되나요?", a: "최근 수집된 '거래완료' 내역의 거래 수량을 서버별로 합산한 값이며, 해당 게임의 모든 서버를 거래량 순으로 보여줍니다. 최근 피드 범위 기준이라 누적 총량과는 다를 수 있습니다." },
   ];
 }
 
