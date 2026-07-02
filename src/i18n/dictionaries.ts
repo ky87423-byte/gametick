@@ -34,6 +34,7 @@ export interface Dictionary {
   calcWorth: string;
   tradesTitle: string;
   tradesEmpty: string;
+  tradeVolume: string;
   rankingsTitle: string;
   namedTitle: string;
   videoSub: string;
@@ -121,6 +122,7 @@ const ko: Dictionary = {
   calcWorth: "예상 가치",
   tradesTitle: "실시간 거래완료",
   tradesEmpty: "최근 거래완료 내역을 불러오는 중…",
+  tradeVolume: "거래량",
   rankingsTitle: "랭킹",
   namedTitle: "인기 영상",
   videoSub: "조회순 · 치지직",
@@ -205,6 +207,7 @@ const vi: Dictionary = {
   calcWorth: "Giá trị ước tính",
   tradesTitle: "Giao dịch hoàn tất",
   tradesEmpty: "Đang tải giao dịch gần đây…",
+  tradeVolume: "Khối lượng",
   rankingsTitle: "Xếp hạng",
   namedTitle: "Video nổi bật",
   videoSub: "Lượt xem · Chzzk",
@@ -290,6 +293,7 @@ const en: Dictionary = {
   calcWorth: "Estimated value",
   tradesTitle: "Completed trades",
   tradesEmpty: "Loading recent trades…",
+  tradeVolume: "Volume",
   rankingsTitle: "Rankings",
   namedTitle: "Popular videos",
   videoSub: "By views · Chzzk",
@@ -376,6 +380,7 @@ const zh: Dictionary = {
   calcWorth: "预估价值",
   tradesTitle: "实时成交",
   tradesEmpty: "正在加载最近成交…",
+  tradeVolume: "成交量",
   rankingsTitle: "排行",
   namedTitle: "热门视频",
   videoSub: "按播放量 · Chzzk",

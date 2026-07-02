@@ -183,6 +183,8 @@ export default async function GamePage({
               title={dict.tradesTitle}
               empty={dict.tradesEmpty}
               locale={locale}
+              volTitle={dict.tradeVolume}
+              currency={currencyOf(game, locale)}
             />
             <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-zinc-800 text-xs text-zinc-600">
               {dict.adSlot}
