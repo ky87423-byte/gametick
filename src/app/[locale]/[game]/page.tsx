@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
@@ -187,9 +188,20 @@ export default async function GamePage({
               currency={currencyOf(game, locale)}
               serverNames={table.servers.map((s) => s.nameKo)}
             />
-            <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-zinc-800 text-xs text-zinc-600">
-              {dict.adSlot}
-            </div>
+            <a
+              href="https://gameboostforge.com"
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="block overflow-hidden rounded-xl border border-zinc-800"
+            >
+              <Image
+                src="/ads/boost-ad.jpg"
+                alt="게임 대리육성 · 데스사관학교 (카카오톡 52aden)"
+                width={640}
+                height={427}
+                className="h-auto w-full"
+              />
+            </a>
           </aside>
         </div>
 
