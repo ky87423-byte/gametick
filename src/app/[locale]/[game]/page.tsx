@@ -17,6 +17,7 @@ import { TrendChart } from "@/components/TrendChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { Faq } from "@/components/Faq";
+import { JsonLd } from "@/components/JsonLd";
 import {
   changeColor,
   changeText,
@@ -83,6 +84,16 @@ export default async function GamePage({
     platform: s.platform,
   }));
   const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
+  const faqs = faqItems(locale, game);
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
 
   return (
     <>
@@ -239,7 +250,8 @@ export default async function GamePage({
         </section>
 
         {/* FAQ */}
-        <Faq title={dict.faqTitle} items={faqItems(locale, game)} />
+        <Faq title={dict.faqTitle} items={faqs} />
+        <JsonLd data={faqLd} />
       </main>
 
       <Footer locale={locale} />
