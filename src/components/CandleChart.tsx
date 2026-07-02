@@ -46,14 +46,33 @@ export function CandleChart({
     .filter((p): p is string => p !== null)
     .join(" ");
 
+  // 축 라벨 — 가격(Y) 3단계, 날짜(X) 3지점(KST)
+  const priceLabels = [max, (max + min) / 2, min].map((v) =>
+    Math.round(v).toLocaleString("ko-KR")
+  );
+  const kstShort = (t: number) => {
+    const d = new Date(t + 9 * 3600 * 1000);
+    const h = String(d.getUTCHours()).padStart(2, "0");
+    const mi = String(d.getUTCMinutes()).padStart(2, "0");
+    return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${h}:${mi}`;
+  };
+  const midIdx = Math.floor(candles.length / 2);
+  const dateLabels = [
+    candles[0].t,
+    candles[midIdx].t,
+    candles[candles.length - 1].t,
+  ].map(kstShort);
+
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-2">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full"
-        preserveAspectRatio="none"
-        style={{ height: H }}
-      >
+      <div className="flex gap-1">
+        <div className="min-w-0 flex-1">
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            className="w-full"
+            preserveAspectRatio="none"
+            style={{ height: H }}
+          >
         {[0, 0.5, 1].map((f) => (
           <line
             key={f}
@@ -93,17 +112,34 @@ export function CandleChart({
             </g>
           );
         })}
-        {maPts && (
-          <polyline
-            points={maPts}
-            fill="none"
-            stroke="#fbbf24"
-            strokeWidth={1.5}
-            strokeLinejoin="round"
-            opacity={0.9}
-          />
-        )}
-      </svg>
+            {maPts && (
+              <polyline
+                points={maPts}
+                fill="none"
+                stroke="#fbbf24"
+                strokeWidth={1.5}
+                strokeLinejoin="round"
+                opacity={0.9}
+              />
+            )}
+          </svg>
+        </div>
+        {/* 가격축(Y) */}
+        <div
+          className="flex w-12 shrink-0 flex-col justify-between py-2 text-right font-mono text-[10px] text-zinc-500"
+          style={{ height: H }}
+        >
+          {priceLabels.map((p, i) => (
+            <span key={i}>{p}</span>
+          ))}
+        </div>
+      </div>
+      {/* 날짜축(X) */}
+      <div className="flex justify-between pr-12 pt-1 font-mono text-[10px] text-zinc-500">
+        {dateLabels.map((d, i) => (
+          <span key={i}>{d}</span>
+        ))}
+      </div>
     </div>
   );
 }
