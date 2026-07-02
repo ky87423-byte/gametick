@@ -168,8 +168,8 @@ export const GAMES: GameInfo[] = [
     nameKo: "솔인챈트",
     nameEn: "SOL:enchant",
     currency: "다이아",
-    unitAmount: 10_000,
-    unitLabelKo: "만",
+    unitAmount: 1_000,
+    unitLabelKo: "천",
     servers: [
       { id: "26754", nameKo: "칼테온", nameEn: "Kalteon" },
       { id: "26755", nameKo: "린델", nameEn: "Lindel" },
