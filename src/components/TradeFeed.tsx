@@ -1,5 +1,8 @@
-// 최근 거래완료 피드 — lc_vn이 바로템 display=3에서 수집한 실데이터.
+"use client";
 
+// 거래 카드 — gamebit 참고: 탭 ① 서버 거래량(랭킹) ② 최근 거래완료.
+
+import { useState } from "react";
 import { Trade } from "@/lib/trades";
 import { timeAgo } from "@/lib/format";
 
@@ -20,6 +23,8 @@ function fmtQty(n: number): string {
   return Math.round(n).toLocaleString("ko-KR");
 }
 
+const RANK_COLOR = ["text-amber-400", "text-zinc-300", "text-orange-400"];
+
 export function TradeFeed({
   trades,
   title,
@@ -37,36 +42,72 @@ export function TradeFeed({
   currency?: string;
   max?: number;
 }) {
-  const list = trades.slice(0, max);
-  // 서버별 거래량(수량 합계) 상위 3 — gamebit 참고
+  const [tab, setTab] = useState<"vol" | "trades">("vol");
+
   const volMap = new Map<string, number>();
   for (const t of trades) {
     const v = parseQty(t.quantity);
     if (v > 0) volMap.set(t.server, (volMap.get(t.server) ?? 0) + v);
   }
-  const topVol = [...volMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const ranking = [...volMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  const list = trades.slice(0, max);
+
+  const tabBtn = (key: "vol" | "trades", label: string) => (
+    <button
+      onClick={() => setTab(key)}
+      className={`flex-1 border-b-2 pb-2 text-xs font-semibold transition-colors ${
+        tab === key
+          ? "border-red-500 text-zinc-100"
+          : "border-transparent text-zinc-500 hover:text-zinc-300"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
-      <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
-        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-        {title}
-      </h3>
-      {topVol.length > 0 && (
-        <div className="mb-2 border-b border-zinc-800/60 pb-2">
-          <div className="mb-1 text-[10px] font-medium text-zinc-500">
-            {volTitle} · {currency}
-          </div>
-          <div className="flex flex-wrap gap-x-2.5 gap-y-0.5 text-[11px]">
-            {topVol.map(([sv, v]) => (
-              <span key={sv} className="text-zinc-400">
-                {sv}{" "}
-                <span className="font-mono text-zinc-300">{fmtQty(v)}</span>
-              </span>
+      <div className="mb-2 flex items-center gap-1">
+        <span className="mr-1 inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+        {tabBtn("vol", volTitle ?? "거래량")}
+        {tabBtn("trades", title)}
+      </div>
+
+      {tab === "vol" ? (
+        ranking.length === 0 ? (
+          <p className="text-xs text-zinc-600">{empty}</p>
+        ) : (
+          <ul className="space-y-1">
+            {ranking.map(([sv, v], i) => (
+              <li
+                key={sv}
+                className="flex items-center gap-2 py-0.5 text-xs"
+              >
+                <span
+                  className={`w-4 shrink-0 text-center font-bold ${
+                    RANK_COLOR[i] ?? "text-zinc-600"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-medium text-zinc-200">
+                  {sv}
+                </span>
+                <span className="shrink-0 font-mono text-zinc-300">
+                  {fmtQty(v)}
+                  {currency && (
+                    <span className="ml-0.5 text-[10px] text-zinc-500">
+                      {currency}
+                    </span>
+                  )}
+                </span>
+              </li>
             ))}
-          </div>
-        </div>
-      )}
-      {list.length === 0 ? (
+          </ul>
+        )
+      ) : list.length === 0 ? (
         <p className="text-xs text-zinc-600">{empty}</p>
       ) : (
         <ul className="space-y-1.5">
