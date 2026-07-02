@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { GAMES, DEFAULT_GAME_SLUG } from "@/data/games";
+import { DEFAULT_GAME_SLUG } from "@/data/games";
 import { Locale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { GameNav } from "@/components/GameNav";
 
 export function Header({
   locale,
@@ -14,8 +15,6 @@ export function Header({
   section?: "data" | "live";
 }) {
   const dict = getDictionary(locale);
-  const gameHref = (slug: string) =>
-    section === "live" ? `/${locale}/live/${slug}` : `/${locale}/${slug}`;
   const liveTarget = activeGame ?? DEFAULT_GAME_SLUG;
   return (
     <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
@@ -65,24 +64,13 @@ export function Header({
         </nav>
       </div>
       <div className="mx-auto max-w-5xl px-4 pb-2">
-        <nav className="flex flex-wrap gap-2">
-          {GAMES.map((g) => {
-            const active = g.slug === activeGame;
-            return (
-              <Link
-                key={g.slug}
-                href={gameHref(g.slug)}
-                className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                  active
-                    ? "bg-red-500 text-white"
-                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                }`}
-              >
-                {g.nameKo}
-              </Link>
-            );
-          })}
-        </nav>
+        <GameNav
+          locale={locale}
+          activeGame={activeGame}
+          section={section}
+          moreLabel={dict.moreGames}
+          lessLabel={dict.lessGames}
+        />
       </div>
     </header>
   );

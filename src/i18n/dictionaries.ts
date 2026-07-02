@@ -49,6 +49,8 @@ export interface Dictionary {
   soopChatNotice: string;
   watchOrigin: string;
   liveEmpty: string;
+  moreGames: string;
+  lessGames: string;
   reportNav: string;
   reportTitle: string;
   reportDesc: string;
@@ -132,6 +134,8 @@ const ko: Dictionary = {
   soopChatNotice: "SOOP은 채팅 임베드를 지원하지 않습니다. '원본 보기'에서 시청하세요.",
   watchOrigin: "원본 보기",
   liveEmpty: "현재 진행 중인 방송이 없습니다.",
+  moreGames: "더보기",
+  lessGames: "접기",
   reportNav: "리포트",
   reportTitle: "시세 리포트",
   reportDesc: "최근 기간 동안 게임별 평균 등락과 급등·급락 서버를 한눈에.",
@@ -212,6 +216,8 @@ const vi: Dictionary = {
   soopChatNotice: "SOOP không hỗ trợ nhúng chat. Xem tại 'Nguồn gốc'.",
   watchOrigin: "Xem nguồn",
   liveEmpty: "Hiện không có buổi phát nào.",
+  moreGames: "Thêm",
+  lessGames: "Thu gọn",
   reportNav: "Báo cáo",
   reportTitle: "Báo cáo giá",
   reportDesc: "Biến động trung bình và máy chủ tăng/giảm mạnh theo từng game.",
