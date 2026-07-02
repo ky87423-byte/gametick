@@ -68,13 +68,22 @@ const TIME_LOCALE: Record<string, string> = {
   vi: "vi-VN",
 };
 
+// 언어별 표시 시간대 — 언어를 바꾸면 시각도 해당 지역 기준으로 자동 변환.
+const TZ_BY_LOCALE: Record<string, string> = {
+  ko: "Asia/Seoul", // KST (UTC+9)
+  zh: "Asia/Shanghai", // CST (UTC+8)
+  vi: "Asia/Ho_Chi_Minh", // ICT (UTC+7)
+  en: "UTC",
+};
+
 export function formatTime(ms: number | null, locale: string): string {
   if (ms === null) return "—";
   return new Date(ms).toLocaleString(TIME_LOCALE[locale] ?? "ko-KR", {
-    timeZone: "Asia/Seoul", // 한국 시세 → 항상 KST 고정(서버 시간대 무관)
+    timeZone: TZ_BY_LOCALE[locale] ?? "Asia/Seoul",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    timeZoneName: "short",
   });
 }
