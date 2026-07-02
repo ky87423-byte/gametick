@@ -54,7 +54,8 @@ export function TradeFeed({
     if (v > 0) volMap.set(t.server, (volMap.get(t.server) ?? 0) + v);
   }
   const ranking = [...volMap.entries()].sort((a, b) => b[1] - a[1]);
-  const list = trades.slice(0, max);
+  // 실시간 거래완료도 서버 수만큼 노출
+  const list = trades.slice(0, serverNames.length > 0 ? serverNames.length : max);
 
   const tabBtn = (key: "vol" | "trades", label: string) => (
     <button
@@ -81,7 +82,7 @@ export function TradeFeed({
         ranking.length === 0 ? (
           <p className="text-xs text-zinc-600">{empty}</p>
         ) : (
-          <ul className="max-h-72 space-y-1 overflow-y-auto pr-1">
+          <ul className="themed-scroll max-h-72 space-y-1 overflow-y-auto pr-1">
             {ranking.map(([sv, v], i) => (
               <li
                 key={sv}
@@ -116,7 +117,7 @@ export function TradeFeed({
       ) : list.length === 0 ? (
         <p className="text-xs text-zinc-600">{empty}</p>
       ) : (
-        <ul className="space-y-1.5">
+        <ul className="themed-scroll max-h-72 space-y-1.5 overflow-y-auto pr-1">
           {list.map((t, i) => (
             <li
               key={i}
