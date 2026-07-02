@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findGame, findServer } from "@/data/games";
+import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
 import { getServerExchangeSeries } from "@/lib/market";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
@@ -34,8 +34,8 @@ export async function generateMetadata({
   const server = findServer(game, sid);
   if (!server) return {};
   const dict = getDictionary(locale as Locale);
-  const gameName = locale === "ko" ? game.nameKo : game.nameEn;
-  const title = `${server.nameKo} · ${gameName} ${game.currency} | ${dict.brand}`;
+  const gameName = gameNameOf(game, locale);
+  const title = `${server.nameKo} · ${gameName} ${currencyOf(game, locale)} | ${dict.brand}`;
   const description = serverIntro(locale as Locale, game, server.nameKo);
   return {
     title,
@@ -72,7 +72,7 @@ export default async function ServerDetail({
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
-  const unitText = dict.perUnit(game.unitAmount, game.currency);
+  const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
   const secondary = secondaryCurrency(data.current, locale, rates);
 
   const tfTab = (t: Timeframe) => (
@@ -114,7 +114,7 @@ export default async function ServerDetail({
           <h1 className="text-2xl font-bold tracking-tight">
             {server.nameKo}
             <span className="ml-2 text-base font-normal text-zinc-500">
-              {game.nameKo} {game.currency}
+              {gameNameOf(game, locale)} {currencyOf(game, locale)}
             </span>
           </h1>
           <div className="flex flex-wrap items-center gap-2">
@@ -131,7 +131,7 @@ export default async function ServerDetail({
             <AlertButton
               gameSlug={game.slug}
               serverId={server.id}
-              name={`${server.nameKo} ${game.currency}`}
+              name={`${server.nameKo} ${currencyOf(game, locale)}`}
               current={data.current}
             />
           </div>
@@ -170,7 +170,7 @@ export default async function ServerDetail({
 
         <div className="mt-6 max-w-md">
           <PriceCalc
-            currency={game.currency}
+            currency={currencyOf(game, locale)}
             unitAmount={game.unitAmount}
             priceKrw={data.current}
             vndRate={rates.vnd}

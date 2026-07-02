@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findGame, liveQuery } from "@/data/games";
+import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getGameTrend, getMarketTable, movers, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
@@ -36,8 +36,8 @@ export async function generateMetadata({
   const game = findGame(slug);
   if (!game || !isLocale(locale)) return {};
   const dict = getDictionary(locale as Locale);
-  const gameName = locale === "ko" ? game.nameKo : game.nameEn;
-  const title = `${dict.priceTitle(gameName, game.currency)} | ${dict.brand}`;
+  const gameName = gameNameOf(game, locale);
+  const title = `${dict.priceTitle(gameName, currencyOf(game, locale))} | ${dict.brand}`;
   const description = gameIntro(locale as Locale, game);
   return {
     title,
@@ -82,7 +82,7 @@ export default async function GamePage({
     live: true,
     platform: s.platform,
   }));
-  const unitText = dict.perUnit(game.unitAmount, game.currency);
+  const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
 
   return (
     <>
@@ -90,7 +90,9 @@ export default async function GamePage({
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
         <div className="mb-1 flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">{game.nameKo}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {gameNameOf(game, locale)}
+          </h1>
           <span className="text-xs text-zinc-500">
             {dict.updatedAt}: {formatTime(table.updatedAt, locale)}
           </span>

@@ -478,6 +478,27 @@ export function findGame(slug: string | null | undefined): GameInfo | null {
   return GAMES.find((g) => g.slug === slug) ?? null;
 }
 
+// 통화 영문 표기(영어·중국어 로케일용). ko·vi는 한국어 통화명 유지.
+const CURRENCY_EN: Record<string, string> = {
+  아데나: "Adena",
+  키나: "Kinah",
+  메소: "Meso",
+  다이아: "Diamond",
+};
+
+/** 로케일별 통화 표기 — en/zh는 영문, 그 외는 원 통화명 */
+export function currencyOf(game: GameInfo, locale: string): string {
+  if (locale === "en" || locale === "zh") {
+    return CURRENCY_EN[game.currency] ?? game.currency;
+  }
+  return game.currency;
+}
+
+/** 로케일별 게임명 — ko는 한글, 그 외는 영문 */
+export function gameNameOf(game: GameInfo, locale: string): string {
+  return locale === "ko" ? game.nameKo : game.nameEn;
+}
+
 export function findServer(
   game: GameInfo,
   serverId: string | null | undefined
