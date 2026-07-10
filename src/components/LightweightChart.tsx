@@ -113,9 +113,9 @@ export function LightweightChart({
           borderColor: theme.timeScale.borderColor,
           timeVisible: true,
           secondsVisible: false,
-          // 축 눈금: 시각(Time~)이면 HH:mm, 날짜 단위면 MM-DD (gamebit 스타일)
-          tickMarkFormatter: (t: number, tickType: number) =>
-            tickType >= LWC.TickMarkType.Time ? fmtHm(t) : fmtMd(t),
+          // 축 눈금: 모든 타임프레임에서 MM-DD HH:mm로 통일(gamebit식) →
+          // 3분봉/시간봉/일봉 시간축 표기가 서로 일관됨.
+          tickMarkFormatter: (t: number) => fmtFull(t),
         },
         localization: {
           locale,
