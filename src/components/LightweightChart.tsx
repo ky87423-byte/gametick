@@ -13,14 +13,41 @@ const UP = "#f87171"; // 상승(빨강)
 const DOWN = "#60a5fa"; // 하락(파랑)
 const KST_OFFSET = 9 * 3600; // 초 단위
 
+// 테마별 축·격자·텍스트 색. 값은 globals.css의 라이트 매핑과 일치시켜
+// (다크=zinc-400/800/700, 라이트=반전값) 사이트 전체와 톤을 맞춘다.
+const DARK_THEME = { text: "#a1a1aa", grid: "#27272a", border: "#3f3f46" };
+const LIGHT_THEME = { text: "#52525b", grid: "#e4e4e7", border: "#d4d4d8" };
+
+function isLightMode() {
+  return (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("light")
+  );
+}
+
+function themeOptions(light: boolean) {
+  const t = light ? LIGHT_THEME : DARK_THEME;
+  return {
+    layout: { textColor: t.text },
+    grid: {
+      vertLines: { color: t.grid },
+      horzLines: { color: t.grid },
+    },
+    rightPriceScale: { borderColor: t.border },
+    timeScale: { borderColor: t.border },
+  };
+}
+
 export function LightweightChart({
   candles,
   ma,
   height = 300,
+  locale = "ko-KR",
 }: {
   candles: Candle[];
   ma: (number | null)[];
   height?: number;
+  locale?: string;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -29,36 +56,44 @@ export function LightweightChart({
   useEffect(() => {
     if (!boxRef.current || candles.length < 2) return;
     let disposed = false;
+    let observer: MutationObserver | null = null;
     const el = boxRef.current;
 
     (async () => {
       const LWC = await import("lightweight-charts");
       if (disposed || !el) return;
 
+      const theme = themeOptions(isLightMode());
       const chart = LWC.createChart(el, {
         autoSize: true,
         layout: {
           background: { type: LWC.ColorType.Solid, color: "transparent" },
-          textColor: "#a1a1aa",
           fontFamily: "ui-monospace, monospace",
+          ...theme.layout,
         },
-        grid: {
-          vertLines: { color: "#27272a" },
-          horzLines: { color: "#27272a" },
-        },
+        grid: theme.grid,
         crosshair: { mode: LWC.CrosshairMode.Magnet },
-        rightPriceScale: { borderColor: "#3f3f46" },
+        rightPriceScale: { borderColor: theme.rightPriceScale.borderColor },
         timeScale: {
-          borderColor: "#3f3f46",
+          borderColor: theme.timeScale.borderColor,
           timeVisible: true,
           secondsVisible: false,
         },
         localization: {
-          locale: "ko-KR",
-          priceFormatter: (p: number) => Math.round(p).toLocaleString("ko-KR"),
+          locale,
+          priceFormatter: (p: number) => Math.round(p).toLocaleString(locale),
         },
       });
       chartRef.current = chart;
+
+      // 테마 토글(html.light 클래스 변경) 시 축·격자 색을 즉시 갱신
+      observer = new MutationObserver(() => {
+        chart.applyOptions(themeOptions(isLightMode()));
+      });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
 
       // 거래량 바(매물 수) — 하단 오버레이
       const hasVolume = candles.some((c) => c.v > 0);
@@ -126,10 +161,11 @@ export function LightweightChart({
 
     return () => {
       disposed = true;
+      observer?.disconnect();
       chartRef.current?.remove();
       chartRef.current = null;
     };
-  }, [candles, ma]);
+  }, [candles, ma, locale]);
 
   if (candles.length < 2) {
     return (
