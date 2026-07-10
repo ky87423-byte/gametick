@@ -171,7 +171,12 @@ export default async function ServerDetail({
           <span className="ml-1 text-xs text-amber-400/80">— MA</span>
         </div>
 
-        <LightweightChart candles={data.candles} ma={data.ma} locale={locale} />
+        <LightweightChart
+          candles={data.candles}
+          ma={data.ma}
+          locale={locale}
+          tf={tf}
+        />
 
         {/* 거래소별 시세 비교 오버레이 (활성 거래소 2곳 이상일 때) */}
         {exchangeSeries.length >= 2 && (

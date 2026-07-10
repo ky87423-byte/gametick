@@ -56,16 +56,27 @@ function themeOptions(light: boolean) {
   };
 }
 
+// 타임프레임별 기본 표시 구간(초). fitContent로 전체를 넣으면 눈금이
+// 과밀→넓게 벌어지므로(예 3분봉 24h=3시간 눈금), 최근 구간만 기본 표시해
+// 원하는 눈금 간격을 유도한다. 데이터는 유지되어 스크롤로 과거 조회 가능(gamebit식).
+const DEFAULT_VIEW_SEC: Record<string, number> = {
+  "3m": 8 * 3600, // 최근 8시간 → 1시간 눈금
+  "1h": 7 * 24 * 3600, // 최근 7일 → 하루(24h) 눈금
+  "1d": 90 * 24 * 3600, // 전체
+};
+
 export function LightweightChart({
   candles,
   ma,
   height = 300,
   locale = "ko-KR",
+  tf = "1h",
 }: {
   candles: Candle[];
   ma: (number | null)[];
   height?: number;
   locale?: string;
+  tf?: string;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -113,9 +124,10 @@ export function LightweightChart({
           borderColor: theme.timeScale.borderColor,
           timeVisible: true,
           secondsVisible: false,
-          // 축 눈금: 모든 타임프레임에서 MM-DD HH:mm로 통일(gamebit식) →
-          // 3분봉/시간봉/일봉 시간축 표기가 서로 일관됨.
-          tickMarkFormatter: (t: number) => fmtFull(t),
+          // 축 눈금: 시각 눈금은 HH:mm, 날짜 경계 눈금은 MM-DD (좁은 라벨이라
+          // 눈금이 촘촘히 들어감). 표시 구간은 아래 setVisibleRange로 제어.
+          tickMarkFormatter: (t: number, tickType: number) =>
+            tickType >= LWC.TickMarkType.Time ? fmtHm(t) : fmtMd(t),
         },
         localization: {
           locale,
@@ -263,7 +275,18 @@ export function LightweightChart({
       };
       chart.subscribeCrosshairMove(onMove);
 
-      chart.timeScale().fitContent();
+      // 기본 표시 구간: 최근 DEFAULT_VIEW_SEC[tf]만큼만(눈금 간격 유도).
+      // 전체가 그보다 짧으면 fitContent로 전부 표시.
+      const firstSec = Math.floor(candles[0].t / 1000) + tz;
+      const lastSec = Math.floor(candles[candles.length - 1].t / 1000) + tz;
+      const from = lastSec - (DEFAULT_VIEW_SEC[tf] ?? DEFAULT_VIEW_SEC["1h"]);
+      if (from > firstSec) {
+        chart
+          .timeScale()
+          .setVisibleRange({ from: from as never, to: lastSec as never });
+      } else {
+        chart.timeScale().fitContent();
+      }
       setReady(true);
     })();
 
@@ -274,7 +297,7 @@ export function LightweightChart({
       chartRef.current?.remove();
       chartRef.current = null;
     };
-  }, [candles, ma, locale]);
+  }, [candles, ma, locale, tf]);
 
   if (candles.length < 2) {
     return (
