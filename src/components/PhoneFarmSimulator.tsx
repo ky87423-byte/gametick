@@ -138,9 +138,10 @@ export function PhoneFarmSimulator() {
             className="w-1/3 mx-4 accent-gray-800"
           />
           <input
-            type="number"
-            value={costPerSet}
-            onChange={(e) => setCostPerSet(Number(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            value={formatKRW(costPerSet)}
+            onChange={(e) => setCostPerSet(Number(e.target.value.replace(/[^0-9]/g, "")))}
             className="w-1/3 bg-gray-100 rounded-md px-3 py-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
@@ -158,9 +159,10 @@ export function PhoneFarmSimulator() {
             className="w-1/3 mx-4 accent-gray-800"
           />
           <input
-            type="number"
-            value={revenuePerSet}
-            onChange={(e) => setRevenuePerSet(Number(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            value={formatKRW(revenuePerSet)}
+            onChange={(e) => setRevenuePerSet(Number(e.target.value.replace(/[^0-9]/g, "")))}
             className="w-1/3 bg-gray-100 rounded-md px-3 py-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
@@ -198,9 +200,10 @@ export function PhoneFarmSimulator() {
             className="w-1/3 mx-4 accent-gray-800"
           />
           <input
-            type="number"
-            value={costPerIp}
-            onChange={(e) => setCostPerIp(Number(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            value={formatKRW(costPerIp)}
+            onChange={(e) => setCostPerIp(Number(e.target.value.replace(/[^0-9]/g, "")))}
             className="w-1/3 bg-gray-100 rounded-md px-3 py-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
@@ -218,9 +221,10 @@ export function PhoneFarmSimulator() {
             className="w-1/3 mx-4 accent-gray-800"
           />
           <input
-            type="number"
-            value={fixedOpex}
-            onChange={(e) => setFixedOpex(Number(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            value={formatKRW(fixedOpex)}
+            onChange={(e) => setFixedOpex(Number(e.target.value.replace(/[^0-9]/g, "")))}
             className="w-1/3 bg-gray-100 rounded-md px-3 py-2 text-center text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
