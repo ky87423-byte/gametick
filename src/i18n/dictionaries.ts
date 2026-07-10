@@ -12,6 +12,7 @@ export interface Dictionary {
   change24h: string;
   listings: string;
   chart: string;
+  chartLoading: string;
   perUnit: (amount: number, currency: string) => string;
   noData: string;
   updatedAt: string;
@@ -100,6 +101,7 @@ const ko: Dictionary = {
   change24h: "24h 등락",
   listings: "매물",
   chart: "추이",
+  chartLoading: "차트 불러오는 중…",
   perUnit: (amount, currency) => `${amount.toLocaleString("ko-KR")} ${currency} 기준`,
   noData: "데이터 없음",
   updatedAt: "업데이트",
@@ -185,6 +187,7 @@ const vi: Dictionary = {
   change24h: "24h",
   listings: "Tin",
   chart: "Xu hướng",
+  chartLoading: "Đang tải biểu đồ…",
   perUnit: (amount, currency) => `Theo ${amount.toLocaleString("en-US")} ${currency} (KRW)`,
   noData: "Không có dữ liệu",
   updatedAt: "Cập nhật",
@@ -270,6 +273,7 @@ const en: Dictionary = {
   change24h: "24h",
   listings: "Listings",
   chart: "Trend",
+  chartLoading: "Loading chart…",
   perUnit: (amount, currency) =>
     `Per ${amount.toLocaleString("en-US")} ${currency} (KRW)`,
   noData: "No data",
@@ -357,6 +361,7 @@ const zh: Dictionary = {
   change24h: "24h",
   listings: "在售",
   chart: "走势",
+  chartLoading: "加载图表中…",
   perUnit: (amount, currency) =>
     `每 ${amount.toLocaleString("en-US")} ${currency}（韩元）`,
   noData: "暂无数据",
@@ -443,6 +448,7 @@ const ja: Dictionary = {
   change24h: "24h",
   listings: "出品",
   chart: "推移",
+  chartLoading: "チャートを読み込み中…",
   perUnit: (amount, currency) =>
     `${amount.toLocaleString("ja-JP")} ${currency}あたり (KRW)`,
   noData: "データなし",
@@ -530,6 +536,7 @@ const th: Dictionary = {
   change24h: "24 ชม.",
   listings: "ประกาศ",
   chart: "แนวโน้ม",
+  chartLoading: "กำลังโหลดแผนภูมิ…",
   perUnit: (amount, currency) =>
     `ต่อ ${amount.toLocaleString("en-US")} ${currency} (KRW)`,
   noData: "ไม่มีข้อมูล",
@@ -617,6 +624,7 @@ const tl: Dictionary = {
   change24h: "24h",
   listings: "Listing",
   chart: "Trend",
+  chartLoading: "Naglo-load ng chart…",
   perUnit: (amount, currency) =>
     `Kada ${amount.toLocaleString("en-US")} ${currency} (KRW)`,
   noData: "Walang data",

@@ -3,15 +3,29 @@
 // TradingView lightweight-charts 기반 캔들차트 (gamebit 벤치마크).
 // canvas 렌더라 SSR 불가 → 라이브러리는 useEffect 안에서 동적 import한다.
 // 한국 관례: 양봉(상승)=빨강, 음봉(하락)=파랑. 하단 거래량 바 = 매물 수.
-// KST 표시: lightweight-charts는 항상 UTC로 그리므로 타임스탬프에 +9h 오프셋.
+// 시간축: lightweight-charts는 항상 UTC로 그리므로 로케일별 오프셋을 더해 표시.
 
 import { useEffect, useRef, useState } from "react";
 import type { IChartApi } from "lightweight-charts";
 import { Candle } from "@/lib/candles";
+import { getDictionary } from "@/i18n/dictionaries";
+import { Locale } from "@/i18n/config";
 
 const UP = "#f87171"; // 상승(빨강)
 const DOWN = "#60a5fa"; // 하락(파랑)
-const KST_OFFSET = 9 * 3600; // 초 단위
+
+// 로케일별 표시 시간대 오프셋(초). lightweight-charts는 항상 UTC로 그리므로
+// 타임스탬프에 오프셋을 더해 해당 지역 시각으로 축을 맞춘다.
+// format.ts의 TZ_BY_LOCALE와 일치(전부 DST 없는 아시아권 → 정적값 안전).
+const TZ_OFFSET_SEC: Record<string, number> = {
+  ko: 9 * 3600, // KST
+  ja: 9 * 3600, // JST
+  zh: 8 * 3600, // CST
+  tl: 8 * 3600, // PHT
+  vi: 7 * 3600, // ICT
+  th: 7 * 3600, // ICT
+  en: 0, // UTC
+};
 
 // 테마별 축·격자·텍스트 색. 값은 globals.css의 라이트 매핑과 일치시켜
 // (다크=zinc-400/800/700, 라이트=반전값) 사이트 전체와 톤을 맞춘다.
@@ -52,12 +66,14 @@ export function LightweightChart({
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const [ready, setReady] = useState(false);
+  const dict = getDictionary(locale as Locale);
 
   useEffect(() => {
     if (!boxRef.current || candles.length < 2) return;
     let disposed = false;
     let observer: MutationObserver | null = null;
     const el = boxRef.current;
+    const tz = TZ_OFFSET_SEC[locale] ?? 9 * 3600;
 
     (async () => {
       const LWC = await import("lightweight-charts");
@@ -109,7 +125,7 @@ export function LightweightChart({
         });
         vol.setData(
           candles.map((c) => ({
-            time: (Math.floor(c.t / 1000) + KST_OFFSET) as never,
+            time: (Math.floor(c.t / 1000) + tz) as never,
             value: c.v,
             color: c.c >= c.o ? "rgba(248,113,113,0.4)" : "rgba(96,165,250,0.4)",
           }))
@@ -128,7 +144,7 @@ export function LightweightChart({
       });
       candleSeries.setData(
         candles.map((c) => ({
-          time: (Math.floor(c.t / 1000) + KST_OFFSET) as never,
+          time: (Math.floor(c.t / 1000) + tz) as never,
           open: c.o,
           high: c.h,
           low: c.l,
@@ -141,7 +157,7 @@ export function LightweightChart({
         .map((c, i) => ({ t: c.t, m: ma[i] }))
         .filter((d): d is { t: number; m: number } => d.m !== null)
         .map((d) => ({
-          time: (Math.floor(d.t / 1000) + KST_OFFSET) as never,
+          time: (Math.floor(d.t / 1000) + tz) as never,
           value: d.m,
         }));
       if (maData.length) {
@@ -173,7 +189,7 @@ export function LightweightChart({
         className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/40 text-sm text-zinc-500"
         style={{ height }}
       >
-        데이터가 충분하지 않습니다
+        {dict.noData}
       </div>
     );
   }
@@ -183,7 +199,7 @@ export function LightweightChart({
       <div ref={boxRef} style={{ height }} className="w-full">
         {!ready && (
           <div className="flex h-full items-center justify-center text-sm text-zinc-600">
-            차트 불러오는 중…
+            {dict.chartLoading}
           </div>
         )}
       </div>
