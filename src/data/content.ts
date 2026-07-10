@@ -13,6 +13,15 @@ export function gameIntro(locale: Locale, game: GameInfo): string {
   if (locale === "vi") {
     return `Giá ${currencyOf(game, locale)} theo máy chủ ${game.nameEn} theo thời gian thực. Chúng tôi thu thập giá bán thấp nhất của các tin đang giao dịch trên sàn bên ngoài, quy theo mỗi ${game.unitLabelKo} ${currencyOf(game, locale)} (KRW) và tự động cập nhật. Giá chỉ mang tính tham khảo.`;
   }
+  if (locale === "ja") {
+    return `${game.nameEn} のゲームマネー ${currencyOf(game, locale)} のサーバー別リアルタイム相場です。外部取引所の取引可能な出品の中から最安値を ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)}（KRW）あたりで収集し、自動更新します。サーバーをタップするとローソク足チャート・24時間騰落・価格アラートを確認できます。表示価格は参考用であり、実際の取引価格と異なる場合があります。`;
+  }
+  if (locale === "th") {
+    return `ราคา ${currencyOf(game, locale)} แบบเรียลไทม์แยกตามเซิร์ฟเวอร์ของ ${game.nameEn} เรารวบรวมราคาขายต่ำสุดจากประกาศที่ซื้อขายได้บนตลาดภายนอก คิดต่อ ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} (KRW) และอัปเดตอัตโนมัติ แตะที่เซิร์ฟเวอร์เพื่อดูกราฟแท่งเทียน การเปลี่ยนแปลง 24 ชม. และการแจ้งเตือนราคา ราคาเป็นเพียงข้อมูลอ้างอิงและอาจต่างจากราคาซื้อขายจริง`;
+  }
+  if (locale === "tl") {
+    return `Real-time na presyo ng ${currencyOf(game, locale)} kada server para sa ${game.nameEn}. Kinukuha namin ang pinakamababang presyo mula sa mga listing na pwedeng i-trade sa mga panlabas na exchange, kada ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} (KRW), at awtomatikong ina-update. Pindutin ang server para sa candle chart, 24h na pagbabago, at price alert. Reference lamang ang mga presyo at maaaring maiba sa aktwal na transaksyon.`;
+  }
   return `${game.nameKo} ${currencyOf(game, locale)} 서버별 실시간 시세입니다. 외부 거래소의 거래가능 매물 중 최저 판매가를 ${game.unitLabelKo} ${currencyOf(game, locale)}당(원) 기준으로 수집해 자동 갱신합니다. 서버를 누르면 캔들 차트와 24시간 등락, 가격 알림을 볼 수 있습니다. 표시 가격은 참고용이며 실제 거래가와 다를 수 있습니다.`;
 }
 
@@ -29,6 +38,15 @@ export function serverIntro(
   }
   if (locale === "vi") {
     return `Giá ${currencyOf(game, locale)} máy chủ ${serverName} của ${game.nameEn} theo thời gian thực. Cung cấp giá thấp nhất mỗi ${game.unitLabelKo} ${currencyOf(game, locale)}, biến động 24h, biểu đồ nến (3 phút/1 giờ/ngày) và cảnh báo giá. Giá chỉ mang tính tham khảo.`;
+  }
+  if (locale === "ja") {
+    return `${game.nameEn} ${serverName} サーバーの ${currencyOf(game, locale)} リアルタイム相場です。${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} あたりの最安値、24時間騰落、ローソク足チャート（3分/1時間/日足）、価格アラートを提供します。相場は外部取引所の取引可能な出品を基に自動更新され、参考用です。`;
+  }
+  if (locale === "th") {
+    return `ราคา ${currencyOf(game, locale)} แบบเรียลไทม์ของเซิร์ฟเวอร์ ${serverName} ของ ${game.nameEn} ให้ราคาต่ำสุดต่อ ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} การเปลี่ยนแปลง 24 ชม. กราฟแท่งเทียน (3 นาที/1 ชม./รายวัน) และการแจ้งเตือนราคา อัปเดตอัตโนมัติจากประกาศที่ซื้อขายได้บนตลาดภายนอก เป็นเพียงข้อมูลอ้างอิง`;
+  }
+  if (locale === "tl") {
+    return `Real-time na presyo ng ${currencyOf(game, locale)} para sa server na ${serverName} ng ${game.nameEn}. Nagbibigay ng pinakamababang presyo kada ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)}, 24h na pagbabago, candle chart (3m/1h/1d), at price alert. Awtomatikong ina-update mula sa mga listing sa panlabas na exchange at para sa reference lamang.`;
   }
   return `${serverName} 서버 ${game.nameKo} ${currencyOf(game, locale)} 실시간 시세입니다. ${game.unitLabelKo} ${currencyOf(game, locale)}당 최저 판매가와 24시간 등락률, 캔들 차트(3분·1시간·일봉), 가격 알림을 제공합니다. 시세는 외부 거래소 거래가능 매물을 기준으로 자동 갱신되며 참고용입니다.`;
 }
@@ -77,6 +95,45 @@ export function generalFaq(locale: Locale): FaqItem[] {
       { q: "Số tin (listings) đo cái gì?", a: "Số tin bán 'có thể giao dịch' của máy chủ đó trên Barotem tại thời điểm thu thập. Càng nhiều thì giao dịch càng sôi động, thanh khoản càng cao." },
       { q: "Giao dịch hoàn tất có thật không?", a: "Có — là dữ liệu giao dịch thật lấy từ mục 'đã hoàn tất' của Barotem (máy chủ, số lượng, tổng giá, thời gian), mới nhất trước. Không phải dữ liệu tự tạo." },
       { q: "Khối lượng giao dịch tính thế nào?", a: "Cộng số lượng của các giao dịch hoàn tất thu thập gần đây theo máy chủ, rồi xếp hạng toàn bộ máy chủ của game theo tổng đó. Dựa trên khung dữ liệu gần đây nên có thể khác tổng tích lũy." },
+    ];
+  }
+  if (locale === "ja") {
+    return [
+      { q: "相場はどのように算定されますか？", a: "外部取引所（Barotem・Itembay・Itemmania）の取引可能な出品の中から最安値をサーバー別に収集し、定期的に更新します。参考用の情報です。" },
+      { q: "価格の単位はどういう意味ですか？", a: "ゲームマネー一定数量あたりのウォン価格です（例：10,000アデナあたり、10,000,000キナあたり）。各ゲームページに「10,000アデナあたり」のように表示されます。" },
+      { q: "出品数とは何ですか？", a: "そのサーバーの現在の取引可能な出品数です。多いほど取引が活発で流動性が高いことを意味します。" },
+      { q: "価格アラートはどう使いますか？", a: "サーバーページで目標価格を設定すると、Telegram・Discord・ブラウザ通知でアラートを受け取れます。" },
+      { q: "取引を仲介しますか？", a: "いいえ。参考相場のみ提供し、取引を仲介せず、取引による責任も負いません。" },
+      { q: "サーバーの現在価格はどこから来て、どう決まりますか？", a: "外部取引所（Barotem・Itembay・Itemmania）から「取引可能」な出品をサーバー別に収集し、その中の最安値を現在価格とします。ゲームごとの基準数量（例：10,000アデナ）あたりのウォンで表示され、3〜5分ごとに自動更新される参考値です。" },
+      { q: "出品数は何を数えていますか？", a: "収集時点でBarotem上のそのサーバーの「取引可能」な売り出品数です。数が多いほど取引が活発で流動性が高いことを意味します。" },
+      { q: "取引完了は実際の取引ですか？", a: "はい。Barotemの「取引完了」記録から収集した実際の約定データ（サーバー・数量・約定額・時刻）で、新しい順に表示します。捏造ではありません。" },
+      { q: "取引量はどう計算されますか？", a: "直近に収集した取引完了の数量をサーバー別に合算し、そのゲームの全サーバーをその合計で順位付けします。直近のフィード範囲に基づくため、累計とは異なる場合があります。" },
+    ];
+  }
+  if (locale === "th") {
+    return [
+      { q: "ราคาคำนวณอย่างไร?", a: "รวบรวมราคาขายต่ำสุดจากประกาศที่ซื้อขายได้บนตลาดภายนอก (Barotem, Itembay, Itemmania) แยกตามเซิร์ฟเวอร์และอัปเดตเป็นระยะ เป็นเพียงข้อมูลอ้างอิง" },
+      { q: "หน่วยราคาหมายความว่าอย่างไร?", a: "ราคาเป็นเงินวอนต่อจำนวนเงินเกมที่กำหนด (เช่น ต่อ 10,000 Adena, ต่อ 10,000,000 Kinah) แต่ละหน้าเกมจะแสดงเป็น \"ต่อ 10,000 …\"" },
+      { q: "จำนวนประกาศคืออะไร?", a: "จำนวนประกาศที่ซื้อขายได้ของเซิร์ฟเวอร์นั้น ยิ่งมากยิ่งมีสภาพคล่องสูง" },
+      { q: "การแจ้งเตือนราคาใช้อย่างไร?", a: "ตั้งราคาเป้าหมายในหน้าเซิร์ฟเวอร์เพื่อรับการแจ้งเตือนผ่าน Telegram, Discord หรือการแจ้งเตือนของเบราว์เซอร์" },
+      { q: "คุณเป็นตัวกลางซื้อขายหรือไม่?", a: "ไม่ เราให้เพียงราคาอ้างอิงเท่านั้น ไม่เป็นตัวกลางและไม่รับผิดชอบต่อการทำธุรกรรมใด ๆ" },
+      { q: "ราคาปัจจุบันของเซิร์ฟเวอร์มาจากไหนและกำหนดอย่างไร?", a: "เรารวบรวมประกาศที่ 'ซื้อขายได้' แยกตามเซิร์ฟเวอร์จากตลาดภายนอก (Barotem, Itembay, Itemmania) ราคาต่ำสุดในนั้นคือราคาปัจจุบัน แสดงเป็นเงินวอนต่อหน่วยพื้นฐานของเกม (เช่น ต่อ 10,000 Adena) อัปเดตอัตโนมัติทุก 3–5 นาที และเป็นเพียงข้อมูลอ้างอิง" },
+      { q: "จำนวนประกาศวัดอะไร?", a: "จำนวนประกาศขายที่ 'ซื้อขายได้' ของเซิร์ฟเวอร์นั้นบน Barotem ณ เวลาที่เก็บข้อมูล ยิ่งมากยิ่งแสดงว่าการซื้อขายคึกคักและสภาพคล่องสูง" },
+      { q: "รายการซื้อขายที่สำเร็จเป็นของจริงหรือไม่?", a: "จริง เป็นข้อมูลการซื้อขายจริงที่เก็บจากบันทึก 'เสร็จสิ้น' ของ Barotem (เซิร์ฟเวอร์ จำนวน ยอดรวม เวลา) เรียงจากใหม่สุด ไม่ได้สร้างขึ้นเอง" },
+      { q: "ปริมาณซื้อขายคำนวณอย่างไร?", a: "รวมจำนวนของรายการซื้อขายที่สำเร็จซึ่งเก็บล่าสุดแยกตามเซิร์ฟเวอร์ แล้วจัดอันดับเซิร์ฟเวอร์ทั้งหมดของเกมตามยอดรวมนั้น อิงจากช่วงข้อมูลล่าสุดจึงอาจต่างจากยอดสะสมทั้งหมด" },
+    ];
+  }
+  if (locale === "tl") {
+    return [
+      { q: "Paano kinakalkula ang mga presyo?", a: "Kinukuha namin ang pinakamababang presyo mula sa mga listing na pwedeng i-trade sa mga panlabas na exchange (Barotem, Itembay, Itemmania) kada server at pana-panahong ina-update. Para sa reference lamang." },
+      { q: "Ano ang ibig sabihin ng unit ng presyo?", a: "Ang presyo sa KRW kada takdang dami ng game currency (hal. kada 10,000 Adena, kada 10,000,000 Kinah). Ipinapakita ito sa bawat page ng laro bilang \"kada 10,000 …\"." },
+      { q: "Ano ang bilang ng listing?", a: "Ang dami ng mga listing na pwedeng i-trade sa server na iyon — mas marami, mas mataas ang liquidity." },
+      { q: "Paano gumagana ang price alerts?", a: "Magtakda ng target na presyo sa page ng server para makatanggap ng alert sa pamamagitan ng Telegram, Discord, o browser notification." },
+      { q: "Namamagitan ba kayo sa kalakalan?", a: "Hindi. Nagbibigay lamang kami ng reference na presyo; hindi kami namamagitan at hindi mananagot sa anumang transaksyon." },
+      { q: "Saan nanggagaling ang presyo ng server at paano ito nadedesisyunan?", a: "Kinukuha namin ang mga 'pwedeng i-trade' na listing kada server mula sa mga panlabas na exchange (Barotem, Itembay, Itemmania). Ang pinakamababa rito ang nagiging kasalukuyang presyo, ipinapakita sa KRW kada base unit ng laro (hal. kada 10,000 Adena). Awtomatikong nag-a-update tuwing 3–5 minuto at para sa reference lamang." },
+      { q: "Ano ang sinusukat ng bilang ng listing?", a: "Ang bilang ng 'pwedeng i-trade' na sell listing para sa server na iyon sa Barotem sa oras ng pagkolekta. Mas mataas na bilang, mas aktibo ang kalakalan at liquidity." },
+      { q: "Totoo ba ang mga natapos na transaksyon?", a: "Oo — aktwal na mga natapos na transaksyon ang mga ito na kinolekta mula sa 'completed' na tala ng Barotem (server, dami, kabuuang halaga, oras), pinakabago muna. Hindi gawa-gawa." },
+      { q: "Paano kinakalkula ang trade volume?", a: "Sinusuma nito ang dami ng mga kamakailang nakolektang natapos na transaksyon kada server, tapos ni-rarank ang lahat ng server ng laro ayon sa kabuuang iyon. Sumasalamin ito sa kamakailang feed window, kaya maaaring maiba sa all-time na kabuuan." },
     ];
   }
   return [
@@ -158,6 +215,78 @@ export function faqItems(locale: Locale, game: GameInfo): FaqItem[] {
       {
         q: "Có trung gian giao dịch không?",
         a: "Không. Chúng tôi chỉ cung cấp thông tin giá tham khảo, không trung gian và không chịu trách nhiệm giao dịch.",
+      },
+    ];
+  }
+  if (locale === "ja") {
+    return [
+      {
+        q: "相場はどのように算定されますか？",
+        a: `外部取引所の取引可能な出品の中から ${currencyOf(game, locale)} の最安値をサーバー別に収集し、定期的に更新します。参考用です。`,
+      },
+      {
+        q: `価格の単位（${game.unitAmount.toLocaleString("en-US")} あたり）はどういう意味ですか？`,
+        a: `${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} あたりのウォン価格です。例えば「1,500」は ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} が1,500ウォンという意味です。`,
+      },
+      {
+        q: "出品数とは何ですか？",
+        a: "そのサーバーの取引可能な出品数です。多いほど流動性が高くなります。",
+      },
+      {
+        q: "価格アラートはどう使いますか？",
+        a: "サーバーページで目標価格（以下／以上）を設定すると、条件に達したときにブラウザ通知を送ります。",
+      },
+      {
+        q: "取引を仲介しますか？",
+        a: "いいえ。参考価格情報のみ提供し、取引を仲介せず、取引による責任も負いません。",
+      },
+    ];
+  }
+  if (locale === "th") {
+    return [
+      {
+        q: "ราคาคำนวณอย่างไร?",
+        a: `รวบรวมราคาขายต่ำสุดของ ${currencyOf(game, locale)} จากประกาศที่ซื้อขายได้บนตลาดภายนอก อัปเดตแยกตามเซิร์ฟเวอร์ เป็นเพียงข้อมูลอ้างอิง`,
+      },
+      {
+        q: `หน่วยราคา (ต่อ ${game.unitAmount.toLocaleString("en-US")}) หมายความว่าอย่างไร?`,
+        a: `ราคาเป็นเงินวอนต่อ ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} เช่น "1,500" หมายถึง ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} = 1,500 วอน`,
+      },
+      {
+        q: "จำนวนประกาศคืออะไร?",
+        a: "จำนวนประกาศที่ซื้อขายได้ของเซิร์ฟเวอร์นั้น ยิ่งมากยิ่งมีสภาพคล่องสูง",
+      },
+      {
+        q: "การแจ้งเตือนราคาใช้อย่างไร?",
+        a: "ในหน้าเซิร์ฟเวอร์ ตั้งราคาเป้าหมาย (ต่ำกว่า/สูงกว่า) แล้วเราจะส่งการแจ้งเตือนของเบราว์เซอร์เมื่อราคาถึงเงื่อนไข",
+      },
+      {
+        q: "คุณเป็นตัวกลางซื้อขายหรือไม่?",
+        a: "ไม่ เราให้เพียงข้อมูลราคาอ้างอิง ไม่เป็นตัวกลางและไม่รับผิดชอบต่อการทำธุรกรรม",
+      },
+    ];
+  }
+  if (locale === "tl") {
+    return [
+      {
+        q: "Paano kinakalkula ang mga presyo?",
+        a: `Kinukuha namin ang pinakamababang asking price ng ${currencyOf(game, locale)} mula sa mga listing na pwedeng i-trade sa mga panlabas na exchange, ina-update kada server. Reference lamang.`,
+      },
+      {
+        q: `Ano ang ibig sabihin ng unit ng presyo (kada ${game.unitAmount.toLocaleString("en-US")})?`,
+        a: `Ang presyo sa KRW kada ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)}. Halimbawa, ang "1,500" ay nangangahulugang ${game.unitAmount.toLocaleString("en-US")} ${currencyOf(game, locale)} = 1,500 KRW.`,
+      },
+      {
+        q: "Ano ang bilang ng listing?",
+        a: "Ang dami ng mga listing na pwedeng i-trade sa server na iyon. Mas marami, mas mataas ang liquidity.",
+      },
+      {
+        q: "Paano gumagana ang price alerts?",
+        a: "Sa page ng server, magtakda ng target na presyo (pababa/pataas) at magpapadala kami ng browser notification kapag naabot ito.",
+      },
+      {
+        q: "Namamagitan ba kayo sa kalakalan?",
+        a: "Hindi. Nagbibigay lamang kami ng reference na impormasyon ng presyo; hindi kami namamagitan at hindi mananagot sa anumang transaksyon.",
       },
     ];
   }

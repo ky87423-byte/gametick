@@ -235,7 +235,7 @@ const zh: Guide[] = [
 ];
 
 // 게임별 기본 정보 가이드 — GAME_META에서 생성(출처: 나무위키)
-const META_LABELS: Record<
+const META_LABELS: Partial<Record<
   Locale,
   {
     title: string;
@@ -250,7 +250,7 @@ const META_LABELS: Record<
     minSpec: string;
     recSpec: string;
   }
-> = {
+>> = {
   ko: {
     title: "게임 정보 총정리",
     summary: "게임별 출시·회사·장르·플랫폼·사양·서비스 국가",
@@ -311,7 +311,7 @@ const META_LABELS: Record<
 
 // game-info는 표(GameInfoTable)로 렌더 → 문서엔 제목·인트로만.
 function gameInfoGuide(locale: Locale): Guide {
-  const L = META_LABELS[locale] ?? META_LABELS.ko;
+  const L = META_LABELS[locale] ?? META_LABELS.en!;
   return {
     slug: "game-info",
     summary: L.summary,
@@ -331,7 +331,7 @@ interface PriceTpl {
   ) => Doc;
 }
 
-const PRICE_TPL: Record<Locale, PriceTpl> = {
+const PRICE_TPL: Partial<Record<Locale, PriceTpl>> = {
   ko: {
     summary: (game, cur) =>
       `${game} ${cur} 서버별 실시간 시세와 단위·등락 보는 법, 안전 거래 요령`,
@@ -479,7 +479,7 @@ function priceGuide(locale: Locale, g: GameInfo): Guide {
   const cur = currencyOf(g, locale);
   const unit = g.unitAmount.toLocaleString(locale === "ko" ? "ko-KR" : "en-US");
   const m = GAME_META[g.slug];
-  const T = PRICE_TPL[locale] ?? PRICE_TPL.ko;
+  const T = PRICE_TPL[locale] ?? PRICE_TPL.en!;
   return {
     slug: `price-${g.slug}`,
     summary: T.summary(game, cur),
@@ -510,6 +510,21 @@ const FAQ_META: Record<Locale, { title: string; summary: string; intro: string }
       summary: "Giá, đơn vị, tin đăng, cảnh báo và giao dịch",
       intro: "Các câu hỏi thường gặp khi dùng GameSise và giao dịch tiền game.",
     },
+    ja: {
+      title: "よくある質問",
+      summary: "相場・単位・出品・アラート・取引に関するよくある質問",
+      intro: "GameSiseの利用とゲームマネー取引についてよくある質問をまとめました。",
+    },
+    th: {
+      title: "คำถามที่พบบ่อย",
+      summary: "เกี่ยวกับราคา หน่วย ประกาศ การแจ้งเตือน และการซื้อขาย",
+      intro: "รวมคำถามที่พบบ่อยเกี่ยวกับการใช้ GameSise และการซื้อขายเงินเกม",
+    },
+    tl: {
+      title: "Mga FAQ",
+      summary: "Presyo, unit, listing, alert, at kalakalan",
+      intro: "Mga madalas itanong tungkol sa paggamit ng GameSise at pangangalakal ng game currency.",
+    },
   };
 
 function faqGuide(locale: Locale): Guide {
@@ -523,7 +538,7 @@ function faqGuide(locale: Locale): Guide {
 
 export function guideList(locale: Locale): Guide[] {
   const base =
-    locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
+    locale === "ko" ? ko : locale === "zh" ? zh : locale === "vi" ? vi : en;
   const priceGuides = GAMES.filter((g) => GAME_META[g.slug]).map((g) =>
     priceGuide(locale, g)
   );

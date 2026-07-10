@@ -486,9 +486,9 @@ const CURRENCY_EN: Record<string, string> = {
   다이아: "Dia",
 };
 
-/** 로케일별 통화 표기 — en/zh는 영문, 그 외는 원 통화명 */
+/** 로케일별 통화 표기 — en/zh/ja/th/tl은 영문, ko/vi는 원 통화명 */
 export function currencyOf(game: GameInfo, locale: string): string {
-  if (locale === "en" || locale === "zh") {
+  if (locale !== "ko" && locale !== "vi") {
     return CURRENCY_EN[game.currency] ?? game.currency;
   }
   return game.currency;

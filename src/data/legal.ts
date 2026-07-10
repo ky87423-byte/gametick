@@ -193,6 +193,6 @@ const zh: Record<LegalKey, Doc> = {
 
 export function getLegal(locale: Locale, key: LegalKey): Doc {
   const set =
-    locale === "en" ? en : locale === "zh" ? zh : locale === "vi" ? vi : ko;
+    locale === "ko" ? ko : locale === "zh" ? zh : locale === "vi" ? vi : en;
   return set[key];
 }

@@ -4,7 +4,7 @@ import { GAMES, gameNameOf } from "@/data/games";
 import { GAME_META } from "@/data/gamemeta";
 import { Locale } from "@/i18n/config";
 
-const COLS: Record<
+const COLS: Partial<Record<
   Locale,
   {
     game: string;
@@ -16,7 +16,7 @@ const COLS: Record<
     multi: string;
     spec: string;
   }
-> = {
+>> = {
   ko: {
     game: "게임",
     release: "출시",
@@ -60,7 +60,7 @@ const COLS: Record<
 };
 
 export function GameInfoTable({ locale }: { locale: Locale }) {
-  const C = COLS[locale] ?? COLS.ko;
+  const C = COLS[locale] ?? COLS.en!;
   const rows = GAMES.filter((g) => GAME_META[g.slug]);
   const th = "px-3 py-2 text-left font-medium whitespace-nowrap";
   const td = "px-3 py-2 align-top text-zinc-400";

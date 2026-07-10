@@ -36,6 +36,19 @@ const TIME_AGO: Record<
     h: (n) => `${n} giờ trước`,
     d: (n) => `${n} ngày trước`,
   },
+  ja: { now: "たった今", m: (n) => `${n}分前`, h: (n) => `${n}時間前`, d: (n) => `${n}日前` },
+  th: {
+    now: "เมื่อสักครู่",
+    m: (n) => `${n} นาทีที่แล้ว`,
+    h: (n) => `${n} ชม.ที่แล้ว`,
+    d: (n) => `${n} วันที่แล้ว`,
+  },
+  tl: {
+    now: "ngayon lang",
+    m: (n) => `${n}m ang nakalipas`,
+    h: (n) => `${n}h ang nakalipas`,
+    d: (n) => `${n}d ang nakalipas`,
+  },
 };
 
 export function timeAgo(ms: number | null, locale: string): string {
@@ -66,6 +79,9 @@ const TIME_LOCALE: Record<string, string> = {
   en: "en-US",
   zh: "zh-CN",
   vi: "vi-VN",
+  ja: "ja-JP",
+  th: "th-TH",
+  tl: "fil-PH",
 };
 
 // 언어별 표시 시간대 — 언어를 바꾸면 시각도 해당 지역 기준으로 자동 변환.
@@ -74,6 +90,9 @@ const TZ_BY_LOCALE: Record<string, string> = {
   zh: "Asia/Shanghai", // CST (UTC+8)
   vi: "Asia/Ho_Chi_Minh", // ICT (UTC+7)
   en: "UTC",
+  ja: "Asia/Tokyo", // JST (UTC+9)
+  th: "Asia/Bangkok", // ICT (UTC+7)
+  tl: "Asia/Manila", // PHT (UTC+8)
 };
 
 export function formatTime(ms: number | null, locale: string): string {

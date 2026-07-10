@@ -10,6 +10,9 @@ const LANGS = [
   { code: "en", flag: "🇺🇸", label: "English" },
   { code: "zh", flag: "🇨🇳", label: "中文" },
   { code: "vi", flag: "🇻🇳", label: "Tiếng Việt" },
+  { code: "ja", flag: "🇯🇵", label: "日本語" },
+  { code: "th", flag: "🇹🇭", label: "ไทย" },
+  { code: "tl", flag: "🇵🇭", label: "Filipino" },
 ] as const;
 
 export function LangSwitch({

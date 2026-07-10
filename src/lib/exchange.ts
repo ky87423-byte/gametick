@@ -5,9 +5,19 @@ interface Rates {
   vnd: number;
   usd: number;
   cny: number;
+  jpy: number;
+  thb: number;
+  php: number;
 }
 
-const FALLBACK: Rates = { vnd: 17.1, usd: 0.00072, cny: 0.0052 };
+const FALLBACK: Rates = {
+  vnd: 17.1,
+  usd: 0.00072,
+  cny: 0.0052,
+  jpy: 0.11,
+  thb: 0.024,
+  php: 0.041,
+};
 let cache: { rates: Rates; at: number } | null = null;
 const TTL_MS = 60 * 60 * 1000;
 
@@ -20,16 +30,29 @@ export async function getRates(): Promise<Rates> {
     if (!res.ok) throw new Error("rate fetch failed");
     const data = (await res.json()) as {
       result?: string;
-      rates?: { VND?: number; USD?: number; CNY?: number };
+      rates?: {
+        VND?: number;
+        USD?: number;
+        CNY?: number;
+        JPY?: number;
+        THB?: number;
+        PHP?: number;
+      };
     };
     const ok = data.result === "success";
     const vnd = data.rates?.VND;
     const usd = data.rates?.USD;
     const cny = data.rates?.CNY;
+    const jpy = data.rates?.JPY;
+    const thb = data.rates?.THB;
+    const php = data.rates?.PHP;
     const rates: Rates = {
       vnd: ok && vnd && vnd > 0 ? vnd : FALLBACK.vnd,
       usd: ok && usd && usd > 0 ? usd : FALLBACK.usd,
       cny: ok && cny && cny > 0 ? cny : FALLBACK.cny,
+      jpy: ok && jpy && jpy > 0 ? jpy : FALLBACK.jpy,
+      thb: ok && thb && thb > 0 ? thb : FALLBACK.thb,
+      php: ok && php && php > 0 ? php : FALLBACK.php,
     };
     cache = { rates, at: Date.now() };
     return rates;
@@ -56,6 +79,24 @@ export function secondaryCurrency(
   }
   if (locale === "zh") {
     return `≈ ¥${(krw * rates.cny).toLocaleString("zh-CN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+  if (locale === "ja") {
+    return `≈ ¥${(krw * rates.jpy).toLocaleString("ja-JP", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+  if (locale === "th") {
+    return `≈ ฿${(krw * rates.thb).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+  if (locale === "tl") {
+    return `≈ ₱${(krw * rates.php).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
