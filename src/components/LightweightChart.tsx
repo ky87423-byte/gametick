@@ -6,7 +6,7 @@
 // 시간축: lightweight-charts는 항상 UTC로 그리므로 로케일별 오프셋을 더해 표시.
 
 import { useEffect, useRef, useState } from "react";
-import type { IChartApi } from "lightweight-charts";
+import type { IChartApi, MouseEventParams } from "lightweight-charts";
 import { Candle } from "@/lib/candles";
 import { getDictionary } from "@/i18n/dictionaries";
 import { Locale } from "@/i18n/config";
@@ -72,8 +72,10 @@ export function LightweightChart({
     if (!boxRef.current || candles.length < 2) return;
     let disposed = false;
     let observer: MutationObserver | null = null;
+    let tipEl: HTMLDivElement | null = null;
     const el = boxRef.current;
     const tz = TZ_OFFSET_SEC[locale] ?? 9 * 3600;
+    const listingsLabel = getDictionary(locale as Locale).listings;
 
     (async () => {
       const LWC = await import("lightweight-charts");
@@ -113,6 +115,7 @@ export function LightweightChart({
 
       // 거래량 바(매물 수) — 하단 오버레이
       const hasVolume = candles.some((c) => c.v > 0);
+      let volSeries: ReturnType<typeof chart.addHistogramSeries> | null = null;
       if (hasVolume) {
         const vol = chart.addHistogramSeries({
           priceScaleId: "vol",
@@ -120,6 +123,7 @@ export function LightweightChart({
           priceLineVisible: false,
           lastValueVisible: false,
         });
+        volSeries = vol;
         vol.priceScale().applyOptions({
           scaleMargins: { top: 0.82, bottom: 0 },
         });
@@ -171,6 +175,56 @@ export function LightweightChart({
         maSeries.setData(maData);
       }
 
+      // 크로스헤어 툴팁 — 마우스 위치의 종가 + 매물 수 표시(gamebit 보강).
+      // 색은 zinc CSS변수라 라이트/다크 자동 대응.
+      const tip = document.createElement("div");
+      tip.style.cssText =
+        "position:absolute;display:none;pointer-events:none;z-index:10;" +
+        "padding:4px 8px;border-radius:6px;font:11px/1.4 ui-monospace,monospace;" +
+        "white-space:nowrap;background:var(--color-zinc-800);" +
+        "color:var(--color-zinc-100);border:1px solid var(--color-zinc-700);" +
+        "box-shadow:0 2px 8px rgba(0,0,0,.25)";
+      el.appendChild(tip);
+      tipEl = tip;
+
+      const onMove = (param: MouseEventParams) => {
+        if (!param.time || !param.point || param.point.x < 0 || param.point.y < 0) {
+          tip.style.display = "none";
+          return;
+        }
+        const bar = param.seriesData.get(candleSeries) as
+          | { close?: number }
+          | undefined;
+        if (!bar || typeof bar.close !== "number") {
+          tip.style.display = "none";
+          return;
+        }
+        let html = `<div>${Math.round(bar.close).toLocaleString(locale)}</div>`;
+        if (volSeries) {
+          const v = param.seriesData.get(volSeries) as
+            | { value?: number }
+            | undefined;
+          if (v && typeof v.value === "number" && v.value > 0) {
+            html += `<div style="opacity:.7">${listingsLabel} ${v.value.toLocaleString(
+              locale
+            )}</div>`;
+          }
+        }
+        tip.innerHTML = html;
+        tip.style.display = "block";
+
+        const pad = 12;
+        let left = param.point.x + pad;
+        if (left + tip.offsetWidth > el.clientWidth)
+          left = param.point.x - tip.offsetWidth - pad;
+        let top = param.point.y + pad;
+        if (top + tip.offsetHeight > el.clientHeight)
+          top = param.point.y - tip.offsetHeight - pad;
+        tip.style.left = `${Math.max(0, left)}px`;
+        tip.style.top = `${Math.max(0, top)}px`;
+      };
+      chart.subscribeCrosshairMove(onMove);
+
       chart.timeScale().fitContent();
       setReady(true);
     })();
@@ -178,6 +232,7 @@ export function LightweightChart({
     return () => {
       disposed = true;
       observer?.disconnect();
+      tipEl?.remove();
       chartRef.current?.remove();
       chartRef.current = null;
     };
@@ -196,7 +251,7 @@ export function LightweightChart({
 
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-2">
-      <div ref={boxRef} style={{ height }} className="w-full">
+      <div ref={boxRef} style={{ height }} className="relative w-full">
         {!ready && (
           <div className="flex h-full items-center justify-center text-sm text-zinc-600">
             {dict.chartLoading}
