@@ -76,6 +76,19 @@ export function LightweightChart({
     const el = boxRef.current;
     const tz = TZ_OFFSET_SEC[locale] ?? 9 * 3600;
     const listingsLabel = getDictionary(locale as Locale).listings;
+    // 가격축·툴팁 통화 표기(gamebit "원" 스타일). KRW 가치라 ko=원, 그 외 ₩.
+    const priceSuffix = locale === "ko" ? "원" : "₩";
+    // 타임스탬프에 이미 tz 오프셋이 반영돼 있으므로 UTC 게터로 읽으면 지역 시각.
+    const p2 = (n: number) => String(n).padStart(2, "0");
+    const fmtHm = (sec: number) => {
+      const d = new Date(sec * 1000);
+      return `${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
+    };
+    const fmtMd = (sec: number) => {
+      const d = new Date(sec * 1000);
+      return `${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}`;
+    };
+    const fmtFull = (sec: number) => `${fmtMd(sec)} ${fmtHm(sec)}`;
 
     (async () => {
       const LWC = await import("lightweight-charts");
@@ -96,10 +109,16 @@ export function LightweightChart({
           borderColor: theme.timeScale.borderColor,
           timeVisible: true,
           secondsVisible: false,
+          // 축 눈금: 시각(Time~)이면 HH:mm, 날짜 단위면 MM-DD (gamebit 스타일)
+          tickMarkFormatter: (t: number, tickType: number) =>
+            tickType >= LWC.TickMarkType.Time ? fmtHm(t) : fmtMd(t),
         },
         localization: {
           locale,
-          priceFormatter: (p: number) => Math.round(p).toLocaleString(locale),
+          priceFormatter: (p: number) =>
+            Math.round(p).toLocaleString(locale) + priceSuffix,
+          // 크로스헤어 시간 라벨: MM-DD HH:mm (gamebit 스타일)
+          timeFormatter: (t: number) => fmtFull(t),
         },
       });
       chartRef.current = chart;
@@ -199,7 +218,9 @@ export function LightweightChart({
           tip.style.display = "none";
           return;
         }
-        let html = `<div>${Math.round(bar.close).toLocaleString(locale)}</div>`;
+        let html = `<div>${
+          Math.round(bar.close).toLocaleString(locale) + priceSuffix
+        }</div>`;
         if (volSeries) {
           const v = param.seriesData.get(volSeries) as
             | { value?: number }
