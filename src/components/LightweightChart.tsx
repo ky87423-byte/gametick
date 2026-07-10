@@ -6,7 +6,11 @@
 // 시간축: lightweight-charts는 항상 UTC로 그리므로 로케일별 오프셋을 더해 표시.
 
 import { useEffect, useRef, useState } from "react";
-import type { IChartApi, MouseEventParams } from "lightweight-charts";
+import type {
+  IChartApi,
+  MouseEventParams,
+  AutoscaleInfo,
+} from "lightweight-charts";
 import { Candle } from "@/lib/candles";
 import { getDictionary } from "@/i18n/dictionaries";
 import { Locale } from "@/i18n/config";
@@ -161,6 +165,19 @@ export function LightweightChart({
         wickUpColor: UP,
         wickDownColor: DOWN,
         borderVisible: false,
+        // 가격축을 정수(원) 기준으로 → 배율대별 깔끔한 눈금(예 2500원대=10원 간격).
+        priceFormat: { type: "price", precision: 0, minMove: 1 },
+        // 줌 시 보이는 캔들 범위에 맞춰 가격축 재조정 + 위아래 5% 여백(gamebit식).
+        autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
+          const res = original();
+          if (res && res.priceRange) {
+            const pad =
+              (res.priceRange.maxValue - res.priceRange.minValue) * 0.05;
+            res.priceRange.minValue -= pad;
+            res.priceRange.maxValue += pad;
+          }
+          return res;
+        },
       });
       candleSeries.priceScale().applyOptions({
         scaleMargins: { top: 0.08, bottom: hasVolume ? 0.22 : 0.08 },
