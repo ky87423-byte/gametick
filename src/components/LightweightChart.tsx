@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import type {
   IChartApi,
+  ISeriesApi,
   MouseEventParams,
   AutoscaleInfo,
 } from "lightweight-charts";
@@ -80,8 +81,17 @@ export function LightweightChart({
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const maSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const [ready, setReady] = useState(false);
+  const [showMa, setShowMa] = useState(true);
+  const showMaRef = useRef(showMa);
   const dict = getDictionary(locale as Locale);
+
+  // MA 토글: 차트 재생성 없이 선 표시/숨김만 갱신(+ 재생성 시 초기값용 ref 동기화)
+  useEffect(() => {
+    showMaRef.current = showMa;
+    maSeriesRef.current?.applyOptions({ visible: showMa });
+  }, [showMa]);
 
   useEffect(() => {
     if (!boxRef.current || candles.length < 2) return;
@@ -171,40 +181,72 @@ export function LightweightChart({
         );
       }
 
-      const candleSeries = chart.addCandlestickSeries({
-        upColor: UP,
-        downColor: DOWN,
-        wickUpColor: UP,
-        wickDownColor: DOWN,
-        borderVisible: false,
-        // 가격축을 정수(원) 기준으로 → 배율대별 깔끔한 눈금(예 2500원대=10원 간격).
-        priceFormat: { type: "price", precision: 0, minMove: 1 },
-        // 줌 시 보이는 캔들 범위에 맞춰 가격축 재조정 + 위아래 5% 여백(gamebit식).
-        autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
-          const res = original();
-          if (res && res.priceRange) {
-            const pad =
-              (res.priceRange.maxValue - res.priceRange.minValue) * 0.05;
-            res.priceRange.minValue -= pad;
-            res.priceRange.maxValue += pad;
-          }
-          return res;
-        },
-      });
-      candleSeries.priceScale().applyOptions({
+      // 가격축을 정수(원) 기준으로 → 배율대별 깔끔한 눈금(예 2500원대=10원 간격).
+      const priceFormat = { type: "price" as const, precision: 0, minMove: 1 };
+      // 줌 시 보이는 범위에 맞춰 가격축 재조정 + 위아래 5% 여백(gamebit식).
+      const autoscale = (original: () => AutoscaleInfo | null) => {
+        const res = original();
+        if (res && res.priceRange) {
+          const pad =
+            (res.priceRange.maxValue - res.priceRange.minValue) * 0.05;
+          res.priceRange.minValue -= pad;
+          res.priceRange.maxValue += pad;
+        }
+        return res;
+      };
+
+      // 수집주기=버킷이면 캔들마다 데이터 1개 → o=h=l=c로 몸통이 없어 캔들이
+      // 안 보인다(예: 3분봉). 대부분 몸통 0이면 선(line) 차트로 자동 전환.
+      const flat = candles.filter(
+        (c) => c.o === c.h && c.h === c.l && c.l === c.c
+      ).length;
+      const useLine = flat / candles.length > 0.8;
+
+      let priceSeries: ISeriesApi<"Candlestick"> | ISeriesApi<"Line">;
+      if (useLine) {
+        const closes = candles.map((c) => c.c);
+        // 추세선 색 = 스파크 관례(마지막값 ≥ 첫값이면 상승 빨강, 아니면 파랑)
+        const line = chart.addLineSeries({
+          color: closes[closes.length - 1] >= closes[0] ? UP : DOWN,
+          lineWidth: 2,
+          priceLineVisible: false,
+          lastValueVisible: true,
+          priceFormat,
+          autoscaleInfoProvider: autoscale,
+        });
+        line.setData(
+          candles.map((c) => ({
+            time: (Math.floor(c.t / 1000) + tz) as never,
+            value: c.c,
+          }))
+        );
+        priceSeries = line;
+      } else {
+        const candle = chart.addCandlestickSeries({
+          upColor: UP,
+          downColor: DOWN,
+          wickUpColor: UP,
+          wickDownColor: DOWN,
+          borderVisible: false,
+          priceFormat,
+          autoscaleInfoProvider: autoscale,
+        });
+        candle.setData(
+          candles.map((c) => ({
+            time: (Math.floor(c.t / 1000) + tz) as never,
+            open: c.o,
+            high: c.h,
+            low: c.l,
+            close: c.c,
+          }))
+        );
+        priceSeries = candle;
+      }
+      priceSeries.priceScale().applyOptions({
         scaleMargins: { top: 0.08, bottom: hasVolume ? 0.22 : 0.08 },
       });
-      candleSeries.setData(
-        candles.map((c) => ({
-          time: (Math.floor(c.t / 1000) + tz) as never,
-          open: c.o,
-          high: c.h,
-          low: c.l,
-          close: c.c,
-        }))
-      );
 
-      // 이동평균선
+      // 이동평균선 (MA 토글로 표시/숨김)
       const maData = candles
         .map((c, i) => ({ t: c.t, m: ma[i] }))
         .filter((d): d is { t: number; m: number } => d.m !== null)
@@ -219,8 +261,10 @@ export function LightweightChart({
           priceLineVisible: false,
           lastValueVisible: false,
           crosshairMarkerVisible: false,
+          visible: showMaRef.current,
         });
         maSeries.setData(maData);
+        maSeriesRef.current = maSeries;
       }
 
       // 크로스헤어 툴팁 — 마우스 위치의 종가 + 매물 수 표시(gamebit 보강).
@@ -240,15 +284,16 @@ export function LightweightChart({
           tip.style.display = "none";
           return;
         }
-        const bar = param.seriesData.get(candleSeries) as
-          | { close?: number }
+        const bar = param.seriesData.get(priceSeries) as
+          | { close?: number; value?: number }
           | undefined;
-        if (!bar || typeof bar.close !== "number") {
+        const price = bar ? (useLine ? bar.value : bar.close) : undefined;
+        if (typeof price !== "number") {
           tip.style.display = "none";
           return;
         }
         let html = `<div>${
-          Math.round(bar.close).toLocaleString(locale) + priceSuffix
+          Math.round(price).toLocaleString(locale) + priceSuffix
         }</div>`;
         if (volSeries) {
           const v = param.seriesData.get(volSeries) as
@@ -296,6 +341,7 @@ export function LightweightChart({
       tipEl?.remove();
       chartRef.current?.remove();
       chartRef.current = null;
+      maSeriesRef.current = null;
     };
   }, [candles, ma, locale, tf]);
 
@@ -312,6 +358,20 @@ export function LightweightChart({
 
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-2">
+      <div className="mb-1 flex justify-end px-1">
+        <button
+          type="button"
+          onClick={() => setShowMa((v) => !v)}
+          aria-pressed={showMa}
+          className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+            showMa
+              ? "bg-amber-400/15 text-amber-400"
+              : "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          MA
+        </button>
+      </div>
       <div ref={boxRef} style={{ height }} className="relative w-full">
         {!ready && (
           <div className="flex h-full items-center justify-center text-sm text-zinc-600">

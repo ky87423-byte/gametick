@@ -166,10 +166,7 @@ export default async function ServerDetail({
           {stat(`${dict.low} (${TF_SPECS[tf].label})`, formatKrw(data.low))}
         </div>
 
-        <div className="mb-3 flex items-center gap-2">
-          {TF_ORDER.map(tfTab)}
-          <span className="ml-1 text-xs text-amber-400/80">— MA</span>
-        </div>
+        <div className="mb-3 flex items-center gap-2">{TF_ORDER.map(tfTab)}</div>
 
         <LightweightChart
           candles={data.candles}
