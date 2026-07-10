@@ -23,7 +23,7 @@ export const TF_SPECS: Record<Timeframe, TfSpec> = {
   },
   "1d": {
     bucketMs: 24 * 60 * 60 * 1000,
-    lookbackMs: 7 * 24 * 60 * 60 * 1000,
+    lookbackMs: 90 * 24 * 60 * 60 * 1000, // lc_vn 보관 90일에 맞춰 최대치
     label: "일봉",
   },
 };
