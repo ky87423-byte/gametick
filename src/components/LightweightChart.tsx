@@ -72,18 +72,19 @@ export function LightweightChart({
   height = 300,
   locale = "ko-KR",
   tf = "1h",
+  showMa = true,
 }: {
   candles: Candle[];
   ma: (number | null)[];
   height?: number;
   locale?: string;
   tf?: string;
+  showMa?: boolean;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const maSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const [ready, setReady] = useState(false);
-  const [showMa, setShowMa] = useState(true);
   const showMaRef = useRef(showMa);
   const dict = getDictionary(locale as Locale);
 
@@ -358,20 +359,6 @@ export function LightweightChart({
 
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-2">
-      <div className="mb-1 flex justify-end px-1">
-        <button
-          type="button"
-          onClick={() => setShowMa((v) => !v)}
-          aria-pressed={showMa}
-          className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
-            showMa
-              ? "bg-amber-400/15 text-amber-400"
-              : "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
-          }`}
-        >
-          MA
-        </button>
-      </div>
       <div ref={boxRef} style={{ height }} className="relative w-full">
         {!ready && (
           <div className="flex h-full items-center justify-center text-sm text-zinc-600">

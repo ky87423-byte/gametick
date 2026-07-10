@@ -10,7 +10,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { LightweightChart } from "@/components/LightweightChart";
+import { ChartPanel } from "@/components/ChartPanel";
 import { ExchangeOverlay } from "@/components/ExchangeOverlay";
 import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
@@ -87,19 +87,12 @@ export default async function ServerDetail({
     },
   ]);
 
-  const tfTab = (t: Timeframe) => (
-    <Link
-      key={t}
-      href={`/${locale}/${game.slug}/${server.id}?tf=${t}`}
-      className={`rounded px-3 py-1 text-sm ${
-        tf === t
-          ? "bg-zinc-100 text-zinc-900"
-          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-      }`}
-    >
-      {TF_SPECS[t].label}
-    </Link>
-  );
+  const chartTabs = TF_ORDER.map((t) => ({
+    tf: t,
+    label: TF_SPECS[t].label,
+    href: `/${locale}/${game.slug}/${server.id}?tf=${t}`,
+    active: tf === t,
+  }));
 
   const stat = (label: string, value: string, cls = "") => (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
@@ -166,13 +159,12 @@ export default async function ServerDetail({
           {stat(`${dict.low} (${TF_SPECS[tf].label})`, formatKrw(data.low))}
         </div>
 
-        <div className="mb-3 flex items-center gap-2">{TF_ORDER.map(tfTab)}</div>
-
-        <LightweightChart
+        <ChartPanel
           candles={data.candles}
           ma={data.ma}
           locale={locale}
           tf={tf}
+          tabs={chartTabs}
         />
 
         {/* 거래소별 시세 비교 오버레이 (활성 거래소 2곳 이상일 때) */}
