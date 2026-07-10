@@ -10,7 +10,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CandleChart } from "@/components/CandleChart";
+import { LightweightChart } from "@/components/LightweightChart";
 import { ExchangeOverlay } from "@/components/ExchangeOverlay";
 import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
@@ -171,7 +171,7 @@ export default async function ServerDetail({
           <span className="ml-1 text-xs text-amber-400/80">— MA</span>
         </div>
 
-        <CandleChart candles={data.candles} ma={data.ma} />
+        <LightweightChart candles={data.candles} ma={data.ma} />
 
         {/* 거래소별 시세 비교 오버레이 (활성 거래소 2곳 이상일 때) */}
         {exchangeSeries.length >= 2 && (

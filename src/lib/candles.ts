@@ -28,6 +28,8 @@ export interface Candle {
   h: number;
   l: number;
   c: number;
+  /** 거래량 자리 표시용 매물 수(해당 버킷 최대). 데이터 없으면 0 */
+  v: number;
 }
 
 export interface CandleData {
@@ -72,6 +74,16 @@ export async function getServerCandles(
     else buckets.set(key, [p.v]);
   }
 
+  // 매물 수(거래량 자리)를 같은 버킷으로 집계 — 버킷 내 최대치
+  const countBuckets = new Map<number, number>();
+  for (const p of history) {
+    if (p.t < since) continue;
+    const cnt = p.c?.[server.id];
+    if (typeof cnt !== "number") continue;
+    const key = Math.floor(p.t / spec.bucketMs) * spec.bucketMs;
+    countBuckets.set(key, Math.max(countBuckets.get(key) ?? 0, cnt));
+  }
+
   const candles: Candle[] = [...buckets.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(([t, vals]) => ({
@@ -80,6 +92,7 @@ export async function getServerCandles(
       h: Math.max(...vals),
       l: Math.min(...vals),
       c: vals[vals.length - 1],
+      v: countBuckets.get(t) ?? 0,
     }));
 
   const all = seriesFor(history, server.id, 0);
