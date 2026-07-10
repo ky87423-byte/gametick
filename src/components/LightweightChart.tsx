@@ -182,8 +182,24 @@ export function LightweightChart({
         );
       }
 
-      // 가격축을 정수(원) 기준으로 → 배율대별 깔끔한 눈금(예 2500원대=10원 간격).
-      const priceFormat = { type: "price" as const, precision: 0, minMove: 1 };
+      // 가격축 눈금 간격을 금액 자릿수에 맞춤(minMove=최소 눈금 단위):
+      // 만원대=50, 천원대=10, 백원대=5, 십원대=1, 그 이하=0.5.
+      const lastClose = candles[candles.length - 1].c;
+      const step =
+        lastClose >= 10000
+          ? 50
+          : lastClose >= 1000
+          ? 10
+          : lastClose >= 100
+          ? 5
+          : lastClose >= 10
+          ? 1
+          : 0.5;
+      const priceFormat = {
+        type: "price" as const,
+        precision: step < 1 ? 1 : 0,
+        minMove: step,
+      };
       // 줌 시 보이는 범위에 맞춰 가격축 재조정 + 위아래 5% 여백(gamebit식).
       const autoscale = (original: () => AutoscaleInfo | null) => {
         const res = original();
