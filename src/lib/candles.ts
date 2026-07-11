@@ -62,6 +62,19 @@ function movingAverage(closes: number[], period: number): (number | null)[] {
   return out;
 }
 
+// 수집 오류 스파이크 제거 — 바로템 최저가에 순간적으로 잘못된 매물이 잡혀
+// 1·2·200·766원 같은 단발 이상치가 섞인다. 이웃 5개 중앙값(median-5) 필터로
+// 각 값을 대체해 단발/2연속 스파이크를 제거하고 실제 추세는 보존한다.
+function despike(pts: { t: number; v: number }[]): { t: number; v: number }[] {
+  if (pts.length < 5) return pts;
+  const v = pts.map((p) => p.v);
+  return pts.map((p, i) => {
+    const lo = Math.max(0, i - 2);
+    const win = v.slice(lo, Math.min(v.length, lo + 5)).slice().sort((a, b) => a - b);
+    return { t: p.t, v: win[Math.floor(win.length / 2)] };
+  });
+}
+
 export async function getServerCandles(
   game: GameInfo,
   server: ServerInfo,
@@ -70,7 +83,7 @@ export async function getServerCandles(
   const spec = TF_SPECS[tf];
   const history = await readHistory(game.slug);
   const since = Date.now() - spec.lookbackMs;
-  const pts = seriesFor(history, server.id, since);
+  const pts = despike(seriesFor(history, server.id, since));
 
   const buckets = new Map<number, number[]>();
   for (const p of pts) {
@@ -101,7 +114,7 @@ export async function getServerCandles(
       v: countBuckets.get(t) ?? 0,
     }));
 
-  const all = seriesFor(history, server.id, 0);
+  const all = despike(seriesFor(history, server.id, 0));
   const current = all.length ? Math.round(all[all.length - 1].v) : null;
   const highs = candles.map((c) => c.h);
   const lows = candles.map((c) => c.l);
