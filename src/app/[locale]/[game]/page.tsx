@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getGameTrend, getMarketTable, summarize } from "@/lib/market";
+import { getMarketTable, summarize } from "@/lib/market";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
@@ -14,16 +14,10 @@ import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarketTable } from "@/components/MarketTable";
-import { TrendChart } from "@/components/TrendChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
-import {
-  changeColor,
-  changeText,
-  formatKrw,
-  formatViewers,
-} from "@/lib/format";
+import { formatKrw, formatViewers } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -64,9 +58,8 @@ export default async function GamePage({
 
   const dict = getDictionary(locale);
   const keyword = game.chzzkKeyword ?? game.nameKo;
-  const [table, trend, trades, lives, popularVideos] = await Promise.all([
+  const [table, trades, lives, popularVideos] = await Promise.all([
     getMarketTable(game),
-    getGameTrend(game),
     readTrades(game.slug),
     fetchAllLives(liveQuery(game), 5),
     fetchPopularVideos(keyword, 5),
@@ -209,19 +202,6 @@ export default async function GamePage({
             </a>
           </aside>
         </div>
-
-        {/* 게임 평균 시세 추이 (gamebit엔 없는 인사이트) */}
-        <section className="mt-8">
-          <div className="mb-2 flex items-baseline justify-between">
-            <h2 className="text-lg font-bold">{dict.trendTitle}</h2>
-            {trend.changePercent !== null && (
-              <span className={`font-mono text-sm ${changeColor(trend.changePercent)}`}>
-                {changeText(trend.changePercent)}
-              </span>
-            )}
-          </div>
-          <TrendChart points={trend.points} />
-        </section>
 
         {/* 인기 영상 / BJ 순위 */}
         <section className="mt-8">
