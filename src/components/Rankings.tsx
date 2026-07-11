@@ -15,45 +15,42 @@ const PLATFORM_BADGE: Record<
 
 function RankRow({ it }: { it: RankItem }) {
   const badge = it.platform ? PLATFORM_BADGE[it.platform] : null;
-  const name = (
-    <span className="flex items-center gap-1.5 truncate">
+  // 순위 + 뱃지/라이브점 + 이름(길면 말줄임) — 한 flex로 평탄화해 오버플로우 방지
+  const inner = (
+    <>
+      <span
+        className={`w-5 shrink-0 text-center font-mono text-xs ${
+          it.rank <= 3 ? "text-amber-400" : "text-zinc-500"
+        }`}
+      >
+        {it.rank}
+      </span>
       {badge ? (
         <span
           className={`shrink-0 rounded px-1 py-0.5 text-[9px] font-bold text-white ${badge.color}`}
         >
           {badge.label}
         </span>
-      ) : (
-        it.live && (
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
-        )
-      )}
+      ) : it.live ? (
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+      ) : null}
       <span className="truncate text-zinc-200">{it.name}</span>
-    </span>
+    </>
   );
   return (
     <li className="flex items-center justify-between gap-2 text-sm">
-      <span className="flex min-w-0 items-center gap-2">
-        <span
-          className={`w-5 shrink-0 text-center font-mono text-xs ${
-            it.rank <= 3 ? "text-amber-400" : "text-zinc-500"
-          }`}
+      {it.url ? (
+        <a
+          href={it.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex min-w-0 flex-1 items-center gap-2 hover:text-amber-300"
         >
-          {it.rank}
-        </span>
-        {it.url ? (
-          <a
-            href={it.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="min-w-0 hover:text-amber-300"
-          >
-            {name}
-          </a>
-        ) : (
-          name
-        )}
-      </span>
+          {inner}
+        </a>
+      ) : (
+        <span className="flex min-w-0 flex-1 items-center gap-2">{inner}</span>
+      )}
       {it.note && (
         <span className="shrink-0 text-xs text-zinc-500">{it.note}</span>
       )}
