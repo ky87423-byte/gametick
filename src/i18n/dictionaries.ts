@@ -92,6 +92,11 @@ export interface Dictionary {
   ctaBoost: string;
   adSlot: string;
   adInquiry: string;
+  contactTitle: string;
+  contactBody: string;
+  contactContact: string;
+  contactSend: string;
+  contactSent: string;
   footerNote: string;
 }
 
@@ -180,6 +185,11 @@ const ko: Dictionary = {
   ctaBoost: "대리육성 보러가기",
   adSlot: "광고 영역",
   adInquiry: "광고/제휴 문의",
+  contactTitle: "제목",
+  contactBody: "내용",
+  contactContact: "연락처 (메신저 아이디)",
+  contactSend: "보내기",
+  contactSent: "접수되었습니다. 확인 후 연락드리겠습니다.",
   footerNote:
     "본 시세는 외부 거래소 데이터를 수집·가공한 참고용 정보이며 실제 거래가와 다를 수 있습니다. 게임시세(GameSise)는 직접 거래를 중개하지 않으며 거래로 인한 책임을 지지 않습니다.",
 };
@@ -269,6 +279,11 @@ const vi: Dictionary = {
   ctaBoost: "Xem dịch vụ cày thuê",
   adSlot: "Khu vực quảng cáo",
   adInquiry: "Liên hệ quảng cáo",
+  contactTitle: "Tiêu đề",
+  contactBody: "Nội dung",
+  contactContact: "Liên hệ (ID messenger)",
+  contactSend: "Gửi",
+  contactSent: "Đã nhận. Chúng tôi sẽ liên hệ lại.",
   footerNote:
     "Giá tham khảo được tổng hợp từ dữ liệu sàn giao dịch bên ngoài, có thể khác giá thực tế. GameSise không trung gian giao dịch.",
 };
@@ -360,6 +375,11 @@ const en: Dictionary = {
   ctaBoost: "See power-leveling",
   adSlot: "Ad space",
   adInquiry: "Advertise",
+  contactTitle: "Subject",
+  contactBody: "Message",
+  contactContact: "Contact (messenger ID)",
+  contactSend: "Send",
+  contactSent: "Received. We will get back to you soon.",
   footerNote:
     "Prices are reference information aggregated from external exchanges and may differ from actual trades. GameSise does not broker trades and is not liable for any transaction.",
 };
@@ -450,6 +470,11 @@ const zh: Dictionary = {
   ctaBoost: "查看代练",
   adSlot: "广告位",
   adInquiry: "广告合作",
+  contactTitle: "标题",
+  contactBody: "内容",
+  contactContact: "联系方式（通讯ID）",
+  contactSend: "发送",
+  contactSent: "已收到，我们会尽快与您联系。",
   footerNote:
     "本行情为汇总外部交易所数据的参考信息，可能与实际成交价不同。GameSise 不居间交易，不对交易承担责任。",
 };
@@ -541,6 +566,11 @@ const ja: Dictionary = {
   ctaBoost: "代行育成を見る",
   adSlot: "広告枠",
   adInquiry: "広告・提携のお問い合わせ",
+  contactTitle: "件名",
+  contactBody: "内容",
+  contactContact: "連絡先 (メッセンジャーID)",
+  contactSend: "送信",
+  contactSent: "受け付けました。確認後ご連絡します。",
   footerNote:
     "本相場は外部取引所のデータを収集・加工した参考情報であり、実際の取引価格と異なる場合があります。GameSiseは直接取引を仲介せず、取引による責任を負いません。",
 };
@@ -632,6 +662,11 @@ const th: Dictionary = {
   ctaBoost: "ดูบริการเลเวล",
   adSlot: "พื้นที่โฆษณา",
   adInquiry: "โฆษณา/พันธมิตร",
+  contactTitle: "หัวข้อ",
+  contactBody: "ข้อความ",
+  contactContact: "ติดต่อ (ID แชท)",
+  contactSend: "ส่ง",
+  contactSent: "ได้รับแล้ว เราจะติดต่อกลับโดยเร็ว",
   footerNote:
     "ราคานี้เป็นข้อมูลอ้างอิงที่รวบรวมจากตลาดภายนอก อาจต่างจากราคาซื้อขายจริง GameSise ไม่เป็นตัวกลางในการซื้อขายและไม่รับผิดชอบต่อการทำธุรกรรม",
 };
@@ -725,6 +760,11 @@ const tl: Dictionary = {
   ctaBoost: "Tingnan ang power-leveling",
   adSlot: "Espasyo ng ad",
   adInquiry: "Mag-advertise",
+  contactTitle: "Paksa",
+  contactBody: "Mensahe",
+  contactContact: "Kontak (messenger ID)",
+  contactSend: "Ipadala",
+  contactSent: "Natanggap. Kami ay makikipag-ugnayan sa lalong madaling panahon.",
   footerNote:
     "Ang mga presyo ay reference na impormasyong kinalap mula sa mga panlabas na exchange at maaaring maiba sa aktwal na transaksyon. Hindi namamagitan ang GameSise sa mga transaksyon at hindi mananagot para rito.",
 };
