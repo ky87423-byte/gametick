@@ -1,19 +1,23 @@
 // 거래소별 시세 비교 표 — 세로=시간, 가로=거래소(바로템·아이템매니아·아이템베이).
-// 시간별 종가, 행마다 최저가를 앰버로 강조. (리니지클래식·아이온2처럼 거래소 2곳+)
+// 버킷별 종가, 행마다 최저가를 앰버로 강조. dateOnly=일간(날짜만) 표기.
 
-import { ExchangeTableData } from "@/lib/market";
-import { formatShort } from "@/lib/format";
+import { ExchangeTableRow } from "@/lib/market";
+import { formatShort, formatDay } from "@/lib/format";
 
 export function ExchangeTable({
-  data,
+  columns,
+  rows,
   locale,
   timeLabel,
+  dateOnly = false,
 }: {
-  data: ExchangeTableData;
+  columns: { id: string; name: string }[];
+  rows: ExchangeTableRow[];
   locale: string;
   timeLabel: string;
+  dateOnly?: boolean;
 }) {
-  if (data.rows.length === 0) return null;
+  if (rows.length === 0) return null;
 
   return (
     <div className="themed-scroll overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/40">
@@ -21,7 +25,7 @@ export function ExchangeTable({
         <thead>
           <tr className="border-b border-zinc-800 text-xs text-zinc-500">
             <th className="px-3 py-2 text-left font-medium">{timeLabel}</th>
-            {data.columns.map((c) => (
+            {columns.map((c) => (
               <th key={c.id} className="px-3 py-2 text-right font-medium">
                 {c.name}
               </th>
@@ -29,10 +33,10 @@ export function ExchangeTable({
           </tr>
         </thead>
         <tbody className="font-mono tabular-nums">
-          {data.rows.map((r) => (
+          {rows.map((r) => (
             <tr key={r.t} className="border-b border-zinc-800/50 last:border-0">
               <td className="whitespace-nowrap px-3 py-1.5 text-left text-zinc-500">
-                {formatShort(r.t, locale)}
+                {dateOnly ? formatDay(r.t, locale) : formatShort(r.t, locale)}
               </td>
               {r.cells.map((v, i) => (
                 <td

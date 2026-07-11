@@ -11,7 +11,7 @@ import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ChartPanel } from "@/components/ChartPanel";
-import { ExchangeTable } from "@/components/ExchangeTable";
+import { ExchangeTablePanel } from "@/components/ExchangeTablePanel";
 import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
 import { DiscordAlert } from "@/components/DiscordAlert";
@@ -167,16 +167,14 @@ export default async function ServerDetail({
           tabs={chartTabs}
         />
 
-        {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상일 때 = 리니지클래식·아이온2) */}
+        {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상 = 리니지클래식·아이온2) */}
         {exchangeTable.columns.length >= 2 && (
-          <section className="mt-6">
-            <h2 className="mb-2 text-lg font-bold">{dict.exchangeCompare}</h2>
-            <ExchangeTable
-              data={exchangeTable}
-              locale={locale}
-              timeLabel={dict.time}
-            />
-          </section>
+          <ExchangeTablePanel
+            tables={exchangeTable}
+            locale={locale}
+            title={dict.exchangeCompare}
+            timeLabel={dict.time}
+          />
         )}
 
         <div className="mt-6 max-w-md">

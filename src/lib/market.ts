@@ -325,44 +325,35 @@ export interface ExchangeTableRow {
   cells: (number | null)[]; // columns 순서대로 시장가(원/단위)
   lowestIdx: number; // 최저가 컬럼 인덱스(-1 = 없음)
 }
-export interface ExchangeTableData {
+export interface ExchangeTables {
   columns: { id: string; name: string }[];
-  rows: ExchangeTableRow[]; // 최신순
+  hour: ExchangeTableRow[]; // 1시간 버킷, 최신순
+  day: ExchangeTableRow[]; // 일간 버킷(KST), 최신순
 }
 
-/**
- * 한 서버의 거래소별 시세를 시간(세로)×거래소(가로) 표로.
- * 시간별 버킷의 마지막(종가)값, despike로 노이즈 제거, 행별 최저가 표시.
- */
-export async function getServerExchangeTable(
-  game: GameInfo,
-  server: ServerInfo,
-  hours = 12
-): Promise<ExchangeTableData> {
-  const bucketMs = 60 * 60 * 1000;
-  const since = Date.now() - (hours + 1) * bucketMs;
-  const cols: { id: string; name: string; byBucket: Map<number, number> }[] = [];
-  for (const id of EXCHANGE_TABLE_ORDER) {
-    const ex = ACTIVE_EXCHANGES.find((e) => e.id === id);
-    if (!ex) continue;
-    const hist = await readHistory(game.slug, ex.id);
-    const raw = despike(seriesFor(hist, server.id, since));
-    if (raw.length === 0) continue;
-    const byBucket = new Map<number, number>();
-    for (const p of raw) {
-      // raw는 오래된 순 → 마지막 set이 그 시간의 종가
-      byBucket.set(Math.floor(p.t / bucketMs) * bucketMs, Math.round(p.v));
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+/** despike된 거래소별 시계열을 버킷 단위로 묶어 행 배열 생성(최신순). */
+function buildExchangeRows(
+  cols: { series: { t: number; v: number }[] }[],
+  bucketMs: number,
+  offsetMs: number,
+  count: number
+): ExchangeTableRow[] {
+  const maps = cols.map((c) => {
+    const m = new Map<number, number>();
+    for (const p of c.series) {
+      // raw는 오래된 순 → 마지막 set이 그 버킷의 종가
+      const k = Math.floor((p.t + offsetMs) / bucketMs) * bucketMs - offsetMs;
+      m.set(k, Math.round(p.v));
     }
-    cols.push({ id: ex.id, name: ex.name, byBucket });
-  }
-  if (cols.length < 2) return { columns: [], rows: [] };
-
-  const allBuckets = new Set<number>();
-  cols.forEach((c) => c.byBucket.forEach((_, k) => allBuckets.add(k)));
-  const buckets = [...allBuckets].sort((a, b) => b - a).slice(0, hours);
-
-  const rows: ExchangeTableRow[] = buckets.map((t) => {
-    const cells = cols.map((c) => c.byBucket.get(t) ?? null);
+    return m;
+  });
+  const all = new Set<number>();
+  maps.forEach((m) => m.forEach((_, k) => all.add(k)));
+  const buckets = [...all].sort((a, b) => b - a).slice(0, count);
+  return buckets.map((t) => {
+    const cells = maps.map((m) => m.get(t) ?? null);
     let lowestIdx = -1;
     let lowest = Infinity;
     cells.forEach((v, i) => {
@@ -373,8 +364,35 @@ export async function getServerExchangeTable(
     });
     return { t, cells, lowestIdx };
   });
+}
 
-  return { columns: cols.map((c) => ({ id: c.id, name: c.name })), rows };
+/**
+ * 한 서버의 거래소별 시세를 시간(세로)×거래소(가로) 표로. 1시간·일간 둘 다.
+ * 파일은 거래소당 1번만 읽고 despike도 1번 → 두 타임프레임 계산은 저비용.
+ * 행별 최저가 강조용 lowestIdx 포함.
+ */
+export async function getServerExchangeTable(
+  game: GameInfo,
+  server: ServerInfo
+): Promise<ExchangeTables> {
+  const days = 14;
+  const since = Date.now() - (days + 1) * 24 * 60 * 60 * 1000;
+  const cols: { id: string; name: string; series: { t: number; v: number }[] }[] =
+    [];
+  for (const id of EXCHANGE_TABLE_ORDER) {
+    const ex = ACTIVE_EXCHANGES.find((e) => e.id === id);
+    if (!ex) continue;
+    const hist = await readHistory(game.slug, ex.id);
+    const raw = despike(seriesFor(hist, server.id, since));
+    if (raw.length === 0) continue;
+    cols.push({ id: ex.id, name: ex.name, series: raw });
+  }
+  if (cols.length < 2) return { columns: [], hour: [], day: [] };
+  return {
+    columns: cols.map((c) => ({ id: c.id, name: c.name })),
+    hour: buildExchangeRows(cols, 60 * 60 * 1000, 0, 12),
+    day: buildExchangeRows(cols, 24 * 60 * 60 * 1000, KST_OFFSET_MS, days),
+  };
 }
 
 export interface ServerChart {

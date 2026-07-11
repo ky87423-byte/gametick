@@ -120,3 +120,14 @@ export function formatShort(ms: number, locale: string): string {
   const g = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
   return `${g("month")}-${g("day")} ${g("hour")}:${g("minute")}`;
 }
+
+/** 표용 날짜 — "MM-DD" (로케일 시간대) */
+export function formatDay(ms: number, locale: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ_BY_LOCALE[locale] ?? "Asia/Seoul",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(ms));
+  const g = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${g("month")}-${g("day")}`;
+}
