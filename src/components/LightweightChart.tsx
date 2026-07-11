@@ -15,6 +15,7 @@ import type {
 import { Candle } from "@/lib/candles";
 import { getDictionary } from "@/i18n/dictionaries";
 import { Locale } from "@/i18n/config";
+import { Rates, secondaryCurrency } from "@/lib/exchange";
 
 const UP = "#f87171"; // 상승(빨강)
 const DOWN = "#60a5fa"; // 하락(파랑)
@@ -73,6 +74,8 @@ export function LightweightChart({
   locale = "ko-KR",
   tf = "1h",
   showMa = true,
+  rates,
+  showSecondary = false,
 }: {
   candles: Candle[];
   ma: (number | null)[];
@@ -80,13 +83,21 @@ export function LightweightChart({
   locale?: string;
   tf?: string;
   showMa?: boolean;
+  rates?: Rates;
+  showSecondary?: boolean;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const maSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const [ready, setReady] = useState(false);
   const showMaRef = useRef(showMa);
+  const showSecondaryRef = useRef(showSecondary);
   const dict = getDictionary(locale as Locale);
+
+  // 보조통화 토글 → 크로스헤어 툴팁이 다음 이동 시 읽도록 ref 동기화
+  useEffect(() => {
+    showSecondaryRef.current = showSecondary;
+  }, [showSecondary]);
 
   // MA 토글: 차트 재생성 없이 선 표시/숨김만 갱신(+ 재생성 시 초기값용 ref 동기화)
   useEffect(() => {
@@ -312,6 +323,11 @@ export function LightweightChart({
         let html = `<div>${
           Math.round(price).toLocaleString(locale) + priceSuffix
         }</div>`;
+        // 보조통화(현지통화) 병기 — 원화는 그대로, 옵션 켰을 때만
+        if (showSecondaryRef.current && rates) {
+          const sec = secondaryCurrency(Math.round(price), locale, rates);
+          if (sec) html += `<div style="opacity:.7">${sec}</div>`;
+        }
         if (volSeries) {
           const v = param.seriesData.get(volSeries) as
             | { value?: number }
@@ -360,7 +376,7 @@ export function LightweightChart({
       chartRef.current = null;
       maSeriesRef.current = null;
     };
-  }, [candles, ma, locale, tf]);
+  }, [candles, ma, locale, tf, rates]);
 
   if (candles.length < 2) {
     return (

@@ -6,6 +6,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Candle } from "@/lib/candles";
+import { Rates, currencySymbol } from "@/lib/exchange";
 import { LightweightChart } from "./LightweightChart";
 
 export interface TfTab {
@@ -21,14 +22,18 @@ export function ChartPanel({
   locale,
   tf,
   tabs,
+  rates,
 }: {
   candles: Candle[];
   ma: (number | null)[];
   locale: string;
   tf: string;
   tabs: TfTab[];
+  rates: Rates;
 }) {
   const [showMa, setShowMa] = useState(false);
+  const [showSecondary, setShowSecondary] = useState(false);
+  const secSym = currencySymbol(locale); // ko면 null → 통화 토글 숨김
 
   return (
     <>
@@ -59,6 +64,22 @@ export function ChartPanel({
         >
           MA
         </button>
+        {/* 보조통화(현지통화) 토글 — 원화 유지, 툴팁에 환산 병기. ko는 숨김 */}
+        {secSym && (
+          <button
+            type="button"
+            onClick={() => setShowSecondary((v) => !v)}
+            aria-pressed={showSecondary}
+            title={secSym}
+            className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+              showSecondary
+                ? "bg-sky-400/15 text-sky-400"
+                : "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            {secSym}
+          </button>
+        )}
       </div>
 
       <LightweightChart
@@ -67,6 +88,8 @@ export function ChartPanel({
         locale={locale}
         tf={tf}
         showMa={showMa}
+        rates={rates}
+        showSecondary={showSecondary}
       />
     </>
   );

@@ -165,6 +165,7 @@ export default async function ServerDetail({
           locale={locale}
           tf={tf}
           tabs={chartTabs}
+          rates={rates}
         />
 
         {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상 = 리니지클래식·아이온2) */}

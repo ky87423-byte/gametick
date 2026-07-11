@@ -1,13 +1,26 @@
 // 환율 — KRW → VND / USD. 1시간 캐시. 바로템과 무관한 무료 API라 IP 차단 우려 없음.
 // 실패 시 폴백값 사용.
 
-interface Rates {
+export interface Rates {
   vnd: number;
   usd: number;
   cny: number;
   jpy: number;
   thb: number;
   php: number;
+}
+
+/** 로케일의 보조 통화 기호 (ko=null → 보조통화 없음/토글 숨김) */
+export function currencySymbol(locale: string): string | null {
+  const m: Record<string, string> = {
+    vi: "₫",
+    en: "$",
+    zh: "¥",
+    ja: "¥",
+    th: "฿",
+    tl: "₱",
+  };
+  return m[locale] ?? null;
 }
 
 const FALLBACK: Rates = {
