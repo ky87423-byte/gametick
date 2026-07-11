@@ -35,9 +35,9 @@ export function Footer({ locale }: { locale: Locale }) {
           >
             {dict.adInquiry}
           </Link>
-          {/* 관리자 — 차트 이벤트 마커 등록(lc_vn) */}
+          {/* 관리자 — lc_vn 관리자 허브(설정·이벤트·문의) */}
           <a
-            href="https://gmhm365.com/admin/events"
+            href="https://gmhm365.com/admin"
             target="_blank"
             rel="noopener noreferrer"
             className="text-zinc-500 hover:text-zinc-300"
