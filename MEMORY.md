@@ -8,7 +8,8 @@
 > - **데이터 노이즈 제거**: `candles.despike`(롤링중앙값) + lc_vn `barotem.robustLowest`(수집단 오등록 배제). bar/차트 밑꼬리 스파이크 해결.
 > - **거래소 비교: 선그래프→표**(`ExchangeTable`, 세로시간/가로거래소, 1시간·일간, 최저가강조). **시세표 현재가=거래소 로고 토글**(기본 바로템, 전부 클라이언트).
 > - **lc_vn 보관 7→90일**(일봉 장기). ⚠️소급불가·파일증가 모니터링.
-> - memory 신규: `barotem-price-spikes`, `lc_vn-retention-90d`.
+> - **후반**: 레이븐2·아이온 시세 복구(baro_price 폴백, 14게임 전부 시세), **차트 이벤트 마커**(관리자 등록→setMarkers), **광고/제휴 문의 쪽지 시스템**(/contact 폼→lc_vn 저장→/admin/inquiries), **관리자 허브**(3페이지 공유 네비+미확인 배지), og:image 명시(카톡 미리보기), 시세계산기 천단위·현지통화, 차트 보조통화 옵션, 트렌드 섹션 제거.
+> - memory 신규: `barotem-price-spikes`, `lc_vn-retention-90d`, `admin-pages`. 상세는 worklog "2026-07-11 (이어서)".
 >
 > **이전 세션(2026-07-03) 요약** — 상세는 worklog "2026-07-02~03" 섹션:
 > - i18n **4개 언어**(ko/en/zh/vi) — 통화 영문화(Adena/Kinah/Meso/Dia), 언어별 시간대, `LangSwitch`.
@@ -191,6 +192,8 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory(slug,exchange?)`/`seriesFor`/`change24h`/`latestCount`/`latestPrice`/`downsample` |
 | `src/lib/market.ts` | 시세표(`getMarketTable`, 멀티거래소 최저가/quotes/spread), `summarize`/`movers`, `getServerChart`, **`getServerExchangeTable`(거래소×시간 표, 1시간·일간)**, `listingCount` |
 | `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 + **`despike`(export, 롤링중앙값 노이즈제거)**. 3m 몸통0면 선차트로(chart 컴포넌트) |
+| `src/lib/events.ts` | **차트 이벤트 마커(읽기전용)** — lc_vn `chart-events.json`, `eventsForServer`(서버별+게임전체). LightweightChart `setMarkers` |
+| `src/components/ContactForm.tsx` + `app/[locale]/contact/page.tsx` + `api/inquiry` | **광고/제휴 문의 폼**(제목·내용·메신저ID)→프록시→lc_vn `inquiries.json`. 관리자는 lc_vn `/admin/inquiries`. [[admin-pages]] |
 | `src/lib/alerts.ts` | 브라우저 가격알림(localStorage, 백엔드 없음) |
 | `src/lib/exchange.ts` | KRW→VND/USD 환율(1시간 캐시, er-api) |
 | `src/lib/format.ts` | 한국식 색상(상승빨강/하락파랑)·포맷 |
