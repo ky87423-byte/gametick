@@ -28,6 +28,15 @@ export function Footer({ locale }: { locale: Locale }) {
           <Link href={`/${locale}/privacy`} className="hover:text-zinc-300">
             {getLegal(locale, "privacy").title}
           </Link>
+          {/* 관리자 — 차트 이벤트 마커 등록(lc_vn) */}
+          <a
+            href="https://gmhm365.com/admin/events"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-zinc-500 hover:text-zinc-300"
+          >
+            관리자
+          </a>
           {/* 개인용 ROI 시뮬레이터 — 눈에 띄지 않게 배치 */}
           <Link
             href={`/${locale}/roi`}
