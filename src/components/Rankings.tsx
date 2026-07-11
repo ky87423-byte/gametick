@@ -34,7 +34,7 @@ function RankRow({ it }: { it: RankItem }) {
       ) : it.live ? (
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
       ) : null}
-      <span className="truncate text-zinc-200">{it.name}</span>
+      <span className="min-w-0 truncate text-zinc-200">{it.name}</span>
     </>
   );
   return (
@@ -70,7 +70,7 @@ function RankList({
   empty: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+    <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h3 className="text-sm font-semibold text-zinc-300">{title}</h3>
         {subtitle && <span className="text-xs text-zinc-600">{subtitle}</span>}
