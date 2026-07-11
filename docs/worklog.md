@@ -278,10 +278,53 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ---
 
+## 2026-07-11 — 차트 전면개편(lightweight-charts) + 데이터 노이즈 제거 + 거래소 비교 표 + 시세표 거래소 전환
+
+> gamebit 실제 차트 코드/데이터(`v3_get_chart_data.php`)를 직접 대조하며 차트·거래소 UX를 대폭 개선. lc_vn 보관 7→90일, 바로템 수집단 노이즈 제거까지. **전부 배포·라이브.**
+
+### A. 캔들차트: 자체 SVG → TradingView lightweight-charts (v4.2.3)
+- `9df2040` SVG→lightweight-charts 전환 + 거래량(매물수) 바. `components/LightweightChart.tsx`(캔버스라 SSR불가 → useEffect 동적 import).
+- `0747da4` 라이트/다크 반응형(MutationObserver로 `html.light` 감지) + 로케일.
+- `e351637` 시간축 **로케일별 시간대**(ko/ja+9·zh/tl+8·vi/th+7·en UTC, 타임스탬프에 tz오프셋 더해 표시). 플레이스홀더 i18n(`dict.noData`/`chartLoading` 7언어).
+- `efa7413` **크로스헤어 툴팁**(종가+매물수). v4는 `param.seriesData`(Map). ※gamebit은 거래량 툴팁만.
+- `5fc20cc` 가격축 통화표기(ko=원/그외=₩), 시간축 `MM-DD HH:mm`(`timeFormatter`/`tickMarkFormatter`).
+- `8f99fd0` lookback 확대(3분 6h→24h, 1시간 24h→7d) + 캔들 `priceFormat` + `autoscaleInfoProvider` 줌 버퍼.
+- `d657788` **타임프레임별 기본 표시구간**(fitContent 대신 `setVisibleRange`, 3분=최근8h/1시간=최근24h). gamebit도 전체 안 보이고 최근만+스크롤 → 눈금 간격 정상화.
+- `936ff3c` **3분봉 캔들 안 보임 수정**: 수집주기(3분)=버킷이라 캔들당 데이터 1개 → o=h=l=c 몸통0(안 보임). `candles.ts`에서 몸통0 비율>80%면 **선(line) 차트 자동 전환**(추세색=스파크 관례). + **MA 토글 버튼**.
+- `7d861e2` MA 토글을 일봉 탭 오른쪽으로(`components/ChartPanel.tsx` 클라이언트, MA=controlled `showMa` prop).
+- `ae82eed` 가격축 눈금 간격 **금액 자릿수 기반**(만원대=50/천원대=10/백원대=5/십원대=1, `priceFormat.minMove` 동적).
+- `eb5b0ca` **MA 기본 OFF**.
+
+### B. 데이터 노이즈(스파이크) 제거 — 표시단 + 수집단 근본책
+- **원인**: 바로템 "최저가"에 순간 오등록 매물(1·2·160·200·766원 등)이 잡혀 차트 밑꼬리·가격축 폭발. **gamebit엔 없음**(오렌 07-05 09시 우리 160 vs gamebit 1561 → gamebit은 수집단에서 걸러냄).
+- `4690cbb` `candles.ts` **despike**(초기 median-5) + 1시간봉 기본 24h.
+- `d82119d` despike를 **롤링 중앙값(Hampel식: ±10창 중앙값 대비 25%이탈만 대체)**으로 강화 → 3연속+ 클러스터 제거. 오렌 저가 160→1350.
+- **수집단 근본책** lc_vn `da80a00`: `barotem.ts` **`robustLowest`** — `rows[0]`(절대최저) 대신 상위12 표본 중앙값 40%미만은 오등록 배제 후 첫 정상 최저가. **전 게임 적용**. 표본<3은 최저가 유지, 실제할인(40%+)은 보존.
+- ⚠️ 아주 긴(>10점) 지속 이상치는 잔존 가능. 과거 저장분은 소급 불가(표시단 despike가 계속 처리). memory: `barotem-price-spikes`.
+
+### C. 거래소 비교: 선그래프 → 표 (리니지클래식·아이온2)
+- `3cbe955` `ExchangeOverlay`(SVG) **삭제** → **`ExchangeTable`**. 세로=시간, 가로=바로템·아이템매니아·아이템베이. 시간별 종가, **행별 최저가 앰버 강조**, despike 적용. `market.getServerExchangeTable`, `format.formatShort`, dict `time`(7언어).
+- `276a5cc` 제목 오른쪽 **1시간/일간 탭**(3분 제외 — 베이·매니아 3~5분수집이라 빈칸多). `components/ExchangeTablePanel`(client) 전환, **서버 파일 1회 읽고 두 표 계산(부담0)**. 일간=KST자정 정렬, `format.formatDay`.
+
+### D. 시세표(MarketTable) 거래소 선택
+- `1d3b22d`/`48d88f6` 현재가 줄 작은 거래소 글씨(가독성↓) 제거 → 현재가 헤더에 **거래소 실제 로고 3개 토글**(바로템·매니아·베이). 클릭 시 현재가 컬럼·정렬이 그 거래소 기준, **기본 바로템**. 로고=`public/exchanges/*.png`(64px, 구글 파비콘). **서버 부담0**(`quotes` 이미 초기·라이브 전송 중, 전부 클라이언트). 헤더 한 줄 배치.
+
+### E. lc_vn 보관 7→90일 (`fce328d` + gametick `8aaf031`)
+- `history.ts MAX_AGE_MS` 7→90일(일봉 장기데이터). gametick 일봉 lookback도 90d.
+- ⚠️ **과거 소급 불가**(07-11부터 누적, 90일 다 차는 건 ~2026-10-09). 파일 증가(클래식 ~1.8→최대23MB) → 디스크/RAM 모니터링. memory: `lc_vn-retention-90d`.
+
+### 교훈
+- **lightweight-charts v4**: `addCandlestickSeries`/`addLineSeries`(v5는 `addSeries`), 크로스헤어 `param.seriesData`(Map, v3는 `seriesPrices`), `minMove`는 **눈금 간격 하한만**(실제 간격은 보이는 가격범위로 자동) → 촘촘한 눈금은 **좁은 뷰**가 전제.
+- **gamebit도 `lightweight-charts@3.8.0`** 사용, fitContent+최근만+스크롤 로드. 보유 데이터 min14일/hour60일/day60일. gamebit 3분봉 캔들이 보이는 건 3분내 가격변동 데이터가 있어서(우리는 3분수집=버킷이라 선차트가 맞음).
+- **노이즈**: 단발 스파이크=median, **지속 클러스터=median 무력** → 롤링중앙값+상대임계. 근본은 수집단.
+- **아이템베이 빈칸**(예 이실로테): `getRealTimeMarket` `code:-1`(그 서버 매물 없음). 버그 아님, 서버별 매물 유무 차이(클래식 18/29만 베이 시세 있음).
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
 0. **(운영·모니터링) 색인 상태 확인** — 며칠 뒤 구글 서치콘솔 "색인 생성" 리포트 + `site:gamesise.co.kr`로 색인 페이지 수 증가 확인. 네이버 서치어드바이저 "검색 노출/수집" 현황도. 색인 지연/오류(예: 제외 사유) 있으면 대응. 대표 URL 색인요청 추가(하루 할당 재충전).
-1. **(선택·차트) 차트 강화** — 사용자가 gamebit 대비 지적함. 옵션: (a) **이벤트 마커**(`data/events.ts` 수동 큐레이션 or 우리 데이터로 급등락 자동 마커), (b) **크로스헤어 툴팁**(마우스 값 표시, 자체 SVG에 추가), (c) **lightweight-charts 교체**(gamebit 수준, 의존성↑·재작성). ※가격/날짜축 라벨은 이미 추가함.
+1. **(선택·차트) 차트 — 대부분 완료(2026-07-11)**. ✅lightweight-charts 교체 ✅크로스헤어 툴팁 ✅선차트 자동전환 ✅금액축 자릿수눈금 ✅노이즈 despike ✅MA토글. **남은 것: 이벤트 마커**(캔들 위 패치/이벤트 핀, gamebit `setMarkers`) — `data/events.ts` 수동 큐레이션 or 급등락 자동. 이벤트 데이터 소스부터 필요.
 4. **(선택·i18n) 일본어·태국어·필리핀어 추가** — 구조 완성됨(ko/en/zh/vi). `config.ts` locales + `dictionaries.ts`·`content.ts`·`guides.ts`·`legal.ts`·`format.ts` TZ·`LangSwitch`에 각 언어 추가하면 됨. (사용자가 "ja/th/tl은 나중" 요청)
 5. **(수익화) 광고 배너 링크/확장** — 현재 배너 링크=gameboostforge(임시). 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
 6. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크(배포경로·CI).

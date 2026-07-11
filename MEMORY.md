@@ -1,9 +1,16 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-07-03 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> 마지막 갱신: 2026-07-11 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
 > **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
 >
-> **최근 세션(2026-07-03) 요약** — 상세는 worklog "2026-07-02~03" 섹션:
+> **최근 세션(2026-07-11) 요약** — 상세는 worklog "2026-07-11" 섹션:
+> - **캔들차트 lightweight-charts v4 전면개편**: 크로스헤어 툴팁·로케일 시간대·자릿수 눈금·타임프레임별 기본뷰·MA토글(기본OFF)·3분봉 선차트 자동전환.
+> - **데이터 노이즈 제거**: `candles.despike`(롤링중앙값) + lc_vn `barotem.robustLowest`(수집단 오등록 배제). bar/차트 밑꼬리 스파이크 해결.
+> - **거래소 비교: 선그래프→표**(`ExchangeTable`, 세로시간/가로거래소, 1시간·일간, 최저가강조). **시세표 현재가=거래소 로고 토글**(기본 바로템, 전부 클라이언트).
+> - **lc_vn 보관 7→90일**(일봉 장기). ⚠️소급불가·파일증가 모니터링.
+> - memory 신규: `barotem-price-spikes`, `lc_vn-retention-90d`.
+>
+> **이전 세션(2026-07-03) 요약** — 상세는 worklog "2026-07-02~03" 섹션:
 > - i18n **4개 언어**(ko/en/zh/vi) — 통화 영문화(Adena/Kinah/Meso/Dia), 언어별 시간대, `LangSwitch`.
 > - **라이트/다크 테마 토글**(`html.light` zinc 반전), 게임 메뉴 1줄+선택 게임 고정, 시세표 정렬/급등락 표기, 거래 카드 탭화(거래량 랭킹+거래완료).
 > - SEO: 구조화데이터(FAQPage·BreadcrumbList·Organization), 게임별 시세가이드 14편·게임정보표·공통 FAQ(`/guide/faq`), 구글·네이버 서치콘솔 등록.
@@ -87,9 +94,10 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 
 > **차별 기능 대부분 라이브 완료**(멀티거래소·라이브·알림·OG). 추천작업 #1~#7 전부 처리.
 > **다음 세션 할 일(우선순위)은 `docs/worklog.md` 맨 끝**에 정리됨 — 거기부터 보면 됨.
+> **2026-07-11 세션**: 캔들차트 lightweight-charts 전면개편 + 데이터 노이즈 despike/robustLowest + 거래소 비교 표(선그래프→표) + 시세표 거래소 로고 전환 + lc_vn 보관 90일. 상세는 `docs/worklog.md` 2026-07-11 섹션. memory: `barotem-price-spikes`·`lc_vn-retention-90d`.
 
 ### 라이브 완료된 핵심 (요약)
-- ✅ **멀티거래소**: 바로템+아이템베이+아이템매니아 통합 최저가/스프레드. **리니지클래식·아이온2 = 3거래소**, 나머지=바로템(거래소 시세피드 한계). 서버상세 거래소 비교 오버레이.
+- ✅ **멀티거래소**: 바로템+아이템베이+아이템매니아 통합 최저가/스프레드. **리니지클래식·아이온2 = 3거래소**, 나머지=바로템(거래소 시세피드 한계). 서버상세 **거래소 비교 표**(1시간/일간, 최저가 강조). 시세표 현재가=거래소 로고 토글(기본 바로템).
 - ✅ **라이브 탭** `/live/[game]`(치지직+SOOP+유튜브 시청) + 인기영상/BJ 위젯.
 - ✅ **가격 알림** #7: 텔레그램(@gamesise_alert_bot)+디스코드(웹훅), 둘 다 E2E 확인.
 - ✅ OG 썸네일, 다음갱신 카운트다운, 게임별 수집주기 차등.
@@ -181,14 +189,16 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/components/LivePlayer.tsx` | (client) 라이브 플레이어+채팅+방송목록 전환 위젯 |
 | `src/app/[locale]/live/[game]/page.tsx` | 멀티플랫폼 인페이지 시청 페이지 (`/live` = 기본게임 redirect) |
 | `src/lib/history.ts` | **읽기전용** 공유 history (`GAMETICK_DATA_DIR`). `readHistory(slug,exchange?)`/`seriesFor`/`change24h`/`latestCount`/`latestPrice`/`downsample` |
-| `src/lib/market.ts` | 시세표(`getMarketTable`, 멀티거래소 최저가/quotes/spread), `summarize`/`movers`, `getServerChart`, `listingCount` |
-| `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 |
+| `src/lib/market.ts` | 시세표(`getMarketTable`, 멀티거래소 최저가/quotes/spread), `summarize`/`movers`, `getServerChart`, **`getServerExchangeTable`(거래소×시간 표, 1시간·일간)**, `listingCount` |
+| `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 + **`despike`(export, 롤링중앙값 노이즈제거)**. 3m 몸통0면 선차트로(chart 컴포넌트) |
 | `src/lib/alerts.ts` | 브라우저 가격알림(localStorage, 백엔드 없음) |
 | `src/lib/exchange.ts` | KRW→VND/USD 환율(1시간 캐시, er-api) |
 | `src/lib/format.ts` | 한국식 색상(상승빨강/하락파랑)·포맷 |
 | `src/i18n/{config,dictionaries}.ts` | ko/vi 로케일 + 카피 |
-| `src/components/Header,Footer,MarketTable,Sparkline,CandleChart,AlertButton,FavoritesView` | UI. MarketTable이 클라이언트(폴링·정렬·검색·즐겨찾기) |
-| `src/components/ExchangeOverlay.tsx` | 서버상세 거래소별 시세 비교 오버레이(멀티라인 SVG+범례). `market.getServerExchangeSeries` |
+| `src/components/Header,Footer,MarketTable,Sparkline,AlertButton,FavoritesView` | UI. MarketTable이 클라이언트(폴링·정렬·검색·즐겨찾기). **MarketTable 현재가 헤더에 거래소 로고 토글(바로템 기본)→그 거래소 시세로 전환, 전부 클라이언트** |
+| `src/components/LightweightChart.tsx` | **캔들차트(lightweight-charts v4)**. 라이트/다크·로케일 시간대·크로스헤어툴팁·자릿수 눈금·despike된 데이터. 3m 몸통0면 선차트. |
+| `src/components/ChartPanel.tsx` | 차트 타임프레임 탭(3분/1시간/일봉) + **MA 토글(기본 OFF)**, LightweightChart 래핑(client) |
+| `src/components/ExchangeTable.tsx` + `ExchangeTablePanel.tsx` | 서버상세 **거래소별 시세 비교 표**(세로=시간/가로=바로템·매니아·베이, 행별 최저가 앰버). Panel=1시간/일간 탭(client). `market.getServerExchangeTable`. ※기존 ExchangeOverlay(SVG) 삭제됨 |
 | `src/components/TelegramAlert.tsx` | 서버상세 텔레그램 알림 딥링크 버튼. 백엔드는 lc_vn `lib/telegram.ts` |
 | `src/components/DiscordAlert.tsx` + `api/discord-alert` | 디스코드 알림(웹훅URL 입력)+lc_vn 프록시 |
 | `src/app/[locale]/[game]/page.tsx` | 시세표 페이지 |
