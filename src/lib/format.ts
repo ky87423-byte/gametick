@@ -106,3 +106,17 @@ export function formatTime(ms: number | null, locale: string): string {
     timeZoneName: "short",
   });
 }
+
+/** 표용 간결 시각 — "MM-DD HH:mm" (로케일 시간대) */
+export function formatShort(ms: number, locale: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ_BY_LOCALE[locale] ?? "Asia/Seoul",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(ms));
+  const g = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${g("month")}-${g("day")} ${g("hour")}:${g("minute")}`;
+}

@@ -66,7 +66,9 @@ function movingAverage(closes: number[], period: number): (number | null)[] {
 // 1·200·160원 같은 이상치가 (수 개 연속으로) 섞인다. 이웃 ±10개(≈1시간분)의
 // 롤링 중앙값 대비 25% 이상 벗어난 점만 중앙값으로 대체한다. median-5와 달리
 // 3연속 이상 클러스터도 제거하고, 25% 이내 실제 변동·점진 추세는 보존한다.
-function despike(pts: { t: number; v: number }[]): { t: number; v: number }[] {
+export function despike(
+  pts: { t: number; v: number }[]
+): { t: number; v: number }[] {
   if (pts.length < 5) return pts;
   const v = pts.map((p) => p.v);
   const W = 10;

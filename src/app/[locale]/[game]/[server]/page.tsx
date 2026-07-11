@@ -4,14 +4,14 @@ import { notFound } from "next/navigation";
 import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
-import { getServerExchangeSeries } from "@/lib/market";
+import { getServerExchangeTable } from "@/lib/market";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ChartPanel } from "@/components/ChartPanel";
-import { ExchangeOverlay } from "@/components/ExchangeOverlay";
+import { ExchangeTable } from "@/components/ExchangeTable";
 import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
 import { DiscordAlert } from "@/components/DiscordAlert";
@@ -65,11 +65,11 @@ export default async function ServerDetail({
     ? (tfParam as Timeframe)
     : "1h";
   const dict = getDictionary(locale);
-  const [data, rates, history, exchangeSeries] = await Promise.all([
+  const [data, rates, history, exchangeTable] = await Promise.all([
     getServerCandles(game, server, tf),
     getRates(),
     readHistory(game.slug),
-    getServerExchangeSeries(game, server),
+    getServerExchangeTable(game, server),
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
@@ -167,11 +167,15 @@ export default async function ServerDetail({
           tabs={chartTabs}
         />
 
-        {/* 거래소별 시세 비교 오버레이 (활성 거래소 2곳 이상일 때) */}
-        {exchangeSeries.length >= 2 && (
+        {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상일 때 = 리니지클래식·아이온2) */}
+        {exchangeTable.columns.length >= 2 && (
           <section className="mt-6">
             <h2 className="mb-2 text-lg font-bold">{dict.exchangeCompare}</h2>
-            <ExchangeOverlay series={exchangeSeries} />
+            <ExchangeTable
+              data={exchangeTable}
+              locale={locale}
+              timeLabel={dict.time}
+            />
           </section>
         )}
 

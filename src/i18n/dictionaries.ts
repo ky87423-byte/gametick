@@ -29,6 +29,7 @@ export interface Dictionary {
   communityEmpty: string;
   trendTitle: string;
   exchangeCompare: string;
+  time: string;
   faqTitle: string;
   calcTitle: string;
   calcAmount: string;
@@ -118,6 +119,7 @@ const ko: Dictionary = {
   communityEmpty: "준비 중입니다.",
   trendTitle: "평균 시세 추이 (24h)",
   exchangeCompare: "거래소별 시세 비교",
+  time: "시간",
   faqTitle: "자주 묻는 질문",
   calcTitle: "시세 계산기",
   calcAmount: "수량",
@@ -204,6 +206,7 @@ const vi: Dictionary = {
   communityEmpty: "Đang chuẩn bị.",
   trendTitle: "Xu hướng giá TB (24h)",
   exchangeCompare: "So sánh giá theo sàn",
+  time: "Thời gian",
   faqTitle: "Câu hỏi thường gặp",
   calcTitle: "Máy tính giá",
   calcAmount: "Số lượng",
@@ -291,6 +294,7 @@ const en: Dictionary = {
   communityEmpty: "Coming soon.",
   trendTitle: "Average price trend (24h)",
   exchangeCompare: "Price by exchange",
+  time: "Time",
   faqTitle: "FAQ",
   calcTitle: "Price calculator",
   calcAmount: "Amount",
@@ -379,6 +383,7 @@ const zh: Dictionary = {
   communityEmpty: "敬请期待。",
   trendTitle: "平均行情走势（24h）",
   exchangeCompare: "各交易所比价",
+  time: "时间",
   faqTitle: "常见问题",
   calcTitle: "行情计算器",
   calcAmount: "数量",
@@ -466,6 +471,7 @@ const ja: Dictionary = {
   communityEmpty: "準備中です。",
   trendTitle: "平均相場推移 (24h)",
   exchangeCompare: "取引所別 相場比較",
+  time: "時間",
   faqTitle: "よくある質問",
   calcTitle: "相場計算機",
   calcAmount: "数量",
@@ -554,6 +560,7 @@ const th: Dictionary = {
   communityEmpty: "กำลังเตรียมการ",
   trendTitle: "แนวโน้มราคาเฉลี่ย (24 ชม.)",
   exchangeCompare: "เปรียบเทียบราคาตามตลาด",
+  time: "เวลา",
   faqTitle: "คำถามที่พบบ่อย",
   calcTitle: "เครื่องคำนวณราคา",
   calcAmount: "จำนวน",
@@ -643,6 +650,7 @@ const tl: Dictionary = {
   communityEmpty: "Malapit nang dumating.",
   trendTitle: "Average na trend ng presyo (24h)",
   exchangeCompare: "Presyo kada exchange",
+  time: "Oras",
   faqTitle: "Mga FAQ",
   calcTitle: "Calculator ng presyo",
   calcAmount: "Dami",

@@ -3,6 +3,7 @@
 
 import { GameInfo, ServerInfo } from "@/data/games";
 import { ACTIVE_EXCHANGES } from "@/data/exchanges";
+import { despike } from "@/lib/candles";
 import {
   change24h,
   downsample,
@@ -314,6 +315,66 @@ export async function getServerExchangeSeries(
     });
   }
   return out;
+}
+
+// 거래소 비교 표의 컬럼 순서 (사용자 지정: 바로템 → 아이템매니아 → 아이템베이)
+const EXCHANGE_TABLE_ORDER = ["barotem", "itemmania", "itembay"];
+
+export interface ExchangeTableRow {
+  t: number; // 시간 버킷 시작(ms)
+  cells: (number | null)[]; // columns 순서대로 시장가(원/단위)
+  lowestIdx: number; // 최저가 컬럼 인덱스(-1 = 없음)
+}
+export interface ExchangeTableData {
+  columns: { id: string; name: string }[];
+  rows: ExchangeTableRow[]; // 최신순
+}
+
+/**
+ * 한 서버의 거래소별 시세를 시간(세로)×거래소(가로) 표로.
+ * 시간별 버킷의 마지막(종가)값, despike로 노이즈 제거, 행별 최저가 표시.
+ */
+export async function getServerExchangeTable(
+  game: GameInfo,
+  server: ServerInfo,
+  hours = 12
+): Promise<ExchangeTableData> {
+  const bucketMs = 60 * 60 * 1000;
+  const since = Date.now() - (hours + 1) * bucketMs;
+  const cols: { id: string; name: string; byBucket: Map<number, number> }[] = [];
+  for (const id of EXCHANGE_TABLE_ORDER) {
+    const ex = ACTIVE_EXCHANGES.find((e) => e.id === id);
+    if (!ex) continue;
+    const hist = await readHistory(game.slug, ex.id);
+    const raw = despike(seriesFor(hist, server.id, since));
+    if (raw.length === 0) continue;
+    const byBucket = new Map<number, number>();
+    for (const p of raw) {
+      // raw는 오래된 순 → 마지막 set이 그 시간의 종가
+      byBucket.set(Math.floor(p.t / bucketMs) * bucketMs, Math.round(p.v));
+    }
+    cols.push({ id: ex.id, name: ex.name, byBucket });
+  }
+  if (cols.length < 2) return { columns: [], rows: [] };
+
+  const allBuckets = new Set<number>();
+  cols.forEach((c) => c.byBucket.forEach((_, k) => allBuckets.add(k)));
+  const buckets = [...allBuckets].sort((a, b) => b - a).slice(0, hours);
+
+  const rows: ExchangeTableRow[] = buckets.map((t) => {
+    const cells = cols.map((c) => c.byBucket.get(t) ?? null);
+    let lowestIdx = -1;
+    let lowest = Infinity;
+    cells.forEach((v, i) => {
+      if (v !== null && v < lowest) {
+        lowest = v;
+        lowestIdx = i;
+      }
+    });
+    return { t, cells, lowestIdx };
+  });
+
+  return { columns: cols.map((c) => ({ id: c.id, name: c.name })), rows };
 }
 
 export interface ServerChart {
