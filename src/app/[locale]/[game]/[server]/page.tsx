@@ -174,6 +174,8 @@ export default async function ServerDetail({
             locale={locale}
             title={dict.exchangeCompare}
             timeLabel={dict.time}
+            hourLabel={dict.hourly}
+            dayLabel={dict.daily}
           />
         )}
 

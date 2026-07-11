@@ -12,16 +12,20 @@ export function ExchangeTablePanel({
   locale,
   title,
   timeLabel,
+  hourLabel,
+  dayLabel,
 }: {
   tables: ExchangeTables;
   locale: string;
   title: string;
   timeLabel: string;
+  hourLabel: string;
+  dayLabel: string;
 }) {
   const [tf, setTf] = useState<"hour" | "day">("hour");
   const tabs: { key: "hour" | "day"; label: string }[] = [
-    { key: "hour", label: "1시간" },
-    { key: "day", label: "일간" },
+    { key: "hour", label: hourLabel },
+    { key: "day", label: dayLabel },
   ];
 
   return (

@@ -30,6 +30,8 @@ export interface Dictionary {
   trendTitle: string;
   exchangeCompare: string;
   time: string;
+  hourly: string;
+  daily: string;
   faqTitle: string;
   calcTitle: string;
   calcAmount: string;
@@ -120,6 +122,8 @@ const ko: Dictionary = {
   trendTitle: "평균 시세 추이 (24h)",
   exchangeCompare: "거래소별 시세 비교",
   time: "시간",
+  hourly: "1시간",
+  daily: "일간",
   faqTitle: "자주 묻는 질문",
   calcTitle: "시세 계산기",
   calcAmount: "수량",
@@ -207,6 +211,8 @@ const vi: Dictionary = {
   trendTitle: "Xu hướng giá TB (24h)",
   exchangeCompare: "So sánh giá theo sàn",
   time: "Thời gian",
+  hourly: "1 giờ",
+  daily: "Hàng ngày",
   faqTitle: "Câu hỏi thường gặp",
   calcTitle: "Máy tính giá",
   calcAmount: "Số lượng",
@@ -295,6 +301,8 @@ const en: Dictionary = {
   trendTitle: "Average price trend (24h)",
   exchangeCompare: "Price by exchange",
   time: "Time",
+  hourly: "1 Hour",
+  daily: "Daily",
   faqTitle: "FAQ",
   calcTitle: "Price calculator",
   calcAmount: "Amount",
@@ -384,6 +392,8 @@ const zh: Dictionary = {
   trendTitle: "平均行情走势（24h）",
   exchangeCompare: "各交易所比价",
   time: "时间",
+  hourly: "1小时",
+  daily: "每日",
   faqTitle: "常见问题",
   calcTitle: "行情计算器",
   calcAmount: "数量",
@@ -472,6 +482,8 @@ const ja: Dictionary = {
   trendTitle: "平均相場推移 (24h)",
   exchangeCompare: "取引所別 相場比較",
   time: "時間",
+  hourly: "1時間",
+  daily: "日別",
   faqTitle: "よくある質問",
   calcTitle: "相場計算機",
   calcAmount: "数量",
@@ -561,6 +573,8 @@ const th: Dictionary = {
   trendTitle: "แนวโน้มราคาเฉลี่ย (24 ชม.)",
   exchangeCompare: "เปรียบเทียบราคาตามตลาด",
   time: "เวลา",
+  hourly: "1 ชม.",
+  daily: "รายวัน",
   faqTitle: "คำถามที่พบบ่อย",
   calcTitle: "เครื่องคำนวณราคา",
   calcAmount: "จำนวน",
@@ -651,6 +665,8 @@ const tl: Dictionary = {
   trendTitle: "Average na trend ng presyo (24h)",
   exchangeCompare: "Presyo kada exchange",
   time: "Oras",
+  hourly: "1 Oras",
+  daily: "Araw-araw",
   faqTitle: "Mga FAQ",
   calcTitle: "Calculator ng presyo",
   calcAmount: "Dami",
