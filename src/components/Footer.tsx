@@ -28,6 +28,13 @@ export function Footer({ locale }: { locale: Locale }) {
           <Link href={`/${locale}/privacy`} className="hover:text-zinc-300">
             {getLegal(locale, "privacy").title}
           </Link>
+          {/* 광고/제휴 문의 — 약관·정책 옆, 앰버 포인트로 살짝 강조 */}
+          <Link
+            href={`/${locale}/contact`}
+            className="font-medium text-amber-400 hover:text-amber-300"
+          >
+            {dict.adInquiry}
+          </Link>
           {/* 관리자 — 차트 이벤트 마커 등록(lc_vn) */}
           <a
             href="https://gmhm365.com/admin/events"
@@ -48,13 +55,7 @@ export function Footer({ locale }: { locale: Locale }) {
         </nav>
         <p className="text-xs leading-5 text-zinc-600">{dict.footerNote}</p>
         <p className="mt-2 text-xs text-zinc-600">
-          <Link
-            href={`/${locale}/contact`}
-            className="underline hover:text-zinc-400"
-          >
-            {dict.adInquiry}
-          </Link>{" "}
-          · © {new Date().getFullYear()} {dict.brand}
+          © {new Date().getFullYear()} {dict.brand}
         </p>
       </footer>
     </>
