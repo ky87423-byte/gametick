@@ -43,7 +43,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `/${locale}/${game.slug}/${server.id}` },
-    openGraph: { title, description, type: "website" },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    },
   };
 }
 

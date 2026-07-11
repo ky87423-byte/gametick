@@ -23,6 +23,17 @@ export const metadata: Metadata = {
   },
   description:
     "리니지 클래식 아데나, 메이플 메소, 아이온2 키나 등 게임머니 서버별 실시간 시세·차트. 게임시세(GameSise).",
+  // 링크 공유(카톡/메신저) 미리보기 = 브랜드 OG 카드. 명시하지 않으면 스크래퍼가
+  // 페이지 내 광고배너 이미지를 주워가므로 반드시 지정한다.
+  openGraph: {
+    type: "website",
+    siteName: "게임시세 GameSise",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/opengraph-image"],
+  },
   // 검색엔진 소유권 확인 (네이버 서치어드바이저 / 구글 서치콘솔)
   verification: {
     other: {
