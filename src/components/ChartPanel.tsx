@@ -28,7 +28,7 @@ export function ChartPanel({
   tf: string;
   tabs: TfTab[];
 }) {
-  const [showMa, setShowMa] = useState(true);
+  const [showMa, setShowMa] = useState(false);
 
   return (
     <>
