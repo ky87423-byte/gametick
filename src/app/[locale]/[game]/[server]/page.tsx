@@ -5,6 +5,7 @@ import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
 import { getServerExchangeTable } from "@/lib/market";
+import { eventsForServer } from "@/lib/events";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -65,11 +66,12 @@ export default async function ServerDetail({
     ? (tfParam as Timeframe)
     : "1h";
   const dict = getDictionary(locale);
-  const [data, rates, history, exchangeTable] = await Promise.all([
+  const [data, rates, history, exchangeTable, markers] = await Promise.all([
     getServerCandles(game, server, tf),
     getRates(),
     readHistory(game.slug),
     getServerExchangeTable(game, server),
+    eventsForServer(game.slug, server.id),
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
@@ -166,6 +168,7 @@ export default async function ServerDetail({
           tf={tf}
           tabs={chartTabs}
           rates={rates}
+          markers={markers}
         />
 
         {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상 = 리니지클래식·아이온2) */}

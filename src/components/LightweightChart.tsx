@@ -16,6 +16,7 @@ import { Candle } from "@/lib/candles";
 import { getDictionary } from "@/i18n/dictionaries";
 import { Locale } from "@/i18n/config";
 import { Rates, secondaryCurrency } from "@/lib/exchange";
+import type { ChartEvent } from "@/lib/events";
 
 const UP = "#f87171"; // 상승(빨강)
 const DOWN = "#60a5fa"; // 하락(파랑)
@@ -76,6 +77,7 @@ export function LightweightChart({
   showMa = true,
   rates,
   showSecondary = false,
+  markers = [],
 }: {
   candles: Candle[];
   ma: (number | null)[];
@@ -85,6 +87,7 @@ export function LightweightChart({
   showMa?: boolean;
   rates?: Rates;
   showSecondary?: boolean;
+  markers?: ChartEvent[];
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -274,6 +277,36 @@ export function LightweightChart({
         scaleMargins: { top: 0.08, bottom: hasVolume ? 0.22 : 0.08 },
       });
 
+      // 이벤트 마커 (관리자 등록) — 각 이벤트를 가장 가까운 캔들 시각에 핀으로.
+      if (markers.length) {
+        const barTimes = candles.map((c) => Math.floor(c.t / 1000) + tz);
+        const first = candles[0].t;
+        const last = candles[candles.length - 1].t;
+        const mk = markers
+          .filter((m) => m.ts >= first - 86400000 && m.ts <= last + 86400000)
+          .map((m) => {
+            const et = Math.floor(m.ts / 1000) + tz;
+            let bt = barTimes[0];
+            let bd = Infinity;
+            for (const t of barTimes) {
+              const d = Math.abs(t - et);
+              if (d < bd) {
+                bd = d;
+                bt = t;
+              }
+            }
+            return {
+              time: bt as never,
+              position: m.position,
+              color: m.color,
+              shape: m.shape,
+              text: m.title,
+            };
+          })
+          .sort((a, b) => (a.time as number) - (b.time as number));
+        if (mk.length) priceSeries.setMarkers(mk);
+      }
+
       // 이동평균선 (MA 토글로 표시/숨김)
       const maData = candles
         .map((c, i) => ({ t: c.t, m: ma[i] }))
@@ -376,7 +409,7 @@ export function LightweightChart({
       chartRef.current = null;
       maSeriesRef.current = null;
     };
-  }, [candles, ma, locale, tf, rates]);
+  }, [candles, ma, locale, tf, rates, markers]);
 
   if (candles.length < 2) {
     return (

@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Candle } from "@/lib/candles";
 import { Rates, currencySymbol } from "@/lib/exchange";
+import type { ChartEvent } from "@/lib/events";
 import { LightweightChart } from "./LightweightChart";
 
 export interface TfTab {
@@ -23,6 +24,7 @@ export function ChartPanel({
   tf,
   tabs,
   rates,
+  markers,
 }: {
   candles: Candle[];
   ma: (number | null)[];
@@ -30,6 +32,7 @@ export function ChartPanel({
   tf: string;
   tabs: TfTab[];
   rates: Rates;
+  markers: ChartEvent[];
 }) {
   const [showMa, setShowMa] = useState(false);
   const [showSecondary, setShowSecondary] = useState(false);
@@ -90,6 +93,7 @@ export function ChartPanel({
         showMa={showMa}
         rates={rates}
         showSecondary={showSecondary}
+        markers={markers}
       />
     </>
   );
