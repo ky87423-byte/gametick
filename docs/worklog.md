@@ -347,6 +347,10 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **차트 보조통화 옵션**(`dc05a52`): 원화 유지 + 통화기호 토글(vi₫·en$·ja/zh¥·th฿·tl₱, ko숨김)로 툴팁에 현지통화 병기. 환율은 기존 getRates(1h캐시) 재사용.
 - 거래소 표 탭 i18n(`0485bf8`), **평균 시세 추이(트렌드) 섹션 제거**(`3a75ca7`, 차트라 SEO영향 없음), 푸터 정리(문의 링크 약관 옆 이동·앰버 옅게·관리자 허브 링크).
 
+### K. 마무리 UX (gametick)
+- **미확인 문의 점 알림**(`3ed2669`): 메인 푸터 "관리자" 옆에, 미확인 문의 있으면 **빨간 점만**(숫자 없음). gametick이 `GAMETICK_DATA_DIR`로 lc_vn `inquiries.json` 직접 읽어(`lib/inquiries.ts hasUnreadInquiry`, 30s 캐시) 판단 → **Footer async화**. 확인완료/삭제 시 사라짐.
+- **랭킹/BJ 위젯 모바일 오버플로우 수정**(`afe4385`,`5b1c585`): `Rankings.RankRow` 중첩 flex 평탄화 + **이름 span에 `min-w-0`**(flex 자식 기본 min-width:auto라 긴 영상제목이 truncate 안 되고 박스를 밀던 문제) + 박스 `overflow-hidden`. 교훈: **truncate는 flex 자식에 min-w-0 없으면 무력**.
+
 ### 사이트 점검 결과
 - ✅ 전 라우트·14게임·서버 200. 4앱 online, 디스크 19%, 메모리 여유(752MB). 수집 2~3분 신선, 거래소·KR프록시 작동.
 - ✅ SEO 기술 정상(sitemap 2,128 URL·robots·canonical). **색인 수는 서치콘솔 확인 필요**(로그인 요).

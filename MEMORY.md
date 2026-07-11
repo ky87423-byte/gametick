@@ -194,6 +194,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/lib/candles.ts` | OHLC 버킷팅(3m/1h/1d) + 이동평균 + **`despike`(export, 롤링중앙값 노이즈제거)**. 3m 몸통0면 선차트로(chart 컴포넌트) |
 | `src/lib/events.ts` | **차트 이벤트 마커(읽기전용)** — lc_vn `chart-events.json`, `eventsForServer`(서버별+게임전체). LightweightChart `setMarkers` |
 | `src/components/ContactForm.tsx` + `app/[locale]/contact/page.tsx` + `api/inquiry` | **광고/제휴 문의 폼**(제목·내용·메신저ID)→프록시→lc_vn `inquiries.json`. 관리자는 lc_vn `/admin/inquiries`. [[admin-pages]] |
+| `src/lib/inquiries.ts` | **미확인 문의 존재 여부**(읽기전용, `hasUnreadInquiry`, 30s캐시) — Footer(async)의 "관리자" 옆 점 알림용(숫자 없음) |
 | `src/lib/alerts.ts` | 브라우저 가격알림(localStorage, 백엔드 없음) |
 | `src/lib/exchange.ts` | KRW→VND/USD 환율(1시간 캐시, er-api) |
 | `src/lib/format.ts` | 한국식 색상(상승빨강/하락파랑)·포맷 |
