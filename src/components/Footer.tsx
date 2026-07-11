@@ -28,10 +28,10 @@ export function Footer({ locale }: { locale: Locale }) {
           <Link href={`/${locale}/privacy`} className="hover:text-zinc-300">
             {getLegal(locale, "privacy").title}
           </Link>
-          {/* 광고/제휴 문의 — 약관·정책 옆, 앰버 포인트로 살짝 강조 */}
+          {/* 광고/제휴 문의 — 약관·정책 옆, 아주 옅은 앰버 톤으로만 살짝 구분 */}
           <Link
             href={`/${locale}/contact`}
-            className="font-medium text-amber-400 hover:text-amber-300"
+            className="text-amber-500/50 hover:text-amber-400"
           >
             {dict.adInquiry}
           </Link>
