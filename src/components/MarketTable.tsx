@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Sparkline } from "@/components/Sparkline";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 import { checkAlerts } from "@/lib/alerts";
+
+// 현재가 컬럼에서 볼 거래소 선택용 (로고 = public/exchanges/{id}.png)
+const EXCHANGE_ICONS = [
+  { id: "barotem", name: "바로템" },
+  { id: "itemmania", name: "아이템매니아" },
+  { id: "itembay", name: "아이템베이" },
+];
 
 export interface ExchangeQuote {
   exchange: string;
@@ -100,6 +108,10 @@ export function MarketTable({
     "price"
   );
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  // 현재가 컬럼에 표시할 거래소 (기본 바로템). 클릭 시 표 전체가 그 거래소 시세로.
+  const [selectedExchange, setSelectedExchange] = useState("barotem");
+  const priceOf = (s: ServerRow) =>
+    s.quotes?.find((q) => q.exchange === selectedExchange)?.price ?? null;
   const sortBy = (key: "price" | "change" | "listings") => {
     if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
     else {
@@ -199,7 +211,7 @@ export function MarketTable({
       );
     const val = (s: ServerRow) =>
       sortKey === "price"
-        ? s.priceKrw
+        ? priceOf(s)
         : sortKey === "change"
           ? s.change24hPercent
           : s.listingCount;
@@ -218,7 +230,7 @@ export function MarketTable({
         (favs.has(b.serverId) ? 1 : 0) - (favs.has(a.serverId) ? 1 : 0)
     );
     return sorted;
-  }, [rows, query, sortKey, sortDir, favs]);
+  }, [rows, query, sortKey, sortDir, favs, selectedExchange]);
 
   // 최고 등락(급등)·최저 등락(급락) 서버 — 표 안 서버명 옆에 표시
   const { gainerId, loserId } = useMemo(() => {
@@ -296,7 +308,43 @@ export function MarketTable({
             <tr>
               <th className="w-8 px-2 py-2"></th>
               <th className="px-3 py-2 text-left font-medium">{labels.server}</th>
-              {sortableHeader("price", labels.price)}
+              <th className="px-3 py-2 text-right font-medium">
+                <div className="flex flex-col items-end gap-1">
+                  <button
+                    onClick={() => sortBy("price")}
+                    className="inline-flex items-center gap-0.5 hover:text-zinc-200"
+                  >
+                    {labels.price}
+                    <span className="text-[10px] text-zinc-500">
+                      {sortKey === "price" ? (sortDir === "asc" ? "▲" : "▼") : "↕"}
+                    </span>
+                  </button>
+                  <div className="flex gap-1">
+                    {EXCHANGE_ICONS.map((ex) => (
+                      <button
+                        key={ex.id}
+                        type="button"
+                        title={ex.name}
+                        aria-pressed={selectedExchange === ex.id}
+                        onClick={() => setSelectedExchange(ex.id)}
+                        className={`rounded p-0.5 ring-1 transition ${
+                          selectedExchange === ex.id
+                            ? "bg-amber-400/10 ring-amber-400"
+                            : "opacity-40 ring-transparent hover:opacity-90"
+                        }`}
+                      >
+                        <Image
+                          src={`/exchanges/${ex.id}.png`}
+                          alt={ex.name}
+                          width={18}
+                          height={18}
+                          className="rounded-sm"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </th>
               {sortableHeader("change", labels.change24h)}
               {sortableHeader("listings", labels.listings, "hidden sm:table-cell")}
               <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">
@@ -344,29 +392,11 @@ export function MarketTable({
                 </td>
                 <td className="px-3 py-2 text-right">
                   <div className="font-mono tabular-nums">
-                    {formatKrw(s.priceKrw)}
+                    {selectedExchange === "itemmania" && priceOf(s) !== null
+                      ? "~"
+                      : ""}
+                    {formatKrw(priceOf(s))}
                   </div>
-                  {s.quotes && s.quotes.length > 1 && (
-                    <div className="mt-0.5 flex flex-wrap justify-end gap-x-1.5 gap-y-0.5">
-                      {s.quotes.map((q, qi) => (
-                        <span
-                          key={q.exchange}
-                          title={
-                            q.exchange === "itemmania"
-                              ? "아이템매니아는 최저가가 아닌 대표 시세"
-                              : undefined
-                          }
-                          className={`text-[10px] tabular-nums ${
-                            qi === 0 ? "text-amber-400" : "text-zinc-500"
-                          }`}
-                        >
-                          {q.name}{" "}
-                          {q.exchange === "itemmania" ? "~" : ""}
-                          {q.price.toLocaleString("ko-KR")}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </td>
                 <td
                   className={`px-3 py-2 text-right font-mono ${changeColor(
