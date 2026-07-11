@@ -63,15 +63,20 @@ function movingAverage(closes: number[], period: number): (number | null)[] {
 }
 
 // 수집 오류 스파이크 제거 — 바로템 최저가에 순간적으로 잘못된 매물이 잡혀
-// 1·2·200·766원 같은 단발 이상치가 섞인다. 이웃 5개 중앙값(median-5) 필터로
-// 각 값을 대체해 단발/2연속 스파이크를 제거하고 실제 추세는 보존한다.
+// 1·200·160원 같은 이상치가 (수 개 연속으로) 섞인다. 이웃 ±10개(≈1시간분)의
+// 롤링 중앙값 대비 25% 이상 벗어난 점만 중앙값으로 대체한다. median-5와 달리
+// 3연속 이상 클러스터도 제거하고, 25% 이내 실제 변동·점진 추세는 보존한다.
 function despike(pts: { t: number; v: number }[]): { t: number; v: number }[] {
   if (pts.length < 5) return pts;
   const v = pts.map((p) => p.v);
+  const W = 10;
   return pts.map((p, i) => {
-    const lo = Math.max(0, i - 2);
-    const win = v.slice(lo, Math.min(v.length, lo + 5)).slice().sort((a, b) => a - b);
-    return { t: p.t, v: win[Math.floor(win.length / 2)] };
+    const win = v
+      .slice(Math.max(0, i - W), Math.min(v.length, i + W + 1))
+      .sort((a, b) => a - b);
+    const med = win[Math.floor(win.length / 2)];
+    if (med > 0 && Math.abs(p.v - med) / med > 0.25) return { t: p.t, v: med };
+    return p;
   });
 }
 
