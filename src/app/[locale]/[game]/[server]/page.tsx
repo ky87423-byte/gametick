@@ -193,7 +193,7 @@ export default async function ServerDetail({
             currency={currencyOf(game, locale)}
             unitAmount={game.unitAmount}
             priceKrw={data.current}
-            vndRate={rates.vnd}
+            rates={rates}
             locale={locale}
             labels={{
               title: dict.calcTitle,
