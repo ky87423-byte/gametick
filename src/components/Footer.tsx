@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getLegal } from "@/data/legal";
+import { hasUnreadInquiry } from "@/lib/inquiries";
 
-export function Footer({ locale }: { locale: Locale }) {
+export async function Footer({ locale }: { locale: Locale }) {
   const dict = getDictionary(locale);
+  const unread = await hasUnreadInquiry();
   return (
     <>
       {/* 자사 CTA 박스 제거(대리육성·매입문의 버튼 숨김) */}
@@ -43,6 +45,12 @@ export function Footer({ locale }: { locale: Locale }) {
             className="text-zinc-500 hover:text-zinc-300"
           >
             관리자
+            {unread && (
+              <span
+                aria-label="새 문의"
+                className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-red-500 align-middle"
+              />
+            )}
           </a>
           {/* 개인용 ROI 시뮬레이터 — 눈에 띄지 않게 배치 */}
           <Link
