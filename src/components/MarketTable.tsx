@@ -309,7 +309,7 @@ export function MarketTable({
               <th className="w-8 px-2 py-2"></th>
               <th className="px-3 py-2 text-left font-medium">{labels.server}</th>
               <th className="px-3 py-2 text-right font-medium">
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                   <button
                     onClick={() => sortBy("price")}
                     className="inline-flex items-center gap-0.5 hover:text-zinc-200"
@@ -336,8 +336,8 @@ export function MarketTable({
                         <Image
                           src={`/exchanges/${ex.id}.png`}
                           alt={ex.name}
-                          width={18}
-                          height={18}
+                          width={16}
+                          height={16}
                           className="rounded-sm"
                         />
                       </button>
