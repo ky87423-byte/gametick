@@ -1,9 +1,10 @@
 // 시장표 빌더 — 공유 history에서 서버별 "현재 시장가 + 24h 등락 + 스파크라인"을 만든다.
 // 겜틱은 시세 정보 사이트이므로 매입가/할인 없이 시장가(바로템 최저가)를 그대로 보여준다.
 
-import { GameInfo, ServerInfo } from "@/data/games";
+import { GameInfo, ServerInfo, findGame, findServer } from "@/data/games";
 import { ACTIVE_EXCHANGES } from "@/data/exchanges";
 import { despike } from "@/lib/candles";
+import { makeTtlCache } from "@/lib/cache";
 import {
   change24h,
   downsample,
@@ -56,6 +57,27 @@ export interface MarketTable {
   /** 전체 데이터 중 가장 최근 갱신 시각 (epoch ms), 없으면 null */
   updatedAt: number | null;
 }
+
+// ── 요청 간 60초 캐시 래퍼 (force-dynamic 페이지 응답속도 개선) ──
+// 슬러그/서버ID로 키잉해 홈·랭킹·계산기·게임·서버 페이지가 재계산을 공유한다.
+
+/** 시세표 60초 캐시. 홈(15회)·게임페이지·api/prices의 핫패스. */
+export const getMarketTableCached = makeTtlCache(
+  (slug: string) => getMarketTable(findGame(slug)!),
+  60_000
+);
+
+/** 시세 리포트 60초 캐시(리포트 페이지 15회). */
+export const getReportCached = makeTtlCache(
+  (slug: string) => getReport(findGame(slug)!),
+  60_000
+);
+
+/** 거래소 비교표 60초 캐시(서버 페이지, 3거래소 파일·despike). */
+export const getServerExchangeTableCached = makeTtlCache((slug: string, serverId: string) => {
+  const g = findGame(slug)!;
+  return getServerExchangeTable(g, findServer(g, serverId)!);
+}, 60_000);
 
 export async function getMarketTable(game: GameInfo): Promise<MarketTable> {
   // 바로템 = 기본 이력(시계열·등락·매물수의 기준), 나머지 거래소는 현재가만 합산.

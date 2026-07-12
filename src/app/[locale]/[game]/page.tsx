@@ -10,7 +10,7 @@ import {
   localizedName,
 } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getMarketTable, summarize, movers } from "@/lib/market";
+import { getMarketTableCached, summarize, movers } from "@/lib/market";
 import { getRates } from "@/lib/exchange";
 import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
@@ -72,7 +72,7 @@ export default async function GamePage({
   const dict = getDictionary(locale);
   const keyword = game.chzzkKeyword ?? game.nameKo;
   const [table, trades, lives, popularVideos, rates] = await Promise.all([
-    getMarketTable(game),
+    getMarketTableCached(game.slug),
     readTrades(game.slug),
     fetchAllLives(liveQuery(game), 5),
     fetchPopularVideos(keyword, 5),

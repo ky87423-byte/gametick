@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, gameNameOf, localizedName, currencyOf } from "@/data/games";
-import { getMarketTable, MAX_CREDIBLE_CHANGE } from "@/lib/market";
+import { getMarketTableCached, MAX_CREDIBLE_CHANGE } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -57,7 +57,7 @@ export default async function RankingPage({
   const dict = getDictionary(locale);
 
   // 전 게임 시세표를 모아 서버 단위로 평탄화 → 통합 급등/급락.
-  const tables = await Promise.all(GAMES.map((g) => getMarketTable(g)));
+  const tables = await Promise.all(GAMES.map((g) => getMarketTableCached(g.slug)));
   const all: Row[] = [];
   tables.forEach((t, i) => {
     const game = GAMES[i];

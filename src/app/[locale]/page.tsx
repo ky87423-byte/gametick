@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, currencyOf, gameNameOf } from "@/data/games";
-import { getMarketTable, summarize } from "@/lib/market";
+import { getMarketTableCached, summarize } from "@/lib/market";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { altLanguages } from "@/lib/seo";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -57,7 +57,7 @@ export default async function LocaleHome({
   // 전 게임 시세표를 병렬로 읽어 카드용 요약 생성.
   const cards = await Promise.all(
     GAMES.map(async (game) => {
-      const table = await getMarketTable(game);
+      const table = await getMarketTableCached(game.slug);
       const summary = summarize(table);
       // 최소 거래단위 + 통화 (예: "10,000 아데나", "1,000 다이아")
       const unitText = `${game.unitAmount.toLocaleString("en-US")} ${currencyOf(

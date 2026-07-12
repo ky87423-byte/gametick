@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_GAME_SLUG, findGame } from "@/data/games";
-import { getMarketTable } from "@/lib/market";
+import { getMarketTableCached } from "@/lib/market";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   if (!game) {
     return NextResponse.json({ error: "unknown game" }, { status: 400 });
   }
-  const table = await getMarketTable(game);
+  const table = await getMarketTableCached(game.slug);
   return NextResponse.json({
     game: table.game,
     updatedAt: table.updatedAt,

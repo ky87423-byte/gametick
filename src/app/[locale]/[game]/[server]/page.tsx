@@ -9,8 +9,8 @@ import {
   serverNameOf,
 } from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
-import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
-import { getServerExchangeTable, serverStats } from "@/lib/market";
+import { getServerCandlesCached, TF_SPECS, Timeframe } from "@/lib/candles";
+import { getServerExchangeTableCached, serverStats } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { eventsForServer } from "@/lib/events";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
@@ -91,10 +91,10 @@ export default async function ServerDetail({
   const dict = getDictionary(locale);
   const serverName = serverNameOf(server, locale);
   const [data, rates, history, exchangeTable, markers] = await Promise.all([
-    getServerCandles(game, server, tf),
+    getServerCandlesCached(game.slug, server.id, tf),
     getRates(),
     readHistory(game.slug),
-    getServerExchangeTable(game, server),
+    getServerExchangeTableCached(game.slug, server.id),
     eventsForServer(game.slug, server.id),
   ]);
   const change = change24h(history, server.id, data.current);

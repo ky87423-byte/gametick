@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, gameNameOf, currencyOf } from "@/data/games";
-import { getMarketTable, summarize } from "@/lib/market";
+import { getMarketTableCached, summarize } from "@/lib/market";
 import { getRates } from "@/lib/exchange";
 import { altLanguages } from "@/lib/seo";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -48,7 +48,7 @@ export default async function CalculatorPage({
 
   const [rates, tables] = await Promise.all([
     getRates(),
-    Promise.all(GAMES.map((g) => getMarketTable(g))),
+    Promise.all(GAMES.map((g) => getMarketTableCached(g.slug))),
   ]);
   const games: CalcGame[] = GAMES.map((g, i) => ({
     slug: g.slug,

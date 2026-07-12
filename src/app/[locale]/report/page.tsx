@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, localizedName } from "@/data/games";
-import { getReport } from "@/lib/market";
+import { getReportCached } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { recentDates } from "@/lib/reportDates";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -48,7 +48,7 @@ export default async function ReportPage({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const dict = getDictionary(locale);
-  const reports = await Promise.all(GAMES.map((g) => getReport(g)));
+  const reports = await Promise.all(GAMES.map((g) => getReportCached(g.slug)));
   const archive = recentDates(14);
 
   return (

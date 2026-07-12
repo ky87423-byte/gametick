@@ -1,8 +1,9 @@
 // 캔들(OHLC) 생성 — history의 시세 시계열(원/단위)을 시간 버킷으로 묶어
 // open/high/low/close를 만든다. 라인 차트 대비 추세를 더 잘 보여준다.
 
-import { GameInfo, ServerInfo } from "@/data/games";
+import { GameInfo, ServerInfo, findGame, findServer } from "@/data/games";
 import { readHistory, seriesFor } from "@/lib/history";
+import { makeTtlCache } from "@/lib/cache";
 
 export type Timeframe = "3m" | "1h" | "1d";
 
@@ -82,6 +83,15 @@ export function despike(
     return p;
   });
 }
+
+/** 서버 캔들 60초 캐시(서버 페이지). slug|serverId|tf 키. */
+export const getServerCandlesCached = makeTtlCache(
+  (slug: string, serverId: string, tf: Timeframe) => {
+    const g = findGame(slug)!;
+    return getServerCandles(g, findServer(g, serverId)!, tf);
+  },
+  60_000
+);
 
 export async function getServerCandles(
   game: GameInfo,
