@@ -5,6 +5,11 @@ import { Locale } from "@/i18n/config";
 export interface Dictionary {
   brand: string;
   tagline: string;
+  // 홈(허브) 페이지
+  homeHeadline: string;
+  homeLead: string;
+  homeGamesTitle: string;
+  homeAbout: string;
   // 시세표
   rank: string;
   server: string;
@@ -105,6 +110,12 @@ export interface Dictionary {
 const ko: Dictionary = {
   brand: "게임시세",
   tagline: "게임머니 서버별 실시간 시세",
+  homeHeadline: "게임머니 실시간 시세",
+  homeLead:
+    "리니지·아이온 등 주요 게임의 게임머니 시세를 서버별로 한눈에 비교하세요. 여러 거래소의 최저가를 실시간으로 모아 자동 갱신합니다.",
+  homeGamesTitle: "게임별 시세",
+  homeAbout:
+    "게임시세는 바로템·아이템매니아·아이템베이 등 여러 거래소의 게임머니 시세를 서버별로 통합해 제공하는 무료 시세 비교 사이트입니다. 캔들 차트, 24시간 등락, 거래소별 최저가 비교, 가격 알림을 지원합니다. 표시 가격은 참고용이며 실제 거래가와 다를 수 있습니다.",
   rank: "#",
   server: "서버",
   price: "현재가",
@@ -201,6 +212,12 @@ const ko: Dictionary = {
 const vi: Dictionary = {
   brand: "GameSise",
   tagline: "Giá tiền game theo máy chủ, thời gian thực",
+  homeHeadline: "Giá tiền game theo thời gian thực",
+  homeLead:
+    "So sánh giá tiền game theo máy chủ cho Lineage, Aion và nhiều game khác. Chúng tôi thu thập giá thấp nhất từ nhiều sàn theo thời gian thực và tự động cập nhật.",
+  homeGamesTitle: "Giá theo game",
+  homeAbout:
+    "GameSise là trang so sánh giá miễn phí, tổng hợp giá tiền game từ nhiều sàn (Barotem, ItemMania, ItemBay) theo máy chủ. Hỗ trợ biểu đồ nến, biến động 24 giờ, so sánh giá giữa các sàn và cảnh báo giá. Giá chỉ mang tính tham khảo và có thể khác giá giao dịch thực tế.",
   rank: "#",
   server: "Máy chủ",
   price: "Giá",
@@ -297,6 +314,12 @@ const vi: Dictionary = {
 const en: Dictionary = {
   brand: "GameSise",
   tagline: "Real-time game currency prices by server",
+  homeHeadline: "Real-Time Game Currency Prices",
+  homeLead:
+    "Compare game money prices by server for Lineage, Aion and more. We collect the lowest prices from multiple exchanges in real time and update automatically.",
+  homeGamesTitle: "Prices by Game",
+  homeAbout:
+    "GameSise is a free price comparison site that aggregates game-currency prices from multiple exchanges (Barotem, ItemMania, ItemBay) by server. It offers candle charts, 24-hour change, exchange price comparison and price alerts. Prices are for reference only and may differ from actual trades.",
   rank: "#",
   server: "Server",
   price: "Price",
@@ -395,6 +418,12 @@ const en: Dictionary = {
 const zh: Dictionary = {
   brand: "GameSise",
   tagline: "各服务器游戏币实时行情",
+  homeHeadline: "游戏币实时行情",
+  homeLead:
+    "按服务器比较天堂、永恒之塔等主流游戏的游戏币行情。我们实时汇总多家交易所的最低价并自动更新。",
+  homeGamesTitle: "各游戏行情",
+  homeAbout:
+    "GameSise 是一个免费的行情比较网站，按服务器汇总多家交易所（Barotem、ItemMania、ItemBay）的游戏币行情。提供K线图、24小时涨跌、交易所比价和价格提醒。价格仅供参考，可能与实际成交价不同。",
   rank: "#",
   server: "服务器",
   price: "现价",
@@ -492,6 +521,12 @@ const zh: Dictionary = {
 const ja: Dictionary = {
   brand: "GameSise",
   tagline: "サーバー別ゲームマネー・リアルタイム相場",
+  homeHeadline: "ゲームマネー・リアルタイム相場",
+  homeLead:
+    "リネージュ・アイオンなど主要ゲームのゲームマネー相場をサーバー別に比較。複数の取引所の最安値をリアルタイムで集計し自動更新します。",
+  homeGamesTitle: "ゲーム別の相場",
+  homeAbout:
+    "GameSiseは、複数の取引所（Barotem・ItemMania・ItemBay）のゲームマネー相場をサーバー別に集約する無料の相場比較サイトです。ローソク足チャート、24時間騰落、取引所比較、価格アラートに対応します。表示価格は参考用であり、実際の取引価格と異なる場合があります。",
   rank: "#",
   server: "サーバー",
   price: "現在価格",
@@ -590,6 +625,12 @@ const ja: Dictionary = {
 const th: Dictionary = {
   brand: "GameSise",
   tagline: "ราคาเงินเกมแบบเรียลไทม์ แยกตามเซิร์ฟเวอร์",
+  homeHeadline: "ราคาเงินเกมแบบเรียลไทม์",
+  homeLead:
+    "เปรียบเทียบราคาเงินเกมแยกตามเซิร์ฟเวอร์สำหรับ Lineage, Aion และอื่นๆ เรารวบรวมราคาต่ำสุดจากหลายตลาดแบบเรียลไทม์และอัปเดตอัตโนมัติ",
+  homeGamesTitle: "ราคาตามเกม",
+  homeAbout:
+    "GameSise เป็นเว็บเปรียบเทียบราคาฟรีที่รวบรวมราคาเงินเกมจากหลายตลาด (Barotem, ItemMania, ItemBay) แยกตามเซิร์ฟเวอร์ รองรับกราฟแท่งเทียน การเปลี่ยนแปลง 24 ชม. การเทียบราคาระหว่างตลาด และการแจ้งเตือนราคา ราคาเป็นเพียงข้อมูลอ้างอิงและอาจต่างจากราคาซื้อขายจริง",
   rank: "#",
   server: "เซิร์ฟเวอร์",
   price: "ราคา",
@@ -688,6 +729,12 @@ const th: Dictionary = {
 const tl: Dictionary = {
   brand: "GameSise",
   tagline: "Real-time na presyo ng game currency kada server",
+  homeHeadline: "Real-time na Presyo ng Game Currency",
+  homeLead:
+    "Ikumpara ang presyo ng game money kada server para sa Lineage, Aion at iba pa. Kinukuha namin ang pinakamababang presyo mula sa maraming exchange nang real-time at awtomatikong ina-update.",
+  homeGamesTitle: "Presyo kada Laro",
+  homeAbout:
+    "Ang GameSise ay libreng price comparison site na nag-aagregate ng presyo ng game currency mula sa maraming exchange (Barotem, ItemMania, ItemBay) kada server. May candle chart, 24-oras na pagbabago, paghahambing ng presyo sa mga exchange, at price alert. Reference lamang ang mga presyo at maaaring maiba sa aktwal na transaksyon.",
   rank: "#",
   server: "Server",
   price: "Presyo",

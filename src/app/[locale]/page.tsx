@@ -1,15 +1,160 @@
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DEFAULT_GAME_SLUG } from "@/data/games";
-import { isLocale } from "@/i18n/config";
+import { GAMES, currencyOf, gameNameOf } from "@/data/games";
+import { getMarketTable, summarize } from "@/lib/market";
+import { altLanguages } from "@/lib/seo";
+import { getDictionary } from "@/i18n/dictionaries";
+import { isLocale, Locale } from "@/i18n/config";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { JsonLd, SITE } from "@/components/JsonLd";
+import { formatKrw } from "@/lib/format";
 
-// /[locale] → 기본 게임 시세표로
-export default async function LocaleIndex({
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = getDictionary(locale as Locale);
+  const title = `${dict.brand} · ${dict.homeHeadline}`;
+  const description = dict.homeLead;
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: altLanguages(""),
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    },
+  };
+}
+
+// /[locale] — 전체 게임 시세를 모은 홈(허브). 예전엔 기본 게임으로 리디렉션했으나,
+// 리디렉션 페이지는 구글이 색인하지 않아(홈페이지 색인 누락) 실제 콘텐츠 페이지로 전환.
+export default async function LocaleHome({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  redirect(`/${locale}/${DEFAULT_GAME_SLUG}`);
+  const dict = getDictionary(locale);
+
+  // 전 게임 시세표를 병렬로 읽어 카드용 요약 생성.
+  const cards = await Promise.all(
+    GAMES.map(async (game) => {
+      const table = await getMarketTable(game);
+      const summary = summarize(table);
+      return {
+        slug: game.slug,
+        name: gameNameOf(game, locale),
+        currency: currencyOf(game, locale),
+        unitLabel: dict.perUnit(game.unitAmount, currencyOf(game, locale)),
+        avg: summary.avg,
+        low: summary.low,
+        activeCount: summary.activeCount,
+        total: table.servers.length,
+      };
+    })
+  );
+  // 시세 있는 게임을 앞으로, 활성 서버 많은 순.
+  cards.sort((a, b) => b.activeCount - a.activeCount);
+
+  const siteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: dict.brand,
+    url: `${SITE}/${locale}`,
+    description: dict.homeLead,
+    inLanguage: locale,
+  };
+
+  return (
+    <>
+      <Header locale={locale} />
+      <JsonLd data={siteLd} />
+
+      <main className="mx-auto w-full max-w-5xl px-4 py-6">
+        <section className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
+            {dict.homeHeadline}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+            {dict.homeLead}
+          </p>
+        </section>
+
+        <h2 className="mb-3 text-lg font-bold">{dict.homeGamesTitle}</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/${locale}/${c.slug}`}
+              className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 transition-colors hover:border-amber-500/60 hover:bg-zinc-900"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="min-w-0 truncate font-semibold text-zinc-100 group-hover:text-amber-300">
+                  {c.name}
+                </span>
+                <span className="shrink-0 text-xs text-zinc-500">
+                  {c.currency}
+                </span>
+              </div>
+
+              {c.avg !== null ? (
+                <div className="mt-3 flex items-end justify-between gap-2">
+                  <div>
+                    <div className="text-[11px] text-zinc-500">
+                      {dict.avgPrice}
+                    </div>
+                    <div className="font-mono text-lg font-semibold tabular-nums text-zinc-100">
+                      {formatKrw(c.avg)}
+                    </div>
+                  </div>
+                  {c.low && (
+                    <div className="text-right">
+                      <div className="text-[11px] text-zinc-500">
+                        {dict.lowest}
+                      </div>
+                      <div className="font-mono text-sm tabular-nums text-zinc-300">
+                        {formatKrw(c.low.price)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-3 text-sm text-zinc-600">{dict.noData}</div>
+              )}
+
+              <div className="mt-3 flex items-center justify-between text-xs text-zinc-500">
+                <span>
+                  {dict.serverCount} {c.activeCount}/{c.total}
+                </span>
+                <span className="text-amber-500/80 group-hover:text-amber-300">
+                  {dict.chart} →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* 홈 소개 (SEO) */}
+        <section className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <p className="text-sm leading-6 text-zinc-400">{dict.homeAbout}</p>
+        </section>
+      </main>
+
+      <Footer locale={locale} />
+    </>
+  );
 }
