@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Sparkline } from "@/components/Sparkline";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
+import { secondaryCurrency, type Rates } from "@/lib/exchange";
 import { checkAlerts } from "@/lib/alerts";
 
 // 현재가 컬럼에서 볼 거래소 선택용 (로고 = public/exchanges/{id}.png)
@@ -90,6 +91,7 @@ export function MarketTable({
   servers,
   initialUpdatedAt,
   labels,
+  rates,
   refreshSeconds = 60,
   updateIntervalSeconds = 300,
 }: {
@@ -98,6 +100,8 @@ export function MarketTable({
   servers: ServerRow[];
   initialUpdatedAt: number | null;
   labels: TableLabels;
+  /** 환율(원→현지통화). 비한국 로케일에서 현재가에 현지통화 병기용 */
+  rates: Rates;
   refreshSeconds?: number;
   updateIntervalSeconds?: number;
 }) {
@@ -397,6 +401,14 @@ export function MarketTable({
                       : ""}
                     {formatKrw(priceOf(s))}
                   </div>
+                  {(() => {
+                    const sec = secondaryCurrency(priceOf(s), locale, rates);
+                    return sec ? (
+                      <div className="font-mono text-[11px] tabular-nums text-zinc-500">
+                        {sec}
+                      </div>
+                    ) : null;
+                  })()}
                 </td>
                 <td
                   className={`px-3 py-2 text-right font-mono ${changeColor(
