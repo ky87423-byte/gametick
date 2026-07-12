@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, currencyOf, gameNameOf } from "@/data/games";
 import { getMarketTable, summarize } from "@/lib/market";
+import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { altLanguages } from "@/lib/seo";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -50,6 +51,9 @@ export default async function LocaleHome({
   if (!isLocale(locale)) notFound();
   const dict = getDictionary(locale);
 
+  // 환율(원→현지통화)은 게임과 무관하므로 1번만 조회. ko는 null(원화만).
+  const rates = await getRates();
+
   // 전 게임 시세표를 병렬로 읽어 카드용 요약 생성.
   const cards = await Promise.all(
     GAMES.map(async (game) => {
@@ -65,7 +69,11 @@ export default async function LocaleHome({
         name: gameNameOf(game, locale),
         unitText,
         avg: summary.avg,
+        avgSec: secondaryCurrency(summary.avg, locale, rates),
         low: summary.low,
+        lowSec: summary.low
+          ? secondaryCurrency(summary.low.price, locale, rates)
+          : null,
         activeCount: summary.activeCount,
         total: table.servers.length,
       };
@@ -117,13 +125,18 @@ export default async function LocaleHome({
 
               {c.avg !== null ? (
                 <div className="mt-3 flex items-end justify-between gap-2">
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-[11px] text-zinc-500">
                       {dict.avgPrice}
                     </div>
                     <div className="font-mono text-lg font-semibold tabular-nums text-zinc-100">
                       {formatKrw(c.avg)}
                     </div>
+                    {c.avgSec && (
+                      <div className="font-mono text-[11px] tabular-nums text-zinc-500">
+                        {c.avgSec}
+                      </div>
+                    )}
                   </div>
                   {c.low && (
                     <div className="text-right">
@@ -133,6 +146,11 @@ export default async function LocaleHome({
                       <div className="font-mono text-sm tabular-nums text-zinc-300">
                         {formatKrw(c.low.price)}
                       </div>
+                      {c.lowSec && (
+                        <div className="font-mono text-[11px] tabular-nums text-zinc-500">
+                          {c.lowSec}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
