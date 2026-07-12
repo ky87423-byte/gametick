@@ -16,7 +16,8 @@ import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
-import { gameIntro } from "@/data/content";
+import { gameIntro, faqItems } from "@/data/content";
+import { Faq } from "@/components/Faq";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
@@ -78,6 +79,7 @@ export default async function GamePage({
   ]);
   const summary = summarize(table);
   const move = movers(table, 5);
+  const faqs = faqItems(locale, game);
   const namedRanks = popularVideos.map((v, i) => ({
     rank: i + 1,
     name: v.title,
@@ -304,6 +306,24 @@ export default async function GamePage({
             {gameIntro(locale, game)}
           </p>
         </section>
+
+        {/* 게임 FAQ — 화면에 보이는 Q&A + FAQPage 스키마(실제 표시 내용과 일치) */}
+        {faqs.length > 0 && (
+          <>
+            <Faq title={dict.faqTitle} items={faqs} />
+            <JsonLd
+              data={{
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: faqs.map((f) => ({
+                  "@type": "Question",
+                  name: f.q,
+                  acceptedAnswer: { "@type": "Answer", text: f.a },
+                })),
+              }}
+            />
+          </>
+        )}
 
         <JsonLd data={crumbLd} />
       </main>
