@@ -12,13 +12,14 @@ interface TfSpec {
   label: string;
 }
 
-// lookback은 원본 보관기간(lc_vn MAX_AGE_MS = 7일)이 상한. 그 안에서
+// lookback은 원본 보관기간(lc_vn MAX_AGE_MS = 90일)이 상한. 그 안에서
 // 최대한 많은 캔들을 보여줘 줌/가격축 autoscale이 의미 있게 동작하도록 한다.
+// 실제 표시 길이는 "쌓인 데이터 양"에 좌우된다(신규 도메인은 데이터가 짧아 짧게 보임).
 export const TF_SPECS: Record<Timeframe, TfSpec> = {
   "3m": { bucketMs: 3 * 60 * 1000, lookbackMs: 24 * 60 * 60 * 1000, label: "3분" },
   "1h": {
     bucketMs: 60 * 60 * 1000,
-    lookbackMs: 7 * 24 * 60 * 60 * 1000,
+    lookbackMs: 14 * 24 * 60 * 60 * 1000, // 2주(데이터 쌓이는 대로 길어짐)
     label: "1시간",
   },
   "1d": {
