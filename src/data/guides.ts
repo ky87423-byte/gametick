@@ -13,6 +13,129 @@ export interface Guide {
 
 const ko: Guide[] = [
   {
+    slug: "cash-out",
+    summary: "게임머니 현금화 방법·정산액·위험·세금 총정리",
+    doc: {
+      title: "게임머니 현금화 가이드",
+      intro:
+        "게임머니 현금화가 무엇인지, 어디서·어떻게 하면 안전한지, 정산액과 세금·위험까지 정리했습니다. 본 문서는 정보 제공용이며, 실제 거래는 각 게임 이용약관과 관련 법령을 확인하고 필요 시 전문가와 상담하세요.",
+      sections: [
+        {
+          heading: "1. 게임머니 현금화란?",
+          paragraphs: [
+            "게임 내 재화(아데나·다이아·키나·메소 등)를 거래소를 통해 원화로 바꾸는 것을 흔히 ‘현금화’라고 부릅니다.",
+            "이때 교환 비율이 바로 ‘시세’입니다. 예를 들어 아데나 만당 1,500원이면 1만 아데나를 팔았을 때 약 1,500원을 받는다는 의미입니다(수수료 별도).",
+          ],
+        },
+        {
+          heading: "2. 어디서 하나요? — 정식 거래소",
+          paragraphs: [
+            "바로템·아이템매니아·아이템베이 같은 정식 거래소를 이용하고, 반드시 안전결제(에스크로)를 거치는 것이 기본입니다.",
+            "‘수수료 아껴준다’며 거래소 밖 개인 계좌 직거래로 유도하는 경우는 대표적인 사기 신호입니다. 게임시세는 이 세 거래소의 최저가를 통합해 비교로 보여줍니다.",
+          ],
+        },
+        {
+          heading: "3. 정산액은 어떻게 계산되나요?",
+          paragraphs: [
+            "정산액 ≈ 시세 × 수량 − 거래소 수수료입니다. 수수료 정책은 거래소마다 다르므로 각 거래소 안내를 확인하세요.",
+            "각 서버 페이지의 시세 계산기에 수량을 입력하면 예상 금액을 원화와 현지 통화로 바로 확인할 수 있습니다.",
+          ],
+        },
+        {
+          heading: "4. 시세를 잘 확인하는 법",
+          paragraphs: [
+            "같은 게임머니라도 서버·거래소·시간대에 따라 가격이 다릅니다. 팔기 전에 반드시 적정 시세를 확인하세요.",
+            "게임시세에서 서버별 최저가, 24시간 등락, 거래소별 비교, 최근 7일 최고·최저·평균을 확인할 수 있습니다. 시세보다 지나치게 높거나 낮은 제안은 의심해야 합니다.",
+          ],
+        },
+        {
+          heading: "5. 위험과 주의사항",
+          paragraphs: [
+            "현금 거래는 일부 게임의 이용약관에 위배되어 계정 제재로 이어질 수 있습니다. 거래 전 해당 게임의 약관을 확인하세요.",
+            "선입금 요구, 장외 유인, 시세 대비 비정상 가격, 출처 불명의 대량 매물은 사기·회수 위험 신호입니다. 반드시 에스크로를 사용하고 거래 기록을 남기세요.",
+          ],
+        },
+        {
+          heading: "6. 세금·합법성은?",
+          paragraphs: [
+            "지속적·영리 목적의 거래는 소득으로 보아 과세 대상이 될 수 있습니다. 정확한 신고·납세 의무는 개별 상황에 따라 다르므로 세무 전문가와 상담하는 것이 안전합니다.",
+            "미성년자 거래, 타인 명의 계좌 이용, 자금세탁 등은 법적 문제가 될 수 있으니 하지 마세요. 본 문서는 법률·세무 자문이 아닙니다.",
+          ],
+        },
+        {
+          heading: "7. 안전 체크리스트",
+          paragraphs: [
+            "① 적정 시세 확인 ② 안전결제(에스크로) 사용 ③ 판매자 평판·거래이력 확인 ④ 장외 유인 거부 ⑤ 대화·정산·게임내 거래 기록 보관.",
+            "더 자세한 내용은 안전거래 가이드와 사기 예방 가이드를 함께 참고하세요.",
+          ],
+        },
+        {
+          heading: "8. 고지",
+          paragraphs: [
+            "게임시세는 시세 정보만 제공하며 거래를 중개하지 않습니다. 표시 시세는 참고용이며 실제 체결가와 다를 수 있습니다.",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "exchange-guide",
+    summary: "바로템·아이템매니아·아이템베이 안전 이용·비교법",
+    doc: {
+      title: "게임머니 거래소 이용 가이드",
+      intro:
+        "게임머니를 사고파는 주요 거래소(바로템·아이템매니아·아이템베이)의 특징과, 어디가 싼지 비교하고 안전하게 거래하는 법을 정리했습니다.",
+      sections: [
+        {
+          heading: "1. 게임머니 거래소란?",
+          paragraphs: [
+            "게임머니 거래소는 개인 간 게임머니 매매를 중개하는 플랫폼입니다. 대부분 안전결제(에스크로) 기능을 제공해 사기 위험을 줄여줍니다.",
+          ],
+        },
+        {
+          heading: "2. 주요 거래소",
+          paragraphs: [
+            "국내 주요 거래소로는 바로템·아이템매니아·아이템베이가 있습니다. 각 거래소는 매물 목록, 거래완료 내역, 안전결제를 제공합니다.",
+            "게임시세는 이 세 거래소의 서버별 최저가를 한 화면에서 통합 비교해 보여줍니다.",
+          ],
+        },
+        {
+          heading: "3. 어디가 더 싼지 비교하는 법",
+          paragraphs: [
+            "같은 서버·같은 게임머니라도 거래소마다 최저가가 다릅니다. 살 때는 가장 싼 곳, 팔 때는 가장 비싼 곳이 유리합니다.",
+            "각 서버 페이지의 거래소별 비교표(1시간·일간)에서 시점별 최저가 거래소를 바로 확인할 수 있습니다.",
+          ],
+        },
+        {
+          heading: "4. 안전결제(에스크로)는 필수",
+          paragraphs: [
+            "안전결제는 거래소가 구매자 대금을 보관하고, 게임머니 전달이 확인된 뒤 판매자에게 지급하는 방식입니다. 선입금 사기를 원천 차단합니다.",
+            "‘수수료를 아껴준다’며 거래소 밖 직거래로 유도하면 즉시 중단하세요.",
+          ],
+        },
+        {
+          heading: "5. 수수료와 정산",
+          paragraphs: [
+            "거래소마다 수수료·정산 정책이 다릅니다. 실제 수수료율과 정산 조건은 각 거래소 공지에서 확인하세요.",
+            "정산액 ≈ 시세 − 수수료입니다. 시세는 게임시세에서, 수수료는 거래소에서 확인해 합산하면 실수령액을 가늠할 수 있습니다.",
+          ],
+        },
+        {
+          heading: "6. 거래 전 확인사항",
+          paragraphs: [
+            "판매자 평판·거래 이력, 매물 가격이 시세와 크게 다르지 않은지, 안전결제 여부를 확인하세요. 사기 유형은 사기 예방 가이드를 참고하세요.",
+          ],
+        },
+        {
+          heading: "7. 고지",
+          paragraphs: [
+            "게임시세는 특정 거래소와 제휴·중개 관계가 없으며 시세 정보만 제공합니다. 거래소 이용 조건은 각 사이트 정책을 따르세요.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "how-to-read",
     summary: "가격 단위·등락률·매물·차트 보는 법",
     doc: {
@@ -138,6 +261,129 @@ const ko: Guide[] = [
 
 const vi: Guide[] = [
   {
+    slug: "cash-out",
+    summary: "Cách bán tiền game — số tiền nhận, rủi ro, thuế",
+    doc: {
+      title: "Hướng dẫn quy đổi tiền game ra tiền mặt",
+      intro:
+        "Quy đổi tiền game là gì, bán ở đâu và thế nào cho an toàn, cùng số tiền nhận, thuế và rủi ro. Tài liệu chỉ mang tính thông tin — hãy kiểm tra điều khoản của từng game và luật hiện hành, tham khảo chuyên gia khi cần.",
+      sections: [
+        {
+          heading: "1. Quy đổi tiền game là gì?",
+          paragraphs: [
+            "Bán tiền trong game (Adena, Dia, Kinah, Meso...) lấy tiền mặt qua sàn thường gọi là ‘quy đổi’.",
+            "Tỷ lệ quy đổi chính là ‘giá’. Ví dụ 1.500 KRW cho mỗi 10.000 Adena nghĩa là bán 10.000 Adena nhận khoảng 1.500 KRW (chưa trừ phí).",
+          ],
+        },
+        {
+          heading: "2. Bán ở đâu? — sàn uy tín",
+          paragraphs: [
+            "Hãy dùng các sàn uy tín (Barotem, ItemMania, ItemBay) và luôn qua thanh toán bảo đảm (escrow).",
+            "Bị dụ ra ngoài sàn chuyển vào tài khoản cá nhân để ‘tiết kiệm phí’ là dấu hiệu lừa đảo điển hình. GameSise tổng hợp và so sánh giá thấp nhất giữa các sàn này.",
+          ],
+        },
+        {
+          heading: "3. Số tiền nhận được tính thế nào?",
+          paragraphs: [
+            "Số nhận ≈ giá × số lượng − phí sàn. Chính sách phí khác nhau theo sàn, hãy kiểm tra từng sàn.",
+            "Nhập số lượng vào công cụ tính giá ở mỗi trang máy chủ để xem ước tính bằng KRW và tiền tệ địa phương.",
+          ],
+        },
+        {
+          heading: "4. Cách kiểm tra giá đúng",
+          paragraphs: [
+            "Cùng một loại tiền có thể khác nhau theo máy chủ, sàn và thời điểm. Luôn kiểm tra giá hợp lý trước khi bán.",
+            "GameSise hiển thị giá thấp nhất theo máy chủ, biến động 24h, so sánh giữa các sàn và cao/thấp/trung bình 7 ngày. Cảnh giác với đề nghị cao hoặc thấp bất thường.",
+          ],
+        },
+        {
+          heading: "5. Rủi ro và lưu ý",
+          paragraphs: [
+            "Giao dịch tiền mặt có thể vi phạm điều khoản của một số game và dẫn đến khóa tài khoản — hãy kiểm tra trước.",
+            "Yêu cầu trả trước, dụ ra ngoài sàn, giá bất thường và lượng hàng lớn không rõ nguồn gốc là dấu hiệu lừa đảo/thu hồi. Luôn dùng escrow và lưu bằng chứng.",
+          ],
+        },
+        {
+          heading: "6. Thuế và tính hợp pháp",
+          paragraphs: [
+            "Giao dịch thường xuyên vì lợi nhuận có thể phải chịu thuế thu nhập. Nghĩa vụ khai báo và nộp thuế tùy tình huống, nên tham khảo chuyên gia thuế.",
+            "Không giao dịch khi chưa đủ tuổi, không dùng tài khoản người khác, không rửa tiền. Đây không phải tư vấn pháp lý hay thuế.",
+          ],
+        },
+        {
+          heading: "7. Danh sách kiểm tra an toàn",
+          paragraphs: [
+            "① Kiểm tra giá hợp lý ② Dùng escrow ③ Kiểm tra uy tín/lịch sử người bán ④ Từ chối dụ ra ngoài sàn ⑤ Lưu lịch sử trò chuyện/thanh toán/giao dịch.",
+            "Xem thêm hướng dẫn giao dịch an toàn và phòng chống lừa đảo.",
+          ],
+        },
+        {
+          heading: "8. Miễn trừ",
+          paragraphs: [
+            "GameSise chỉ cung cấp thông tin giá và không môi giới giao dịch. Giá hiển thị chỉ để tham khảo và có thể khác giá thực tế.",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "exchange-guide",
+    summary: "Barotem, ItemMania, ItemBay — dùng an toàn và so sánh",
+    doc: {
+      title: "Hướng dẫn sàn giao dịch tiền game",
+      intro:
+        "Đặc điểm các sàn chính để mua bán tiền game (Barotem, ItemMania, ItemBay), cách so sánh nơi rẻ nhất và giao dịch an toàn.",
+      sections: [
+        {
+          heading: "1. Sàn giao dịch tiền game là gì?",
+          paragraphs: [
+            "Sàn tiền game là nền tảng môi giới giao dịch giữa các cá nhân. Đa số có thanh toán bảo đảm (escrow) để giảm rủi ro lừa đảo.",
+          ],
+        },
+        {
+          heading: "2. Các sàn chính",
+          paragraphs: [
+            "Các sàn lớn tại Hàn gồm Barotem, ItemMania và ItemBay. Mỗi sàn có danh sách tin đăng, lịch sử giao dịch hoàn tất và escrow.",
+            "GameSise so sánh giá thấp nhất theo máy chủ của cả ba trong một màn hình.",
+          ],
+        },
+        {
+          heading: "3. Cách so sánh nơi nào rẻ hơn",
+          paragraphs: [
+            "Cùng máy chủ và loại tiền, giá thấp nhất có thể khác nhau giữa các sàn. Mua nơi rẻ nhất, bán nơi cao nhất.",
+            "Bảng so sánh sàn (theo giờ/ngày) ở mỗi trang máy chủ cho biết sàn rẻ nhất theo từng thời điểm.",
+          ],
+        },
+        {
+          heading: "4. Thanh toán bảo đảm (escrow) là bắt buộc",
+          paragraphs: [
+            "Escrow là khi sàn giữ tiền của người mua và chỉ trả cho người bán sau khi xác nhận đã giao tiền game — chặn lừa đảo trả trước.",
+            "Nếu ai dụ bạn ra ngoài sàn để ‘tiết kiệm phí’, hãy dừng ngay.",
+          ],
+        },
+        {
+          heading: "5. Phí và thanh toán",
+          paragraphs: [
+            "Chính sách phí và thanh toán khác nhau theo sàn. Kiểm tra mức phí và điều kiện thực tế trong thông báo của từng sàn.",
+            "Số nhận ≈ giá − phí; kết hợp giá từ GameSise với phí của sàn để ước tính.",
+          ],
+        },
+        {
+          heading: "6. Trước khi giao dịch",
+          paragraphs: [
+            "Kiểm tra uy tín/lịch sử người bán, giá tin đăng có sát thị trường không, và có dùng escrow không. Xem hướng dẫn phòng chống lừa đảo để biết các loại lừa đảo.",
+          ],
+        },
+        {
+          heading: "7. Miễn trừ",
+          paragraphs: [
+            "GameSise không có quan hệ hợp tác hay môi giới với sàn nào và chỉ cung cấp thông tin giá. Hãy tuân theo chính sách của từng sàn.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "how-to-read",
     summary: "Cách đọc giá, biến động, biểu đồ",
     doc: {
@@ -234,6 +480,129 @@ const vi: Guide[] = [
 
 const en: Guide[] = [
   {
+    slug: "cash-out",
+    summary: "How to cash out game money — payout, risks, taxes",
+    doc: {
+      title: "Game Currency Cash-Out Guide",
+      intro:
+        "What cashing out game currency means, where and how to do it safely, and what to know about payouts, taxes and risks. This is informational only — check each game's terms of service and applicable law, and consult a professional when needed.",
+      sections: [
+        {
+          heading: "1. What is cashing out?",
+          paragraphs: [
+            "Selling in-game currency (Adena, Dia, Kinah, Meso, etc.) for cash through an exchange is commonly called ‘cashing out’.",
+            "The exchange rate is the ‘price’. For example, 1,500 KRW per 10,000 Adena means selling 10,000 Adena gets you about 1,500 KRW (before fees).",
+          ],
+        },
+        {
+          heading: "2. Where to do it — established exchanges",
+          paragraphs: [
+            "Use established exchanges (Barotem, ItemMania, ItemBay) and always go through escrow (safe payment).",
+            "Being lured off-platform to a personal account to ‘save on fees’ is a classic scam sign. GameSise aggregates and compares the lowest prices across these exchanges.",
+          ],
+        },
+        {
+          heading: "3. How is the payout calculated?",
+          paragraphs: [
+            "Payout ≈ price × quantity − exchange fee. Fee policies differ by exchange, so check each one.",
+            "Enter a quantity in the price calculator on any server page to see the estimate in KRW and your local currency.",
+          ],
+        },
+        {
+          heading: "4. Checking the price properly",
+          paragraphs: [
+            "The same currency can differ by server, exchange and time. Always check the fair price before selling.",
+            "GameSise shows the lowest price per server, 24h change, exchange comparison, and 7-day high/low/average. Be suspicious of offers far above or below the market.",
+          ],
+        },
+        {
+          heading: "5. Risks and cautions",
+          paragraphs: [
+            "Cash trading may violate some games' terms of service and lead to account penalties — check the game's terms first.",
+            "Upfront-payment demands, off-platform lures, abnormal prices, and large listings of unknown origin are scam/clawback red flags. Always use escrow and keep records.",
+          ],
+        },
+        {
+          heading: "6. Taxes and legality",
+          paragraphs: [
+            "Ongoing, for-profit trading may be taxable as income. Exact reporting and tax duties depend on your situation, so consult a tax professional.",
+            "Do not trade as a minor, use others' accounts, or launder funds. This is not legal or tax advice.",
+          ],
+        },
+        {
+          heading: "7. Safety checklist",
+          paragraphs: [
+            "① Check the fair price ② Use escrow ③ Check seller reputation/history ④ Refuse off-platform lures ⑤ Keep chat, payment and in-game records.",
+            "See the safe-trade and fraud-prevention guides for more.",
+          ],
+        },
+        {
+          heading: "8. Disclaimer",
+          paragraphs: [
+            "GameSise provides price information only and does not broker trades. Displayed prices are for reference and may differ from actual trades.",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "exchange-guide",
+    summary: "Barotem, ItemMania, ItemBay — safe use and comparison",
+    doc: {
+      title: "Game Currency Exchange Guide",
+      intro:
+        "Features of the main exchanges for buying and selling game currency (Barotem, ItemMania, ItemBay), how to compare where's cheapest, and how to trade safely.",
+      sections: [
+        {
+          heading: "1. What is a game-currency exchange?",
+          paragraphs: [
+            "A game-currency exchange is a platform that brokers peer-to-peer trades. Most offer escrow (safe payment) to reduce scam risk.",
+          ],
+        },
+        {
+          heading: "2. Main exchanges",
+          paragraphs: [
+            "Major Korean exchanges include Barotem, ItemMania and ItemBay. Each offers listings, completed-trade records and escrow.",
+            "GameSise compares the lowest per-server price across all three in one view.",
+          ],
+        },
+        {
+          heading: "3. How to compare where's cheaper",
+          paragraphs: [
+            "The same server and currency can have different lowest prices per exchange. Buy where it's cheapest, sell where it's highest.",
+            "The exchange comparison table (hourly/daily) on each server page shows the cheapest exchange per time point.",
+          ],
+        },
+        {
+          heading: "4. Escrow is essential",
+          paragraphs: [
+            "Escrow means the exchange holds the buyer's payment and releases it to the seller only after the currency is delivered — blocking upfront-payment scams.",
+            "If someone lures you off-platform to ‘save fees’, stop immediately.",
+          ],
+        },
+        {
+          heading: "5. Fees and settlement",
+          paragraphs: [
+            "Fee and settlement policies differ by exchange. Check the actual fee rate and terms in each exchange's notices.",
+            "Payout ≈ price − fee; combine the price from GameSise with the exchange's fee to estimate your net.",
+          ],
+        },
+        {
+          heading: "6. Before you trade",
+          paragraphs: [
+            "Check seller reputation/history, whether the listing price is close to market, and that escrow is used. See the fraud-prevention guide for scam types.",
+          ],
+        },
+        {
+          heading: "7. Disclaimer",
+          paragraphs: [
+            "GameSise has no partnership or brokerage relationship with any exchange and provides price information only. Follow each site's own policies.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "how-to-read",
     summary: "How to read prices, change, and charts",
     doc: {
@@ -329,6 +698,129 @@ const en: Guide[] = [
 ];
 
 const zh: Guide[] = [
+  {
+    slug: "cash-out",
+    summary: "游戏币如何变现——到手金额、风险、税务",
+    doc: {
+      title: "游戏币变现指南",
+      intro:
+        "什么是游戏币变现，在哪里、如何操作才安全，以及到手金额、税务和风险。本文仅供参考——请查看各游戏的服务条款和相关法律，必要时咨询专业人士。",
+      sections: [
+        {
+          heading: "1. 什么是游戏币变现？",
+          paragraphs: [
+            "通过交易所把游戏内货币（阿德纳、钻石、Kinah、Meso 等）换成现金，通常称为‘变现’。",
+            "兑换比率就是‘行情’。例如每 10,000 阿德纳 1,500 韩元，意味着卖出 10,000 阿德纳约得 1,500 韩元（未扣手续费）。",
+          ],
+        },
+        {
+          heading: "2. 在哪里操作？——正规交易所",
+          paragraphs: [
+            "请使用正规交易所（Barotem、ItemMania、ItemBay）并务必通过担保交易（托管）。",
+            "以‘省手续费’为由诱导你到站外私人账户交易，是典型的诈骗信号。GameSise 汇总并比较这些交易所的最低价。",
+          ],
+        },
+        {
+          heading: "3. 到手金额如何计算？",
+          paragraphs: [
+            "到手金额 ≈ 行情 × 数量 − 交易所手续费。各交易所手续费政策不同，请分别查看。",
+            "在任意服务器页的行情计算器输入数量，即可查看以韩元和当地货币计的预估金额。",
+          ],
+        },
+        {
+          heading: "4. 如何正确核对行情",
+          paragraphs: [
+            "同一种游戏币，价格会因服务器、交易所和时段而异。出售前务必核对合理行情。",
+            "GameSise 提供各服务器最低价、24 小时涨跌、交易所比价，以及 7 日最高/最低/平均。对远高或远低于行情的报价要提高警惕。",
+          ],
+        },
+        {
+          heading: "5. 风险与注意事项",
+          paragraphs: [
+            "现金交易可能违反部分游戏的服务条款，导致账号处罚——交易前请查看游戏条款。",
+            "要求先付款、诱导站外、价格异常、来源不明的大量挂单，都是诈骗/追回的危险信号。务必使用担保交易并保留记录。",
+          ],
+        },
+        {
+          heading: "6. 税务与合法性",
+          paragraphs: [
+            "持续性、以营利为目的的交易可能作为收入被征税。具体申报与纳税义务因情况而异，建议咨询税务专业人士。",
+            "请勿未成年交易、使用他人账户或洗钱。本文不构成法律或税务咨询。",
+          ],
+        },
+        {
+          heading: "7. 安全检查清单",
+          paragraphs: [
+            "① 核对合理行情 ② 使用担保交易 ③ 核实卖家信誉/记录 ④ 拒绝站外诱导 ⑤ 保留聊天/付款/游戏内交易记录。",
+            "更多内容请参阅安全交易指南与防诈骗指南。",
+          ],
+        },
+        {
+          heading: "8. 声明",
+          paragraphs: [
+            "GameSise 仅提供行情信息，不居间交易。显示价格仅供参考，可能与实际成交价不同。",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    slug: "exchange-guide",
+    summary: "Barotem、ItemMania、ItemBay——安全使用与比价",
+    doc: {
+      title: "游戏币交易所使用指南",
+      intro:
+        "买卖游戏币的主要交易所（Barotem、ItemMania、ItemBay）的特点，如何比较哪家更便宜，以及如何安全交易。",
+      sections: [
+        {
+          heading: "1. 什么是游戏币交易所？",
+          paragraphs: [
+            "游戏币交易所是撮合个人之间游戏币买卖的平台。大多提供担保交易（托管）以降低诈骗风险。",
+          ],
+        },
+        {
+          heading: "2. 主要交易所",
+          paragraphs: [
+            "韩国主要交易所有 Barotem、ItemMania 和 ItemBay。各家提供挂单列表、成交记录和担保交易。",
+            "GameSise 在一个界面比较三家各服务器的最低价。",
+          ],
+        },
+        {
+          heading: "3. 如何比较哪家更便宜",
+          paragraphs: [
+            "同一服务器、同一游戏币，各交易所的最低价可能不同。买入选最便宜处，卖出选最高价处。",
+            "各服务器页的交易所比价表（按小时/按日）可查看各时点最便宜的交易所。",
+          ],
+        },
+        {
+          heading: "4. 担保交易（托管）必不可少",
+          paragraphs: [
+            "担保交易是指交易所先代管买家货款，确认游戏币交付后再付给卖家——从根本上杜绝先付款诈骗。",
+            "若有人以‘省手续费’为由诱导你到站外，请立即停止。",
+          ],
+        },
+        {
+          heading: "5. 手续费与结算",
+          paragraphs: [
+            "各交易所的手续费与结算政策不同。请在各交易所公告中查看实际费率和条件。",
+            "到手金额 ≈ 行情 − 手续费；将 GameSise 的行情与交易所手续费结合即可估算。",
+          ],
+        },
+        {
+          heading: "6. 交易前确认",
+          paragraphs: [
+            "核实卖家信誉/记录、挂单价格是否贴近行情、以及是否使用担保交易。诈骗类型请参阅防诈骗指南。",
+          ],
+        },
+        {
+          heading: "7. 声明",
+          paragraphs: [
+            "GameSise 与任何交易所无合作或居间关系，仅提供行情信息。交易所使用条件请遵循各站政策。",
+          ],
+        },
+      ],
+    },
+  },
   {
     slug: "how-to-read",
     summary: "如何看价格、涨跌和图表",
