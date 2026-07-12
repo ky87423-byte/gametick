@@ -56,6 +56,151 @@ export interface FaqItem {
   a: string;
 }
 
+export interface ServerFaqStats {
+  current: number | null;
+  high: number | null;
+  low: number | null;
+  avg: number | null;
+  changePercent: number | null;
+  days: number;
+}
+
+/**
+ * 서버별 FAQ — 실제 시세 숫자를 넣어 서버마다 문장이 달라진다(중복 콘텐츠 해소 +
+ * "[서버] 시세 얼마" 롱테일 정조준). 데이터가 없으면 빈 배열(FAQ 미표시).
+ */
+export function serverFaq(
+  locale: Locale,
+  game: GameInfo,
+  serverName: string,
+  stats: ServerFaqStats
+): FaqItem[] {
+  if (stats.avg === null || stats.current === null) return [];
+  const cur = currencyOf(game, locale);
+  const gm = locale === "ko" ? game.nameKo : game.nameEn;
+  const unit = game.unitAmount.toLocaleString("en-US");
+  const n = (v: number | null) => (v === null ? "—" : v.toLocaleString("en-US"));
+  // 현금화 예시: 단위의 100배 수량 = 시세의 100배(원)
+  const exQty = (game.unitAmount * 100).toLocaleString("en-US");
+  const exVal = (stats.current * 100).toLocaleString("en-US");
+  const chg = stats.changePercent;
+  const chgAbs = chg === null ? "0" : Math.abs(chg).toFixed(1);
+  const dir = (up: string, down: string, flat: string) =>
+    chg === null || Math.abs(chg) < 0.1 ? flat : chg > 0 ? up : down;
+
+  if (locale === "en") {
+    return [
+      {
+        q: `How much is ${serverName} ${gm} ${cur} right now?`,
+        a: `The lowest price is currently around ${n(stats.current)} KRW per ${unit} ${cur}. Over the last ${stats.days} day(s) it traded at an average of ${n(stats.avg)} KRW (high ${n(stats.high)} / low ${n(stats.low)} KRW).`,
+      },
+      {
+        q: `How much do I get if I sell ${cur} on ${serverName}?`,
+        a: `At the current price, ${exQty} ${cur} ≈ ${exVal} KRW. Actual payout varies by exchange fees and demand; prices are for reference only.`,
+      },
+      {
+        q: `How is the ${serverName} ${cur} price set, and is it rising?`,
+        a: `We collect the lowest tradable listing price across exchanges (Barotem, ItemMania, ItemBay) in real time. Over the last ${stats.days} day(s) it is ${dir("up", "down", "roughly flat")} ${chgAbs}%.`,
+      },
+    ];
+  }
+  if (locale === "vi") {
+    return [
+      {
+        q: `Giá ${cur} máy chủ ${serverName} ${gm} hiện tại là bao nhiêu?`,
+        a: `Giá thấp nhất hiện khoảng ${n(stats.current)} KRW cho mỗi ${unit} ${cur}. Trong ${stats.days} ngày qua giao dịch ở mức trung bình ${n(stats.avg)} KRW (cao nhất ${n(stats.high)} / thấp nhất ${n(stats.low)} KRW).`,
+      },
+      {
+        q: `Bán ${cur} trên ${serverName} thì được bao nhiêu?`,
+        a: `Theo giá hiện tại, ${exQty} ${cur} ≈ ${exVal} KRW. Số tiền thực nhận thay đổi theo phí sàn và nhu cầu; giá chỉ mang tính tham khảo.`,
+      },
+      {
+        q: `Giá ${cur} máy chủ ${serverName} được tính thế nào, có đang tăng không?`,
+        a: `Chúng tôi thu thập giá bán thấp nhất từ các sàn (Barotem, ItemMania, ItemBay) theo thời gian thực. Trong ${stats.days} ngày qua ${dir("tăng", "giảm", "gần như đi ngang")} ${chgAbs}%.`,
+      },
+    ];
+  }
+  if (locale === "zh") {
+    return [
+      {
+        q: `${serverName} ${gm} ${cur} 现在多少钱？`,
+        a: `目前最低价约为每 ${unit} ${cur} ${n(stats.current)} 韩元。最近 ${stats.days} 天平均成交 ${n(stats.avg)} 韩元（最高 ${n(stats.high)} / 最低 ${n(stats.low)} 韩元）。`,
+      },
+      {
+        q: `在 ${serverName} 出售 ${cur} 能拿到多少？`,
+        a: `按当前行情，${exQty} ${cur} ≈ ${exVal} 韩元。实际到账金额因交易所手续费和需求而异，价格仅供参考。`,
+      },
+      {
+        q: `${serverName} ${cur} 行情如何确定，现在在涨吗？`,
+        a: `我们实时采集各交易所（Barotem、ItemMania、ItemBay）可交易挂单的最低价。最近 ${stats.days} 天${dir("上涨", "下跌", "基本持平")} ${chgAbs}%。`,
+      },
+    ];
+  }
+  if (locale === "ja") {
+    return [
+      {
+        q: `${serverName} ${gm} ${cur} の現在の相場は？`,
+        a: `現在の最安値は ${unit} ${cur} あたり約 ${n(stats.current)} ウォンです。直近 ${stats.days} 日間の平均は ${n(stats.avg)} ウォン（高値 ${n(stats.high)} / 安値 ${n(stats.low)} ウォン）でした。`,
+      },
+      {
+        q: `${serverName} で ${cur} を売るといくらになりますか？`,
+        a: `現在の相場で ${exQty} ${cur} ≈ ${exVal} ウォンです。実際の精算額は取引所の手数料や需要により変動し、価格は参考用です。`,
+      },
+      {
+        q: `${serverName} ${cur} の相場はどう決まり、今は上昇していますか？`,
+        a: `各取引所（Barotem・ItemMania・ItemBay）の取引可能な出品の最安値をリアルタイムで収集します。直近 ${stats.days} 日間で ${dir("上昇", "下落", "ほぼ横ばい")} ${chgAbs}% です。`,
+      },
+    ];
+  }
+  if (locale === "th") {
+    return [
+      {
+        q: `ราคา ${cur} เซิร์ฟเวอร์ ${serverName} ${gm} ตอนนี้เท่าไร?`,
+        a: `ราคาต่ำสุดขณะนี้อยู่ที่ประมาณ ${n(stats.current)} วอน ต่อ ${unit} ${cur} ในช่วง ${stats.days} วันที่ผ่านมาเฉลี่ย ${n(stats.avg)} วอน (สูงสุด ${n(stats.high)} / ต่ำสุด ${n(stats.low)} วอน)`,
+      },
+      {
+        q: `ขาย ${cur} บน ${serverName} ได้เท่าไร?`,
+        a: `ตามราคาปัจจุบัน ${exQty} ${cur} ≈ ${exVal} วอน ยอดที่ได้รับจริงขึ้นอยู่กับค่าธรรมเนียมตลาดและอุปสงค์ ราคาเป็นเพียงข้อมูลอ้างอิง`,
+      },
+      {
+        q: `ราคา ${cur} ของ ${serverName} กำหนดอย่างไร และกำลังขึ้นไหม?`,
+        a: `เรารวบรวมราคาต่ำสุดของประกาศที่ซื้อขายได้จากตลาด (Barotem, ItemMania, ItemBay) แบบเรียลไทม์ ในช่วง ${stats.days} วันที่ผ่านมา${dir("ขึ้น", "ลง", "เกือบคงที่")} ${chgAbs}%`,
+      },
+    ];
+  }
+  if (locale === "tl") {
+    return [
+      {
+        q: `Magkano ang ${cur} sa server na ${serverName} ${gm} ngayon?`,
+        a: `Ang pinakamababang presyo ngayon ay humigit-kumulang ${n(stats.current)} KRW kada ${unit} ${cur}. Sa nakalipas na ${stats.days} araw, nasa average na ${n(stats.avg)} KRW ito (pinakamataas ${n(stats.high)} / pinakamababa ${n(stats.low)} KRW).`,
+      },
+      {
+        q: `Magkano ang makukuha kapag nagbenta ng ${cur} sa ${serverName}?`,
+        a: `Sa kasalukuyang presyo, ${exQty} ${cur} ≈ ${exVal} KRW. Ang aktwal na matatanggap ay depende sa bayad ng exchange at demand; reference lamang ang presyo.`,
+      },
+      {
+        q: `Paano tinutukoy ang presyo ng ${cur} sa ${serverName}, at tumataas ba ito?`,
+        a: `Kinukuha namin ang pinakamababang presyo ng listing sa mga exchange (Barotem, ItemMania, ItemBay) nang real-time. Sa nakalipas na ${stats.days} araw, ${dir("tumaas", "bumaba", "halos pantay")} ito ng ${chgAbs}%.`,
+      },
+    ];
+  }
+  // ko
+  return [
+    {
+      q: `${serverName} ${gm} ${cur} 시세는 지금 얼마인가요?`,
+      a: `현재 ${unit} ${cur}당 최저 약 ${n(stats.current)}원입니다. 최근 ${stats.days}일간 평균 ${n(stats.avg)}원(최고 ${n(stats.high)}원 · 최저 ${n(stats.low)}원)에 거래됐습니다.`,
+    },
+    {
+      q: `${serverName}에서 ${cur}를 팔면 얼마나 받나요?`,
+      a: `현재 시세 기준 ${exQty} ${cur} ≈ ${exVal}원입니다. 실제 정산액은 거래소 수수료와 수요에 따라 달라지며, 표시 시세는 참고용입니다.`,
+    },
+    {
+      q: `${serverName} ${cur} 시세는 어떻게 정해지고, 지금 오르고 있나요?`,
+      a: `바로템·아이템매니아·아이템베이 등 거래소의 거래가능 매물 중 최저가를 실시간으로 수집합니다. 최근 ${stats.days}일간 ${dir("상승", "하락", "보합")} ${chgAbs}% 흐름입니다.`,
+    },
+  ];
+}
+
 // 게임 공통 FAQ (전용 FAQ 페이지용, 게임 무관)
 export function generalFaq(locale: Locale): FaqItem[] {
   if (locale === "en") {

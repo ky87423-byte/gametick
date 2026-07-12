@@ -10,7 +10,7 @@ import {
 } from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
-import { getServerExchangeTable } from "@/lib/market";
+import { getServerExchangeTable, serverStats } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { eventsForServer } from "@/lib/events";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
@@ -24,7 +24,8 @@ import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
 import { DiscordAlert } from "@/components/DiscordAlert";
 import { PriceCalc } from "@/components/PriceCalc";
-import { serverIntro } from "@/data/content";
+import { serverIntro, serverFaq } from "@/data/content";
+import { Faq } from "@/components/Faq";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 import { change24h, latestCount, latestPrice, readHistory } from "@/lib/history";
 
@@ -97,6 +98,9 @@ export default async function ServerDetail({
   ]);
   const change = change24h(history, server.id, data.current);
   const count = latestCount(history, server.id);
+  // 서버 고유 콘텐츠(롱테일 SEO): 최근 7일 시세 통계 + 실데이터 기반 FAQ.
+  const stats = serverStats(history, server.id);
+  const faqs = serverFaq(locale, game, serverName, stats);
   const unitText = dict.perUnit(game.unitAmount, currencyOf(game, locale));
   const secondary = secondaryCurrency(data.current, locale, rates);
   const crumbLd = breadcrumbLd([
@@ -193,6 +197,29 @@ export default async function ServerDetail({
           markers={markers}
         />
 
+        {/* 최근 7일 시세 통계 — 서버마다 값이 달라 고유 콘텐츠(롱테일 SEO) */}
+        {stats.avg !== null && (
+          <section className="mt-6">
+            <h2 className="mb-3 text-lg font-bold">
+              {dict.statsTitle}{" "}
+              <span className="text-sm font-normal text-zinc-500">
+                · {dict.statsPeriod(stats.days)}
+              </span>
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {stat(dict.avgPrice, formatKrw(stats.avg))}
+              {stat(dict.high, formatKrw(stats.high))}
+              {stat(dict.low, formatKrw(stats.low))}
+              {stat(
+                dict.listings,
+                stats.listingCount === null
+                  ? "—"
+                  : stats.listingCount.toLocaleString("ko-KR")
+              )}
+            </div>
+          </section>
+        )}
+
         {/* 거래소별 시세 비교 표 (활성 거래소 2곳 이상 = 리니지클래식·아이온2) */}
         {exchangeTable.columns.length >= 2 && (
           <ExchangeTablePanel
@@ -226,6 +253,24 @@ export default async function ServerDetail({
             {serverIntro(locale, game, serverName)}
           </p>
         </section>
+
+        {/* 서버 FAQ — 실데이터 기반, 서버마다 문장/숫자 상이 + FAQPage 스키마 */}
+        {faqs.length > 0 && (
+          <>
+            <Faq title={dict.faqTitle} items={faqs} />
+            <JsonLd
+              data={{
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: faqs.map((f) => ({
+                  "@type": "Question",
+                  name: f.q,
+                  acceptedAnswer: { "@type": "Answer", text: f.a },
+                })),
+              }}
+            />
+          </>
+        )}
       </main>
 
       <Footer locale={locale} />

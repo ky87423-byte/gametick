@@ -399,6 +399,48 @@ export async function getServerExchangeTable(
   };
 }
 
+export interface ServerStats {
+  current: number | null;
+  /** 최근 N일 최고/최저/평균 (despike 적용, 원/단위) */
+  high: number | null;
+  low: number | null;
+  avg: number | null;
+  /** 기간 등락률(%) — 첫 시점 대비 */
+  changePercent: number | null;
+  /** 최신 매물 수 */
+  listingCount: number | null;
+  /** 실제 데이터가 커버한 일수(≤windowDays). 0이면 데이터 없음 */
+  days: number;
+}
+
+/**
+ * 서버별 시세 통계 — 서버 페이지를 고유 콘텐츠로 만드는 핵심(롱테일 SEO).
+ * 페이지가 이미 읽은 history를 재사용하는 순수 함수(추가 I/O 없음).
+ */
+export function serverStats(
+  history: HistoryPoint[],
+  serverId: string,
+  windowDays = 7
+): ServerStats {
+  const current = latestPrice(history, serverId);
+  const listingCount = latestCount(history, serverId);
+  const since = Date.now() - windowDays * 24 * 60 * 60 * 1000;
+  const raw = despike(seriesFor(history, serverId, since));
+  if (raw.length === 0) {
+    return { current, high: null, low: null, avg: null, changePercent: null, listingCount, days: 0 };
+  }
+  const vals = raw.map((p) => p.v);
+  const high = Math.round(Math.max(...vals));
+  const low = Math.round(Math.min(...vals));
+  const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+  const first = raw[0].v;
+  const last = raw[raw.length - 1].v;
+  const changePercent = first > 0 ? ((last - first) / first) * 100 : null;
+  const spanMs = raw[raw.length - 1].t - raw[0].t;
+  const days = Math.max(1, Math.round(spanMs / (24 * 60 * 60 * 1000)));
+  return { current, high, low, avg, changePercent, listingCount, days };
+}
+
 export interface ServerChart {
   serverId: string;
   nameKo: string;

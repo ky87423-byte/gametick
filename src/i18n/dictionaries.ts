@@ -38,6 +38,8 @@ export interface Dictionary {
   hourly: string;
   daily: string;
   faqTitle: string;
+  statsTitle: string;
+  statsPeriod: (days: number) => string;
   calcTitle: string;
   calcAmount: string;
   calcWorth: string;
@@ -143,6 +145,8 @@ const ko: Dictionary = {
   hourly: "1시간",
   daily: "일간",
   faqTitle: "자주 묻는 질문",
+  statsTitle: "시세 통계",
+  statsPeriod: (d) => `최근 ${d}일`,
   calcTitle: "시세 계산기",
   calcAmount: "수량",
   calcWorth: "예상 가치",
@@ -245,6 +249,8 @@ const vi: Dictionary = {
   hourly: "1 giờ",
   daily: "Hàng ngày",
   faqTitle: "Câu hỏi thường gặp",
+  statsTitle: "Thống kê giá",
+  statsPeriod: (d) => `${d} ngày qua`,
   calcTitle: "Máy tính giá",
   calcAmount: "Số lượng",
   calcWorth: "Giá trị ước tính",
@@ -348,6 +354,8 @@ const en: Dictionary = {
   hourly: "1 Hour",
   daily: "Daily",
   faqTitle: "FAQ",
+  statsTitle: "Price statistics",
+  statsPeriod: (d) => `Last ${d} day${d === 1 ? "" : "s"}`,
   calcTitle: "Price calculator",
   calcAmount: "Amount",
   calcWorth: "Estimated value",
@@ -452,6 +460,8 @@ const zh: Dictionary = {
   hourly: "1小时",
   daily: "每日",
   faqTitle: "常见问题",
+  statsTitle: "行情统计",
+  statsPeriod: (d) => `最近 ${d} 天`,
   calcTitle: "行情计算器",
   calcAmount: "数量",
   calcWorth: "预估价值",
@@ -555,6 +565,8 @@ const ja: Dictionary = {
   hourly: "1時間",
   daily: "日別",
   faqTitle: "よくある質問",
+  statsTitle: "相場統計",
+  statsPeriod: (d) => `直近 ${d} 日`,
   calcTitle: "相場計算機",
   calcAmount: "数量",
   calcWorth: "予想価値",
@@ -659,6 +671,8 @@ const th: Dictionary = {
   hourly: "1 ชม.",
   daily: "รายวัน",
   faqTitle: "คำถามที่พบบ่อย",
+  statsTitle: "สถิติราคา",
+  statsPeriod: (d) => `${d} วันล่าสุด`,
   calcTitle: "เครื่องคำนวณราคา",
   calcAmount: "จำนวน",
   calcWorth: "มูลค่าโดยประมาณ",
@@ -764,6 +778,8 @@ const tl: Dictionary = {
   hourly: "1 Oras",
   daily: "Araw-araw",
   faqTitle: "Mga FAQ",
+  statsTitle: "Estadistika ng presyo",
+  statsPeriod: (d) => `Nakalipas na ${d} araw`,
   calcTitle: "Calculator ng presyo",
   calcAmount: "Dami",
   calcWorth: "Tinatayang halaga",
