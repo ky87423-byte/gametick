@@ -115,8 +115,6 @@ export function MarketTable({
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   // 현재가 컬럼에 표시할 거래소 (기본 바로템). 클릭 시 표 전체가 그 거래소 시세로.
   const [selectedExchange, setSelectedExchange] = useState("barotem");
-  const priceOf = (s: ServerRow) =>
-    s.quotes?.find((q) => q.exchange === selectedExchange)?.price ?? null;
   const sortBy = (key: "price" | "change" | "listings") => {
     if (sortKey === key) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
     else {
@@ -130,6 +128,23 @@ export function MarketTable({
   const [live, setLive] = useState(false);
   const favKey = `gametick:fav:${gameSlug}`;
   const tickRef = useRef(0);
+
+  // 이 게임에 실제 데이터가 있는 거래소만 — 바로템만 수집하는 게임은
+  // 아이템매니아/베이 아이콘을 숨겨 "—" 클릭 혼란을 없앤다.
+  const availableExchanges = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of rows) for (const q of s.quotes ?? []) set.add(q.exchange);
+    return set;
+  }, [rows]);
+  const activeExchange = availableExchanges.has(selectedExchange)
+    ? selectedExchange
+    : "barotem";
+  const priceOf = (s: ServerRow) =>
+    s.quotes?.find((q) => q.exchange === activeExchange)?.price ?? null;
+  const visibleIcons = EXCHANGE_ICONS.filter((ex) =>
+    availableExchanges.has(ex.id)
+  );
+  const showSelector = visibleIcons.length >= 2;
 
   useEffect(() => {
     setRows(servers);
@@ -324,30 +339,32 @@ export function MarketTable({
                       {sortKey === "price" ? (sortDir === "asc" ? "▲" : "▼") : "↕"}
                     </span>
                   </button>
-                  <div className="flex gap-1">
-                    {EXCHANGE_ICONS.map((ex) => (
-                      <button
-                        key={ex.id}
-                        type="button"
-                        title={ex.name}
-                        aria-pressed={selectedExchange === ex.id}
-                        onClick={() => setSelectedExchange(ex.id)}
-                        className={`rounded p-0.5 ring-1 transition ${
-                          selectedExchange === ex.id
-                            ? "bg-amber-400/10 ring-amber-400"
-                            : "opacity-40 ring-transparent hover:opacity-90"
-                        }`}
-                      >
-                        <Image
-                          src={`/exchanges/${ex.id}.png`}
-                          alt={ex.name}
-                          width={16}
-                          height={16}
-                          className="rounded-sm"
-                        />
-                      </button>
-                    ))}
-                  </div>
+                  {showSelector && (
+                    <div className="flex gap-1">
+                      {visibleIcons.map((ex) => (
+                        <button
+                          key={ex.id}
+                          type="button"
+                          title={ex.name}
+                          aria-pressed={activeExchange === ex.id}
+                          onClick={() => setSelectedExchange(ex.id)}
+                          className={`rounded p-0.5 ring-1 transition ${
+                            activeExchange === ex.id
+                              ? "bg-amber-400/10 ring-amber-400"
+                              : "opacity-40 ring-transparent hover:opacity-90"
+                          }`}
+                        >
+                          <Image
+                            src={`/exchanges/${ex.id}.png`}
+                            alt={ex.name}
+                            width={16}
+                            height={16}
+                            className="rounded-sm"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </th>
               {sortableHeader("change", labels.change24h)}
@@ -397,7 +414,7 @@ export function MarketTable({
                 </td>
                 <td className="px-3 py-2 text-right">
                   <div className="font-mono tabular-nums">
-                    {selectedExchange === "itemmania" && priceOf(s) !== null
+                    {activeExchange === "itemmania" && priceOf(s) !== null
                       ? "~"
                       : ""}
                     {formatKrw(priceOf(s))}
