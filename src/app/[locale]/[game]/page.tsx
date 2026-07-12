@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getMarketTable, summarize } from "@/lib/market";
+import { getMarketTable, summarize, movers } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
@@ -18,7 +18,7 @@ import { MarketTable } from "@/components/MarketTable";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
-import { formatKrw, formatViewers } from "@/lib/format";
+import { formatKrw, formatViewers, changeText, changeColor } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +69,7 @@ export default async function GamePage({
     fetchPopularVideos(keyword, 5),
   ]);
   const summary = summarize(table);
+  const move = movers(table, 5);
   const namedRanks = popularVideos.map((v, i) => ({
     rank: i + 1,
     name: v.title,
@@ -206,6 +207,63 @@ export default async function GamePage({
             </a>
           </aside>
         </div>
+
+        {/* 오늘의 급등/급락 — SEO용 텍스트 섹션(서버명·등락%·가격). 검색엔진이 읽는다. */}
+        {(move.gainers.length > 0 || move.losers.length > 0) && (
+          <section className="mt-8">
+            <h2 className="text-lg font-bold">
+              {dict.moversTitle} · {gameNameOf(game, locale)}{" "}
+              {currencyOf(game, locale)}
+            </h2>
+            <p className="mb-3 text-xs text-zinc-500">{dict.moversNote}</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(
+                [
+                  ["rise", move.gainers, "text-red-400"],
+                  ["fall", move.losers, "text-blue-400"],
+                ] as const
+              ).map(([kind, list, color]) => (
+                <div
+                  key={kind}
+                  className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40 p-3"
+                >
+                  <h3 className={`mb-2 text-sm font-semibold ${color}`}>
+                    {kind === "rise" ? dict.rise : dict.fall}
+                  </h3>
+                  {list.length === 0 ? (
+                    <p className="text-xs text-zinc-600">—</p>
+                  ) : (
+                    <ol className="space-y-1 text-sm">
+                      {list.map((s) => (
+                        <li
+                          key={s.serverId}
+                          className="flex items-center justify-between gap-2"
+                        >
+                          <Link
+                            href={`/${locale}/${game.slug}/${s.serverId}`}
+                            className="min-w-0 flex-1 truncate text-zinc-200 hover:text-amber-300"
+                          >
+                            {s.nameKo}
+                          </Link>
+                          <span
+                            className={`shrink-0 font-mono tabular-nums ${changeColor(
+                              s.change24hPercent
+                            )}`}
+                          >
+                            {changeText(s.change24hPercent)}
+                          </span>
+                          <span className="shrink-0 font-mono tabular-nums text-zinc-400">
+                            {formatKrw(s.priceKrw)}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 인기 영상 / BJ 순위 */}
         <section className="mt-8">

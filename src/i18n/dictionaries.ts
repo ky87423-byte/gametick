@@ -77,6 +77,8 @@ export interface Dictionary {
   topLosers: string;
   rise: string;
   fall: string;
+  moversTitle: string;
+  moversNote: string;
   // 상세
   currentPrice: string;
   high: string;
@@ -172,6 +174,8 @@ const ko: Dictionary = {
   topLosers: "급락 TOP",
   rise: "급등",
   fall: "급락",
+  moversTitle: "오늘의 급등·급락",
+  moversNote: "지난 24시간 기준",
   currentPrice: "현재가",
   high: "최고",
   low: "최저",
@@ -266,6 +270,8 @@ const vi: Dictionary = {
   topLosers: "Giảm mạnh",
   rise: "Tăng",
   fall: "Giảm",
+  moversTitle: "Tăng/Giảm hôm nay",
+  moversNote: "Trong 24 giờ qua",
   currentPrice: "Giá hiện tại",
   high: "Cao",
   low: "Thấp",
@@ -362,6 +368,8 @@ const en: Dictionary = {
   topLosers: "Top losers",
   rise: "Rise",
   fall: "Fall",
+  moversTitle: "Today’s biggest movers",
+  moversNote: "Past 24 hours",
   currentPrice: "Price",
   high: "High",
   low: "Low",
@@ -457,6 +465,8 @@ const zh: Dictionary = {
   topLosers: "跌幅榜",
   rise: "涨",
   fall: "跌",
+  moversTitle: "今日涨跌榜",
+  moversNote: "过去24小时",
   currentPrice: "现价",
   high: "最高",
   low: "最低",
@@ -553,6 +563,8 @@ const ja: Dictionary = {
   topLosers: "急落TOP",
   rise: "急騰",
   fall: "急落",
+  moversTitle: "本日の急騰・急落",
+  moversNote: "過去24時間",
   currentPrice: "現在価格",
   high: "高値",
   low: "安値",
@@ -649,6 +661,8 @@ const th: Dictionary = {
   topLosers: "ลงแรงสุด",
   rise: "ขึ้น",
   fall: "ลง",
+  moversTitle: "ขึ้น/ลงวันนี้",
+  moversNote: "ใน 24 ชั่วโมงที่ผ่านมา",
   currentPrice: "ราคา",
   high: "สูงสุด",
   low: "ต่ำสุด",
@@ -746,6 +760,8 @@ const tl: Dictionary = {
   topLosers: "Pinakabumaba",
   rise: "Taas",
   fall: "Baba",
+  moversTitle: "Taas/Baba ngayon",
+  moversNote: "Nakaraang 24 oras",
   currentPrice: "Presyo",
   high: "Mataas",
   low: "Mababa",
