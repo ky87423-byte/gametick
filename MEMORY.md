@@ -1,7 +1,9 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-07-11 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> 마지막 갱신: 2026-07-12 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
 > **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
+>
+> **2026-07-12 요약**(worklog "2026-07-12"): 모바일 테이블 오버플로우 수정(가로스크롤), **다국어 SEO 대폭 보강** — hreflang(페이지+sitemap 17k, `lib/seo.ts`), sitemap lastmod, vi 통화 로마자화(Adena), `<html lang>` 로케일 교정. 6개 외국어 전수 확인 완료. 색인은 서치콘솔 확인 대기.
 >
 > **최근 세션(2026-07-11) 요약** — 상세는 worklog "2026-07-11" 섹션:
 > - **캔들차트 lightweight-charts v4 전면개편**: 크로스헤어 툴팁·로케일 시간대·자릿수 눈금·타임프레임별 기본뷰·MA토글(기본OFF)·3분봉 선차트 자동전환.
@@ -198,6 +200,7 @@ VPS: **Shinjiru `111.90.148.135`**, SSH `ssh -i "$env:USERPROFILE\.ssh\lc_info_d
 | `src/lib/alerts.ts` | 브라우저 가격알림(localStorage, 백엔드 없음) |
 | `src/lib/exchange.ts` | KRW→VND/USD 환율(1시간 캐시, er-api) |
 | `src/lib/format.ts` | 한국식 색상(상승빨강/하락파랑)·포맷 |
+| `src/lib/seo.ts` | **hreflang** 언어대체(`altLanguages`, 게임·서버 metadata + sitemap). 통화는 `data/games.ts currencyOf`(ko만 한글, 그외 로마자 Adena) |
 | `src/i18n/{config,dictionaries}.ts` | ko/vi 로케일 + 카피 |
 | `src/components/Header,Footer,MarketTable,Sparkline,AlertButton,FavoritesView` | UI. MarketTable이 클라이언트(폴링·정렬·검색·즐겨찾기). **MarketTable 현재가 헤더에 거래소 로고 토글(바로템 기본)→그 거래소 시세로 전환, 전부 클라이언트** |
 | `src/components/LightweightChart.tsx` | **캔들차트(lightweight-charts v4)**. 라이트/다크·로케일 시간대·크로스헤어툴팁·자릿수 눈금·despike된 데이터. 3m 몸통0면 선차트. |

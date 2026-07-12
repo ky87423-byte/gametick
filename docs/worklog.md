@@ -358,6 +358,26 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ---
 
+## 2026-07-12 — 모바일 오버플로우 · 다국어 SEO(hreflang)
+
+> 모바일 레이아웃 점검 + 다국어 SEO 대폭 보강. 전부 배포·라이브.
+
+### 모바일 오버플로우 전수 점검 (`c90c9fb`)
+- 코드 전반 스캔(테이블·고정폭·nowrap·flex). **시세표·즐겨찾기 테이블**만 `overflow-hidden`이라 현재가 헤더 거래소 로고 추가 후 좁은 화면서 컬럼 잘림 → **`overflow-x-auto`(가로 스크롤)** + `min-w-340px`. 나머지(TradeFeed·LivePlayer·GameNav·Header 등)는 이미 `min-w-0`/`truncate`/스크롤 처리로 안전.
+
+### 다국어 SEO — hreflang + lastmod (`d324dc7`)
+- **최대 격차였던 hreflang 부재 해결**. `lib/seo.ts altLanguages` → 게임·서버 페이지 metadata `alternates.languages`(7언어+x-default). **sitemap** 전 2,128 URL에 `alternates.languages`(hreflang **17,024개**) + `lastModified`. 구글이 ko/en/zh/vi/ja/th/tl을 **중복 아닌 언어 대체**로 인식.
+
+### 다국어 콘텐츠 SEO 교정 (`b07ee84`)
+- **`currencyOf` vi도 로마자화**: 기존 `ko·vi 한글통화 유지`라 vi 페이지가 "아데나"(한글) → 이제 **`Adena`**(비한국어 검색자 키워드 매칭). ko만 한글, 나머지 6개 로마자.
+- **`<html lang>` 로케일 교정**: 루트 layout이 `lang="ko"` 고정(locale 접근 불가 구조)이라, 인라인 스크립트로 URL 로케일 기준 교정. 언어 타깃팅 1차 신호는 서버렌더 hreflang, lang은 보조.
+- **6개 외국어 전수 확인**: en/zh/ja/th/tl/vi 게임페이지 제목·설명·본문 전부 해당 언어로 정상 번역, 통화 `Adena` 통일, 한국어 누락 없음.
+
+### 구글 색인 상태
+- 서치콘솔 접근 불가(로그인). 미국 구글 `site:`엔 미노출(경쟁사 gamebit은 노출) — 신규 도메인 초기 정상 범위. **서치콘솔에서 색인 리포트·URL검사·사이트맵(hreflang·lastmod 추가로 재제출) 확인 필요**. SEO 기술 요소(sitemap·robots·canonical·JSON-LD·og:image·hreflang·lang)는 이제 전부 갖춤.
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
 0. **(운영·모니터링) 색인 상태 확인** — 며칠 뒤 구글 서치콘솔 "색인 생성" 리포트 + `site:gamesise.co.kr`로 색인 페이지 수 증가 확인. 네이버 서치어드바이저 "검색 노출/수집" 현황도. 색인 지연/오류(예: 제외 사유) 있으면 대응. 대표 URL 색인요청 추가(하루 할당 재충전).
