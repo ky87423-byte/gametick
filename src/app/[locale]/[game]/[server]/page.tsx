@@ -26,6 +26,7 @@ import { DiscordAlert } from "@/components/DiscordAlert";
 import { PriceCalc } from "@/components/PriceCalc";
 import { serverIntro, serverFaq } from "@/data/content";
 import { Faq } from "@/components/Faq";
+import { GuideLinks } from "@/components/GuideLinks";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 import { change24h, latestCount, latestPrice, readHistory } from "@/lib/history";
 
@@ -253,6 +254,8 @@ export default async function ServerDetail({
             {serverIntro(locale, game, serverName)}
           </p>
         </section>
+
+        <GuideLinks locale={locale} title={dict.relatedGuides} />
 
         {/* 서버 FAQ — 실데이터 기반, 서버마다 문장/숫자 상이 + FAQPage 스키마 */}
         {faqs.length > 0 && (

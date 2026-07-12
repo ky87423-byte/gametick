@@ -25,6 +25,7 @@ import { Footer } from "@/components/Footer";
 import { MarketTable } from "@/components/MarketTable";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
+import { GuideLinks } from "@/components/GuideLinks";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { formatKrw, formatViewers, changeText, changeColor } from "@/lib/format";
 
@@ -306,6 +307,8 @@ export default async function GamePage({
             {gameIntro(locale, game)}
           </p>
         </section>
+
+        <GuideLinks locale={locale} title={dict.relatedGuides} />
 
         {/* 게임 FAQ — 화면에 보이는 Q&A + FAQPage 스키마(실제 표시 내용과 일치) */}
         {faqs.length > 0 && (

@@ -75,6 +75,7 @@ export interface Dictionary {
   avgChangeLabel: string;
   reportEmpty: string;
   guideNav: string;
+  relatedGuides: string;
   sortBy: string;
   sortDefault: string;
   sortPrice: string;
@@ -188,6 +189,7 @@ const ko: Dictionary = {
   avgChangeLabel: "평균 등락",
   reportEmpty: "데이터가 쌓이는 중입니다.",
   guideNav: "가이드",
+  relatedGuides: "관련 가이드",
   sortBy: "정렬",
   sortDefault: "기본",
   sortPrice: "가격순",
@@ -298,6 +300,7 @@ const vi: Dictionary = {
   avgChangeLabel: "Biến động TB",
   reportEmpty: "Đang thu thập dữ liệu.",
   guideNav: "Hướng dẫn",
+  relatedGuides: "Hướng dẫn liên quan",
   sortBy: "Sắp xếp",
   sortDefault: "Mặc định",
   sortPrice: "Theo giá",
@@ -410,6 +413,7 @@ const en: Dictionary = {
   avgChangeLabel: "Avg change",
   reportEmpty: "Collecting data.",
   guideNav: "Guide",
+  relatedGuides: "Related guides",
   sortBy: "Sort",
   sortDefault: "Default",
   sortPrice: "By price",
@@ -521,6 +525,7 @@ const zh: Dictionary = {
   avgChangeLabel: "平均涨跌",
   reportEmpty: "数据积累中。",
   guideNav: "指南",
+  relatedGuides: "相关指南",
   sortBy: "排序",
   sortDefault: "默认",
   sortPrice: "按价格",
@@ -633,6 +638,7 @@ const ja: Dictionary = {
   avgChangeLabel: "平均騰落",
   reportEmpty: "データを収集中です。",
   guideNav: "ガイド",
+  relatedGuides: "関連ガイド",
   sortBy: "並べ替え",
   sortDefault: "デフォルト",
   sortPrice: "価格順",
@@ -745,6 +751,7 @@ const th: Dictionary = {
   avgChangeLabel: "เปลี่ยนแปลงเฉลี่ย",
   reportEmpty: "กำลังรวบรวมข้อมูล",
   guideNav: "คู่มือ",
+  relatedGuides: "คู่มือที่เกี่ยวข้อง",
   sortBy: "เรียงลำดับ",
   sortDefault: "ค่าเริ่มต้น",
   sortPrice: "ตามราคา",
@@ -858,6 +865,7 @@ const tl: Dictionary = {
   avgChangeLabel: "Avg na pagbabago",
   reportEmpty: "Nangongolekta ng data.",
   guideNav: "Gabay",
+  relatedGuides: "Kaugnay na gabay",
   sortBy: "Ayusin",
   sortDefault: "Default",
   sortPrice: "Ayon sa presyo",

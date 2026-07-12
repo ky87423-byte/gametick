@@ -13,6 +13,49 @@ export interface Guide {
 
 const ko: Guide[] = [
   {
+    slug: "glossary",
+    summary: "아데나·다이아·키나·메소 등 게임머니 용어 정리",
+    doc: {
+      title: "게임머니 용어 사전",
+      intro:
+        "게임시세에서 자주 쓰는 용어와 게임별 화폐를 한눈에 정리했습니다.",
+      sections: [
+        {
+          heading: "게임머니 화폐 종류",
+          paragraphs: [
+            "아데나(Adena) — 리니지 클래식 등 리니지 시리즈의 대표 게임머니입니다.",
+            "다이아(Dia) — 나이트크로우·리니지M·오딘·로드나인 등 여러 모바일 게임에서 쓰는 재화입니다. 같은 ‘다이아’라도 게임마다 시세가 다릅니다.",
+            "키나(Kinah) — 아이온·아이온2의 게임머니입니다.",
+            "메소(Meso) — 메이플스토리 월드 계열의 게임머니입니다.",
+          ],
+        },
+        {
+          heading: "시세 단위 (만당·천만당·백만당)",
+          paragraphs: [
+            "표시 가격은 ‘일정 수량당 원화’입니다. 예를 들어 아데나 만당 1,500원은 1만 아데나가 1,500원이라는 뜻입니다.",
+            "게임마다 기준 수량이 다릅니다 — 아데나는 만당, 키나는 천만당, 메소는 백만당 기준입니다.",
+          ],
+        },
+        {
+          heading: "최저가·등락률·매물 수",
+          paragraphs: [
+            "최저가 — 거래소의 거래가능 매물 중 가장 낮은 판매가로, 우리가 표시하는 현재가 기준입니다.",
+            "등락률 — 24시간 전 대비 가격 변화율입니다(한국 관례상 상승 빨강·하락 파랑).",
+            "매물 수 — 해당 서버의 현재 거래가능 매물 건수입니다. 많을수록 거래가 활발하고 유동성이 높습니다.",
+          ],
+        },
+        {
+          heading: "거래 관련 용어",
+          paragraphs: [
+            "거래소 — 개인 간 게임머니 매매를 중개하는 플랫폼입니다(바로템·아이템매니아·아이템베이 등).",
+            "안전결제(에스크로) — 거래소가 대금을 보관하고 게임머니 전달이 확인된 뒤 판매자에게 지급하는 방식으로, 선입금 사기를 막습니다.",
+            "현금화 — 게임머니를 거래소를 통해 원화로 바꾸는 것입니다. 자세한 내용은 현금화 가이드를 참고하세요.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "cash-out",
     summary: "게임머니 현금화 방법·정산액·위험·세금 총정리",
     doc: {
@@ -261,6 +304,49 @@ const ko: Guide[] = [
 
 const vi: Guide[] = [
   {
+    slug: "glossary",
+    summary: "Adena, Dia, Kinah, Meso và các thuật ngữ giao dịch",
+    doc: {
+      title: "Từ điển tiền game",
+      intro:
+        "Tổng hợp các thuật ngữ dùng trên GameSise và loại tiền của từng game.",
+      sections: [
+        {
+          heading: "Các loại tiền game",
+          paragraphs: [
+            "Adena — tiền chính của dòng Lineage, bao gồm Lineage Classic.",
+            "Dia (Kim cương) — dùng trong nhiều game mobile như Night Crows, Lineage M, Odin, Lord Nine. Cùng là ‘Dia’ nhưng giá khác nhau theo từng game.",
+            "Kinah — tiền của Aion và Aion 2.",
+            "Meso — tiền của dòng MapleStory World.",
+          ],
+        },
+        {
+          heading: "Đơn vị giá (mỗi 10.000 / 10.000.000 / 1.000.000)",
+          paragraphs: [
+            "Giá hiển thị là KRW cho một số lượng cố định. Ví dụ 1.500 KRW cho mỗi 10.000 Adena nghĩa là 10.000 Adena giá 1.500 KRW.",
+            "Số lượng cơ sở khác nhau theo game — Adena mỗi 10.000, Kinah mỗi 10.000.000, Meso mỗi 1.000.000.",
+          ],
+        },
+        {
+          heading: "Giá thấp nhất, biến động, số tin đăng",
+          paragraphs: [
+            "Giá thấp nhất — tin đăng rẻ nhất có thể giao dịch trên sàn; là giá hiện tại chúng tôi hiển thị.",
+            "Biến động — thay đổi giá so với 24 giờ trước (theo thông lệ Hàn Quốc, tăng màu đỏ, giảm màu xanh).",
+            "Số tin đăng — số tin có thể giao dịch trên máy chủ đó. Càng nhiều thì thanh khoản càng cao.",
+          ],
+        },
+        {
+          heading: "Thuật ngữ giao dịch",
+          paragraphs: [
+            "Sàn giao dịch — nền tảng môi giới mua bán tiền game giữa cá nhân (Barotem, ItemMania, ItemBay...).",
+            "Thanh toán bảo đảm (escrow) — sàn giữ tiền và chỉ trả cho người bán sau khi xác nhận đã giao, ngăn lừa đảo trả trước.",
+            "Quy đổi tiền mặt — bán tiền game lấy tiền mặt qua sàn. Xem hướng dẫn quy đổi để biết chi tiết.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "cash-out",
     summary: "Cách bán tiền game — số tiền nhận, rủi ro, thuế",
     doc: {
@@ -480,6 +566,49 @@ const vi: Guide[] = [
 
 const en: Guide[] = [
   {
+    slug: "glossary",
+    summary: "Adena, Dia, Kinah, Meso and key trading terms",
+    doc: {
+      title: "Game Currency Glossary",
+      intro:
+        "The terms used on GameSise and the game currency for each game, at a glance.",
+      sections: [
+        {
+          heading: "Types of game currency",
+          paragraphs: [
+            "Adena — the main currency of the Lineage series, including Lineage Classic.",
+            "Dia (Diamond) — used in many mobile games such as Night Crows, Lineage M, Odin and Lord Nine. Even the same ‘Dia’ has a different price per game.",
+            "Kinah — the currency of Aion and Aion 2.",
+            "Meso — the currency of the MapleStory World family.",
+          ],
+        },
+        {
+          heading: "Price unit (per 10,000 / 10,000,000 / 1,000,000)",
+          paragraphs: [
+            "The displayed price is KRW per a fixed quantity. For example, 1,500 KRW per 10,000 Adena means 10,000 Adena costs 1,500 KRW.",
+            "The base quantity differs by game — Adena per 10,000, Kinah per 10,000,000, Meso per 1,000,000.",
+          ],
+        },
+        {
+          heading: "Lowest price, change, listings",
+          paragraphs: [
+            "Lowest price — the cheapest tradable listing on the exchanges; the current price we show.",
+            "Change — the price move vs 24 hours ago (by Korean convention, up is red and down is blue).",
+            "Listings — the number of tradable listings on that server. More means higher liquidity.",
+          ],
+        },
+        {
+          heading: "Trading terms",
+          paragraphs: [
+            "Exchange — a platform that brokers peer-to-peer game-currency trades (Barotem, ItemMania, ItemBay, etc.).",
+            "Escrow (safe payment) — the exchange holds the payment and releases it to the seller after delivery is confirmed, preventing upfront-payment scams.",
+            "Cashing out — selling game currency for cash through an exchange. See the cash-out guide for details.",
+          ],
+        },
+      ],
+    },
+  },
+  {
     slug: "cash-out",
     summary: "How to cash out game money — payout, risks, taxes",
     doc: {
@@ -698,6 +827,48 @@ const en: Guide[] = [
 ];
 
 const zh: Guide[] = [
+  {
+    slug: "glossary",
+    summary: "阿德纳、钻石、Kinah、Meso 等游戏币术语",
+    doc: {
+      title: "游戏币术语词典",
+      intro: "汇总 GameSise 常用术语与各游戏的游戏币。",
+      sections: [
+        {
+          heading: "游戏币种类",
+          paragraphs: [
+            "阿德纳(Adena)— 天堂系列（含天堂 Classic）的主要游戏币。",
+            "钻石(Dia)— 用于夜鸦、天堂M、奥丁、Lord Nine 等多款手游。同为‘钻石’，各游戏行情不同。",
+            "Kinah — 永恒之塔与永恒之塔2 的游戏币。",
+            "Meso — 冒险岛世界系列的游戏币。",
+          ],
+        },
+        {
+          heading: "价格单位（每 10,000 / 10,000,000 / 1,000,000）",
+          paragraphs: [
+            "显示价格为每一固定数量的韩元。例如每 10,000 阿德纳 1,500 韩元，表示 10,000 阿德纳价值 1,500 韩元。",
+            "各游戏基准数量不同 — 阿德纳每 10,000，Kinah 每 10,000,000，Meso 每 1,000,000。",
+          ],
+        },
+        {
+          heading: "最低价、涨跌、在售数",
+          paragraphs: [
+            "最低价 — 交易所可交易挂单中最便宜的售价，即我们显示的当前价。",
+            "涨跌 — 与 24 小时前相比的价格变化（按韩国惯例，涨为红、跌为蓝）。",
+            "在售数 — 该服务器当前可交易的挂单数量。越多流动性越高。",
+          ],
+        },
+        {
+          heading: "交易相关术语",
+          paragraphs: [
+            "交易所 — 撮合个人之间游戏币买卖的平台（Barotem、ItemMania、ItemBay 等）。",
+            "担保交易（托管）— 交易所代管货款，确认交付后再付给卖家，防止先付款诈骗。",
+            "变现 — 通过交易所把游戏币换成现金。详情请参阅变现指南。",
+          ],
+        },
+      ],
+    },
+  },
   {
     slug: "cash-out",
     summary: "游戏币如何变现——到手金额、风险、税务",
