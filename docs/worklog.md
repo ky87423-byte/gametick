@@ -422,6 +422,13 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **P1-④**: 미사용이던 `faqItems()`를 14개 게임 페이지에 렌더 + FAQPage 스키마. 검증: 화면 summary 5 = Q마커 5 = 스키마 Question 5(표시=마크업, 규정준수), aion2 "per 10,000,000", 1200→1575단어.
 - **P1-⑥**: 정보성 가이드 2종 신설(원본) — `cash-out`(현금화: 정의·정식거래소·정산액·시세확인·위험·세금/합법성·체크리스트·고지 8섹션), `exchange-guide`(거래소: 개념·주요3사·비교·에스크로·수수료·확인·고지). ko/en/vi/zh(ja/th/tl=en폴백). **ToS/법률 단정 회피·위험고지·전문가상담 권고**로 규정 안전. 검증: 4언어 200·제목 로컬라이즈·가이드목록/사이트맵 자동반영.
 
+### 신규 게임 추가: 오딘: 발할라 라이징 (108서버, grouped 수집) (`4da7a7a` + lc_vn `d8f4d4d`)
+- **점검**: 수집 14 = 표시 14(누락 없음). 단 바로템 인기 게임머니 10개 중 **오딘만 미표시** 발견 → 즉시 추가.
+- **grouped 수집 신설(방식 B)**: 오딘 서버 108개(북유럽 12그룹×9)라 서버별 필터 108회 대신, **전체 매물 페이징(~14회) 후 서버명 그룹핑**. lc_vn `barotem.ts`에 `fetchAllRows`+`fetchGroupedQuotes`(robustLowest 재사용), `GameInfo.collectMode:"grouped"`, `fetchSnapshot` 분기. 매칭 키=서버 nameKo=바로템 server 필드.
+- **양쪽 등록**: lc_vn site.ts(다이아·만·108서버·grouped) + gametick games.ts(동일 108서버, 로마자 nameEn). 빌드 게이트 후 pm2 reload.
+- **검증**: history-odin.json 108/108 서버 시세 수집(18,966~70,000원). `/ko/odin` 200·시세표·홈카드, `/ko/odin/odin-03` 통계+FAQ 자동, `/en/odin` 로마자(Skadi 02…). **기존 P0/P1 기능 전부 신규 게임에 자동 적용 확인.**
+- lc_vn 로컬 작업본: `C:\Users\User\lc_vn_work`(향후 수집기 편집용 클론).
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
