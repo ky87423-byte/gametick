@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Sparkline } from "@/components/Sparkline";
 import { changeColor, changeText, formatKrw, formatTime } from "@/lib/format";
 import { secondaryCurrency, type Rates } from "@/lib/exchange";
+import { localizedName } from "@/data/games";
 import { checkAlerts } from "@/lib/alerts";
 
 // 현재가 컬럼에서 볼 거래소 선택용 (로고 = public/exchanges/{id}.png)
@@ -382,7 +383,7 @@ export function MarketTable({
                   </button>
                 </td>
                 <td className="px-3 py-2 font-medium">
-                  {s.nameKo}
+                  {localizedName(s.nameKo, s.nameEn, locale)}
                   {s.serverId === gainerId && (
                     <span className="ml-1 text-xs font-semibold text-red-400">
                       ({labels.rise})

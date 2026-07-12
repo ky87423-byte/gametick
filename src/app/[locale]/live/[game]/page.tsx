@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { findGame, liveQuery } from "@/data/games";
+import { findGame, liveQuery, gameNameOf } from "@/data/games";
 import { fetchAllLives } from "@/lib/live";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -21,8 +21,8 @@ export async function generateMetadata({
   const game = findGame(slug);
   if (!game || !isLocale(locale)) return {};
   const dict = getDictionary(locale as Locale);
-  const title = `${game.nameKo} ${dict.liveNav} | ${dict.brand}`;
-  const description = `${game.nameKo} 실시간 방송 — 치지직·SOOP·유튜브 라이브를 한 화면에서. ${dict.brand}.`;
+  const title = `${gameNameOf(game, locale)} ${dict.liveNav} | ${dict.brand}`;
+  const description = `${gameNameOf(game, locale)} 실시간 방송 — 치지직·SOOP·유튜브 라이브를 한 화면에서. ${dict.brand}.`;
   return {
     title,
     description,
@@ -59,7 +59,7 @@ export default async function LivePage({
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
         <div className="mb-1 flex items-baseline justify-between gap-2">
           <h1 className="text-2xl font-bold tracking-tight">
-            {game.nameKo} {dict.liveNav}
+            {gameNameOf(game, locale)} {dict.liveNav}
           </h1>
           <Link
             href={`/${locale}/${game.slug}`}

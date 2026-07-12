@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GAMES } from "@/data/games";
+import { GAMES, localizedName } from "@/data/games";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 
 interface Row {
@@ -10,6 +10,7 @@ interface Row {
   gameName: string;
   serverId: string;
   nameKo: string;
+  nameEn: string;
   priceKrw: number | null;
   change24hPercent: number | null;
 }
@@ -33,7 +34,11 @@ export function FavoritesView({
           const raw = localStorage.getItem(`gametick:fav:${g.slug}`);
           const ids: string[] = raw ? JSON.parse(raw) : [];
           if (ids.length)
-            wanted.push({ slug: g.slug, name: g.nameKo, ids: new Set(ids) });
+            wanted.push({
+              slug: g.slug,
+              name: localizedName(g.nameKo, g.nameEn, locale),
+              ids: new Set(ids),
+            });
         } catch {}
       }
       const out: Row[] = [];
@@ -48,6 +53,7 @@ export function FavoritesView({
               servers: {
                 serverId: string;
                 nameKo: string;
+                nameEn: string;
                 priceKrw: number | null;
                 change24hPercent: number | null;
               }[];
@@ -59,6 +65,7 @@ export function FavoritesView({
                   gameName: w.name,
                   serverId: s.serverId,
                   nameKo: s.nameKo,
+                  nameEn: s.nameEn,
                   priceKrw: s.priceKrw,
                   change24hPercent: s.change24hPercent,
                 });
@@ -92,7 +99,9 @@ export function FavoritesView({
                       className="hover:underline"
                     >
                       <span className="text-zinc-500">{s.gameName}</span>{" "}
-                      <span className="font-medium">{s.nameKo}</span>
+                      <span className="font-medium">
+                        {localizedName(s.nameKo, s.nameEn, locale)}
+                      </span>
                     </Link>
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">

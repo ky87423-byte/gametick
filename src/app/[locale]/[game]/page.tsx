@@ -2,7 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
+import {
+  findGame,
+  liveQuery,
+  currencyOf,
+  gameNameOf,
+  localizedName,
+} from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getMarketTable, summarize, movers } from "@/lib/market";
 import { getRates } from "@/lib/exchange";
@@ -192,7 +198,9 @@ export default async function GamePage({
               locale={locale}
               volTitle={dict.tradeVolume}
               currency={currencyOf(game, locale)}
-              serverNames={table.servers.map((s) => s.nameKo)}
+              serverNames={table.servers.map((s) =>
+                localizedName(s.nameKo, s.nameEn, locale)
+              )}
             />
             <a
               href="https://gameboostforge.com"
@@ -246,7 +254,7 @@ export default async function GamePage({
                             href={`/${locale}/${game.slug}/${s.serverId}`}
                             className="min-w-0 flex-1 truncate text-zinc-200 hover:text-amber-300"
                           >
-                            {s.nameKo}
+                            {localizedName(s.nameKo, s.nameEn, locale)}
                           </Link>
                           <span
                             className={`shrink-0 font-mono tabular-nums ${changeColor(

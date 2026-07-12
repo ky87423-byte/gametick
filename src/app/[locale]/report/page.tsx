@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { GAMES } from "@/data/games";
+import { GAMES, localizedName } from "@/data/games";
 import { getReport } from "@/lib/market";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -59,7 +59,7 @@ export default async function ReportPage({
                   href={`/${locale}/${r.slug}`}
                   className="text-lg font-bold hover:underline"
                 >
-                  {r.nameKo}
+                  {localizedName(r.nameKo, r.nameEn, locale)}
                 </Link>
                 <span className="text-xs text-zinc-500">
                   {dict.periodLabel}: {periodText(r.periodMs, locale)}
@@ -80,7 +80,9 @@ export default async function ReportPage({
                   </div>
                   {r.topGainer && (
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">▲ {r.topGainer.nameKo}</span>
+                      <span className="text-zinc-400">
+                        ▲ {localizedName(r.topGainer.nameKo, r.topGainer.nameEn, locale)}
+                      </span>
                       <span className="font-mono text-red-400">
                         {changeText(r.topGainer.changePercent)}
                       </span>
@@ -88,7 +90,9 @@ export default async function ReportPage({
                   )}
                   {r.topLoser && r.topLoser.changePercent < 0 && (
                     <div className="flex justify-between">
-                      <span className="text-zinc-400">▼ {r.topLoser.nameKo}</span>
+                      <span className="text-zinc-400">
+                        ▼ {localizedName(r.topLoser.nameKo, r.topLoser.nameEn, locale)}
+                      </span>
                       <span className="font-mono text-blue-400">
                         {changeText(r.topLoser.changePercent)}
                       </span>

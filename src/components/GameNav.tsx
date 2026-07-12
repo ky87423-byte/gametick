@@ -5,7 +5,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { GAMES } from "@/data/games";
+import { GAMES, localizedName } from "@/data/games";
 
 export function GameNav({
   locale,
@@ -63,7 +63,7 @@ export function GameNav({
                   : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               }`}
             >
-              {g.nameKo}
+              {localizedName(g.nameKo, g.nameEn, locale)}
             </Link>
           );
         })}

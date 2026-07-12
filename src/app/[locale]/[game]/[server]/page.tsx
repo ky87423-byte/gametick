@@ -1,7 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
+import {
+  findGame,
+  findServer,
+  currencyOf,
+  gameNameOf,
+  serverNameOf,
+} from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
 import { getServerExchangeTable } from "@/lib/market";
@@ -38,8 +44,9 @@ export async function generateMetadata({
   if (!server) return {};
   const dict = getDictionary(locale as Locale);
   const gameName = gameNameOf(game, locale);
-  const title = `${server.nameKo} · ${gameName} ${currencyOf(game, locale)} | ${dict.brand}`;
-  const description = serverIntro(locale as Locale, game, server.nameKo);
+  const serverName = serverNameOf(server, locale);
+  const title = `${serverName} · ${gameName} ${currencyOf(game, locale)} | ${dict.brand}`;
+  const description = serverIntro(locale as Locale, game, serverName);
   // 매물(시세)이 있는 서버만 검색 색인. 없으면 noindex(단 follow) — 색인 예산을
   // 알짜 페이지에 집중. 매물이 생기면 자동으로 다시 색인된다(데이터 기반).
   const price = latestPrice(await readHistory(game.slug), server.id);
@@ -80,6 +87,7 @@ export default async function ServerDetail({
     ? (tfParam as Timeframe)
     : "1h";
   const dict = getDictionary(locale);
+  const serverName = serverNameOf(server, locale);
   const [data, rates, history, exchangeTable, markers] = await Promise.all([
     getServerCandles(game, server, tf),
     getRates(),
@@ -98,7 +106,7 @@ export default async function ServerDetail({
       url: `${SITE}/${locale}/${game.slug}`,
     },
     {
-      name: server.nameKo,
+      name: serverName,
       url: `${SITE}/${locale}/${game.slug}/${server.id}`,
     },
   ]);
@@ -134,7 +142,7 @@ export default async function ServerDetail({
 
         <div className="mt-2 mb-1 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-bold tracking-tight">
-            {server.nameKo}
+            {serverName}
             <span className="ml-2 text-base font-normal text-zinc-500">
               {gameNameOf(game, locale)} {currencyOf(game, locale)}
             </span>
@@ -153,7 +161,7 @@ export default async function ServerDetail({
             <AlertButton
               gameSlug={game.slug}
               serverId={server.id}
-              name={`${server.nameKo} ${currencyOf(game, locale)}`}
+              name={`${serverName} ${currencyOf(game, locale)}`}
               current={data.current}
             />
           </div>
@@ -215,7 +223,7 @@ export default async function ServerDetail({
         {/* 서버별 SEO 소개 */}
         <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
           <p className="text-sm leading-6 text-zinc-400">
-            {serverIntro(locale, game, server.nameKo)}
+            {serverIntro(locale, game, serverName)}
           </p>
         </section>
       </main>

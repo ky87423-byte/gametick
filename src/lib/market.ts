@@ -213,6 +213,7 @@ export async function getGameTrend(
 export interface ReportServer {
   serverId: string;
   nameKo: string;
+  nameEn: string;
   current: number;
   base: number;
   changePercent: number;
@@ -221,6 +222,7 @@ export interface ReportServer {
 export interface GameReport {
   slug: string;
   nameKo: string;
+  nameEn: string;
   currency: string;
   unitLabelKo: string;
   /** 실제 비교 기간(ms) — 데이터가 7일 미만이면 그만큼만 */
@@ -253,6 +255,7 @@ export async function getReport(
     rows.push({
       serverId: s.id,
       nameKo: s.nameKo,
+      nameEn: s.nameEn,
       current: Math.round(cur.v),
       base: Math.round(base.v),
       changePercent: ((cur.v - base.v) / base.v) * 100,
@@ -268,6 +271,7 @@ export async function getReport(
   return {
     slug: game.slug,
     nameKo: game.nameKo,
+    nameEn: game.nameEn,
     currency: game.currency,
     unitLabelKo: game.unitLabelKo,
     periodMs: tMin !== null && tMax !== null ? tMax - tMin : null,
