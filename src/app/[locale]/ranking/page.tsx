@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, gameNameOf, localizedName, currencyOf } from "@/data/games";
-import { getMarketTable } from "@/lib/market";
+import { getMarketTable, MAX_CREDIBLE_CHANGE } from "@/lib/market";
 import { altLanguages } from "@/lib/seo";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -63,6 +63,8 @@ export default async function RankingPage({
     const game = GAMES[i];
     for (const s of t.servers) {
       if (s.change24hPercent === null || s.priceKrw === null) continue;
+      // 비현실적 등락값(데이터 아티팩트)은 랭킹에서 제외 — 신뢰도 유지.
+      if (Math.abs(s.change24hPercent) > MAX_CREDIBLE_CHANGE) continue;
       all.push({
         gameSlug: game.slug,
         gameName: gameNameOf(game, locale),

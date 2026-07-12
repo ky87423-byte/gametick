@@ -158,12 +158,21 @@ export function summarize(table: MarketTable): MarketSummary {
   };
 }
 
-/** 24h 등락 기준 급등/급락 상위 n */
+// 24h 등락 신뢰 상한(%). 이를 초과하는 값은 빈 서버 첫 시세·오류값 등
+// 데이터 아티팩트로 보고 급등락/랭킹 노출에서 제외한다(게임머니는 하루 이만큼
+// 움직이는 일이 드묾). despike를 지나도 base가 불안정하면 %가 폭발할 수 있음.
+export const MAX_CREDIBLE_CHANGE = 50;
+
+/** 24h 등락 기준 급등/급락 상위 n (비현실적 등락값 제외) */
 export function movers(
   table: MarketTable,
   n = 3
 ): { gainers: ServerMarket[]; losers: ServerMarket[] } {
-  const withChange = table.servers.filter((s) => s.change24hPercent !== null);
+  const withChange = table.servers.filter(
+    (s) =>
+      s.change24hPercent !== null &&
+      Math.abs(s.change24hPercent) <= MAX_CREDIBLE_CHANGE
+  );
   const sorted = [...withChange].sort(
     (a, b) => (b.change24hPercent ?? 0) - (a.change24hPercent ?? 0)
   );
