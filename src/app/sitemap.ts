@@ -43,6 +43,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   };
 
   add("", "hourly", 1);
+  add("/ranking", "hourly", 0.7);
+  add("/calculator", "weekly", 0.5);
   for (const p of ["report", "about", "terms", "privacy"]) {
     add(`/${p}`, p === "report" ? "daily" : "weekly", 0.5);
   }

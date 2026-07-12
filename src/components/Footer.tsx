@@ -12,8 +12,14 @@ export async function Footer({ locale }: { locale: Locale }) {
       {/* 자사 CTA 박스 제거(대리육성·매입문의 버튼 숨김) */}
       <footer className="mx-auto mt-10 w-full max-w-5xl px-4 pb-10">
         <nav className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+          <Link href={`/${locale}/ranking`} className="hover:text-zinc-300">
+            {dict.rankingNav}
+          </Link>
           <Link href={`/${locale}/report`} className="hover:text-zinc-300">
             {dict.reportNav}
+          </Link>
+          <Link href={`/${locale}/calculator`} className="hover:text-zinc-300">
+            {dict.calcNav}
           </Link>
           <Link href={`/${locale}/guide`} className="hover:text-zinc-300">
             {dict.guideNav}
