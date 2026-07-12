@@ -486,9 +486,10 @@ const CURRENCY_EN: Record<string, string> = {
   다이아: "Dia",
 };
 
-/** 로케일별 통화 표기 — en/zh/ja/th/tl은 영문, ko/vi는 원 통화명 */
+/** 로케일별 통화 표기 — ko만 한글 통화명, 그 외(en/zh/vi/ja/th/tl)는 로마자.
+ *  vi 등 비한국어 검색자가 "아데나"(한글) 대신 "Adena"로 찾도록 SEO 개선. */
 export function currencyOf(game: GameInfo, locale: string): string {
-  if (locale !== "ko" && locale !== "vi") {
+  if (locale !== "ko") {
     return CURRENCY_EN[game.currency] ?? game.currency;
   }
   return game.currency;

@@ -62,7 +62,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col overflow-x-clip">
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light')}catch(e){}`,
+            // 테마 + <html lang>을 URL 로케일로 교정(루트 layout은 locale 접근 불가).
+            // 언어 타깃팅의 1차 신호는 서버렌더된 hreflang이며, lang은 보조 신호.
+            __html: `try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');var l=location.pathname.split('/')[1];if(['ko','en','zh','vi','ja','th','tl'].indexOf(l)>=0)document.documentElement.lang=l;}catch(e){}`,
           }}
         />
         <script
