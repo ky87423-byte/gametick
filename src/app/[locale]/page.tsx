@@ -55,11 +55,15 @@ export default async function LocaleHome({
     GAMES.map(async (game) => {
       const table = await getMarketTable(game);
       const summary = summarize(table);
+      // 최소 거래단위 + 통화 (예: "10,000 아데나", "1,000 다이아")
+      const unitText = `${game.unitAmount.toLocaleString("en-US")} ${currencyOf(
+        game,
+        locale
+      )}`;
       return {
         slug: game.slug,
         name: gameNameOf(game, locale),
-        currency: currencyOf(game, locale),
-        unitLabel: dict.perUnit(game.unitAmount, currencyOf(game, locale)),
+        unitText,
         avg: summary.avg,
         low: summary.low,
         activeCount: summary.activeCount,
@@ -106,8 +110,8 @@ export default async function LocaleHome({
                 <span className="min-w-0 truncate font-semibold text-zinc-100 group-hover:text-amber-300">
                   {c.name}
                 </span>
-                <span className="shrink-0 text-xs text-zinc-500">
-                  {c.currency}
+                <span className="shrink-0 font-mono text-xs tabular-nums text-amber-500/90">
+                  {c.unitText}
                 </span>
               </div>
 
