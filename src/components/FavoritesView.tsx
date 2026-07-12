@@ -78,8 +78,8 @@ export function FavoritesView({
       ) : rows.length === 0 ? (
         <p className="text-sm text-zinc-500">{empty}</p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-800">
-          <table className="w-full text-sm">
+        <div className="themed-scroll overflow-x-auto rounded-xl border border-zinc-800">
+          <table className="w-full min-w-[340px] text-sm">
             <tbody>
               {rows.map((s, i) => (
                 <tr

@@ -302,8 +302,8 @@ export function MarketTable({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-800">
-        <table className="w-full text-sm">
+      <div className="themed-scroll overflow-x-auto rounded-xl border border-zinc-800">
+        <table className="w-full min-w-[340px] text-sm">
           <thead className="bg-zinc-900 text-zinc-400">
             <tr>
               <th className="w-8 px-2 py-2"></th>
