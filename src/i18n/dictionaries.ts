@@ -66,6 +66,11 @@ export interface Dictionary {
   reportNav: string;
   reportTitle: string;
   reportDesc: string;
+  reportArchive: string;
+  prevDay: string;
+  nextDay: string;
+  latestReport: string;
+  dailyReportDesc: (date: string) => string;
   periodLabel: string;
   avgChangeLabel: string;
   reportEmpty: string;
@@ -173,6 +178,12 @@ const ko: Dictionary = {
   reportNav: "리포트",
   reportTitle: "시세 리포트",
   reportDesc: "최근 기간 동안 게임별 평균 등락과 급등·급락 서버를 한눈에.",
+  reportArchive: "지난 리포트",
+  prevDay: "이전 날",
+  nextDay: "다음 날",
+  latestReport: "최신 리포트",
+  dailyReportDesc: (date) =>
+    `${date} 게임머니 시세 요약 — 게임별 평균가·등락과 급등·급락 서버.`,
   periodLabel: "기간",
   avgChangeLabel: "평균 등락",
   reportEmpty: "데이터가 쌓이는 중입니다.",
@@ -277,6 +288,12 @@ const vi: Dictionary = {
   reportNav: "Báo cáo",
   reportTitle: "Báo cáo giá",
   reportDesc: "Biến động trung bình và máy chủ tăng/giảm mạnh theo từng game.",
+  reportArchive: "Báo cáo trước",
+  prevDay: "Ngày trước",
+  nextDay: "Ngày sau",
+  latestReport: "Mới nhất",
+  dailyReportDesc: (date) =>
+    `Tổng hợp giá tiền game ngày ${date} — giá trung bình, biến động và máy chủ tăng/giảm mạnh theo game.`,
   periodLabel: "Kỳ",
   avgChangeLabel: "Biến động TB",
   reportEmpty: "Đang thu thập dữ liệu.",
@@ -383,6 +400,12 @@ const en: Dictionary = {
   reportNav: "Report",
   reportTitle: "Price report",
   reportDesc: "Average change and top gaining/losing servers by game.",
+  reportArchive: "Past reports",
+  prevDay: "Prev",
+  nextDay: "Next",
+  latestReport: "Latest",
+  dailyReportDesc: (date) =>
+    `Game currency price summary for ${date} — average price, change and top gaining/losing servers by game.`,
   periodLabel: "Period",
   avgChangeLabel: "Avg change",
   reportEmpty: "Collecting data.",
@@ -488,6 +511,12 @@ const zh: Dictionary = {
   reportNav: "报告",
   reportTitle: "行情报告",
   reportDesc: "各游戏的平均涨跌与涨跌幅最大的服务器一览。",
+  reportArchive: "历史报告",
+  prevDay: "前一天",
+  nextDay: "后一天",
+  latestReport: "最新",
+  dailyReportDesc: (date) =>
+    `${date} 游戏币行情摘要 — 各游戏平均价、涨跌及涨跌幅最大的服务器。`,
   periodLabel: "周期",
   avgChangeLabel: "平均涨跌",
   reportEmpty: "数据积累中。",
@@ -594,6 +623,12 @@ const ja: Dictionary = {
   reportNav: "レポート",
   reportTitle: "相場レポート",
   reportDesc: "直近期間のゲーム別平均騰落と急騰・急落サーバーを一目で。",
+  reportArchive: "過去のレポート",
+  prevDay: "前日",
+  nextDay: "翌日",
+  latestReport: "最新",
+  dailyReportDesc: (date) =>
+    `${date} のゲームマネー相場まとめ — ゲーム別の平均価格・騰落と急騰・急落サーバー。`,
   periodLabel: "期間",
   avgChangeLabel: "平均騰落",
   reportEmpty: "データを収集中です。",
@@ -700,6 +735,12 @@ const th: Dictionary = {
   reportNav: "รายงาน",
   reportTitle: "รายงานราคา",
   reportDesc: "การเปลี่ยนแปลงเฉลี่ยและเซิร์ฟเวอร์ที่ราคาขึ้น/ลงแรงในแต่ละเกม",
+  reportArchive: "รายงานที่ผ่านมา",
+  prevDay: "ก่อนหน้า",
+  nextDay: "ถัดไป",
+  latestReport: "ล่าสุด",
+  dailyReportDesc: (date) =>
+    `สรุปราคาเงินเกมวันที่ ${date} — ราคาเฉลี่ย การเปลี่ยนแปลง และเซิร์ฟเวอร์ที่ขึ้น/ลงแรงในแต่ละเกม`,
   periodLabel: "ช่วงเวลา",
   avgChangeLabel: "เปลี่ยนแปลงเฉลี่ย",
   reportEmpty: "กำลังรวบรวมข้อมูล",
@@ -807,6 +848,12 @@ const tl: Dictionary = {
   reportNav: "Ulat",
   reportTitle: "Ulat ng presyo",
   reportDesc: "Average na pagbabago at mga server na pinakatumaas/bumaba kada game.",
+  reportArchive: "Mga nakaraang ulat",
+  prevDay: "Nakaraan",
+  nextDay: "Susunod",
+  latestReport: "Pinakabago",
+  dailyReportDesc: (date) =>
+    `Buod ng presyo ng game currency para sa ${date} — average na presyo, pagbabago at mga server na pinakatumaas/bumaba kada game.`,
   periodLabel: "Panahon",
   avgChangeLabel: "Avg na pagbabago",
   reportEmpty: "Nangongolekta ng data.",

@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GAMES, localizedName } from "@/data/games";
 import { getReport } from "@/lib/market";
+import { altLanguages } from "@/lib/seo";
+import { recentDates } from "@/lib/reportDates";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
 import { Header } from "@/components/Header";
@@ -19,7 +21,14 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const dict = getDictionary(locale as Locale);
-  return { title: `${dict.reportTitle} | ${dict.brand}`, description: dict.reportDesc };
+  return {
+    title: `${dict.reportTitle} | ${dict.brand}`,
+    description: dict.reportDesc,
+    alternates: {
+      canonical: `/${locale}/report`,
+      languages: altLanguages("/report"),
+    },
+  };
 }
 
 function periodText(ms: number | null, locale: string): string {
@@ -40,6 +49,7 @@ export default async function ReportPage({
   if (!isLocale(locale)) notFound();
   const dict = getDictionary(locale);
   const reports = await Promise.all(GAMES.map((g) => getReport(g)));
+  const archive = recentDates(14);
 
   return (
     <>
@@ -103,6 +113,22 @@ export default async function ReportPage({
             </div>
           ))}
         </div>
+
+        {/* 지난 리포트 아카이브 — 날짜별 dated URL 내부링크(발견성 + 크롤 경로) */}
+        <section className="mt-10">
+          <h2 className="mb-3 text-lg font-bold">{dict.reportArchive}</h2>
+          <div className="flex flex-wrap gap-2">
+            {archive.map((d) => (
+              <Link
+                key={d}
+                href={`/${locale}/report/${d}`}
+                className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 font-mono text-sm text-zinc-300 hover:border-amber-500/60 hover:text-amber-300"
+              >
+                {d}
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
       <Footer locale={locale} />
     </>

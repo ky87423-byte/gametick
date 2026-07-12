@@ -3,6 +3,7 @@ import { GAMES } from "@/data/games";
 import { guideList } from "@/data/guides";
 import { locales } from "@/i18n/config";
 import { readHistory, latestPrice } from "@/lib/history";
+import { recentDates, kstDayStartMs } from "@/lib/reportDates";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
 
@@ -23,12 +24,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const out: MetadataRoute.Sitemap = [];
   // 한 경로를 전 언어판으로 추가 + 각 항목에 hreflang 대체 + lastmod
-  const add = (seg: string, changeFrequency: Freq, priority: number) => {
+  const add = (
+    seg: string,
+    changeFrequency: Freq,
+    priority: number,
+    lastModified: Date = now
+  ) => {
     const alternates = { languages: langs(seg) };
     for (const locale of locales) {
       out.push({
         url: `${BASE}/${locale}${seg}`,
-        lastModified: now,
+        lastModified,
         changeFrequency,
         priority,
         alternates,
@@ -41,6 +47,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     add(`/${p}`, p === "report" ? "daily" : "weekly", 0.5);
   }
   add("/guide", "weekly", 0.5);
+  // 날짜별 시세 리포트(최근 14일) — 매일 새 URL로 크롤 신선도 확보. lastmod=그 날.
+  for (const d of recentDates(14)) {
+    const dayMs = kstDayStartMs(d);
+    add(`/report/${d}`, "monthly", 0.4, dayMs ? new Date(dayMs) : now);
+  }
   // 가이드 슬러그는 언어 무관(내용만 번역) → 대표 로케일 목록으로 hreflang 구성
   for (const gd of guideList(locales[0])) {
     add(`/guide/${gd.slug}`, "monthly", 0.5);

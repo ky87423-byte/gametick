@@ -282,6 +282,80 @@ export async function getReport(
   };
 }
 
+export interface DailyReport {
+  slug: string;
+  nameKo: string;
+  nameEn: string;
+  currency: string;
+  unitLabelKo: string;
+  /** 그 날 서버 종가 평균(원/단위) */
+  avgPrice: number | null;
+  /** 그 날 종가 vs 시가 평균 변동률(%) */
+  avgChangePercent: number | null;
+  topGainer: ReportServer | null;
+  topLoser: ReportServer | null;
+  activeCount: number;
+}
+
+/**
+ * 특정 하루(KST)의 게임 시세 요약 — 날짜별 리포트 페이지용.
+ * 매일 고유한 dated URL을 만들어 크롤 신선도를 확보한다(SEO 콘텐츠 벨로시티).
+ * dayStartMs = 그 날 00:00(KST)의 epoch ms.
+ */
+export async function getDailyReport(
+  game: GameInfo,
+  dayStartMs: number
+): Promise<DailyReport> {
+  const history = await readHistory(game.slug);
+  const dayEnd = dayStartMs + 24 * 60 * 60 * 1000;
+  const rows: ReportServer[] = [];
+  let priceSum = 0;
+  let priceN = 0;
+
+  for (const s of game.servers) {
+    const day: { t: number; v: number }[] = [];
+    for (const pt of history) {
+      if (pt.t < dayStartMs || pt.t >= dayEnd) continue;
+      const v = pt.p[s.id];
+      if (typeof v === "number" && v > 0) day.push({ t: pt.t, v });
+    }
+    if (day.length === 0) continue;
+    const clean = despike(day);
+    if (clean.length === 0) continue;
+    const open = clean[0].v;
+    const close = clean[clean.length - 1].v;
+    priceSum += close;
+    priceN++;
+    rows.push({
+      serverId: s.id,
+      nameKo: s.nameKo,
+      nameEn: s.nameEn,
+      current: Math.round(close),
+      base: Math.round(open),
+      changePercent: open > 0 ? ((close - open) / open) * 100 : 0,
+    });
+  }
+
+  const sorted = [...rows].sort((a, b) => b.changePercent - a.changePercent);
+  const avgChange =
+    rows.length > 0
+      ? rows.reduce((a, b) => a + b.changePercent, 0) / rows.length
+      : null;
+
+  return {
+    slug: game.slug,
+    nameKo: game.nameKo,
+    nameEn: game.nameEn,
+    currency: game.currency,
+    unitLabelKo: game.unitLabelKo,
+    avgPrice: priceN > 0 ? Math.round(priceSum / priceN) : null,
+    avgChangePercent: avgChange,
+    topGainer: sorted.length ? sorted[0] : null,
+    topLoser: sorted.length ? sorted[sorted.length - 1] : null,
+    activeCount: rows.length,
+  };
+}
+
 export interface ExchangeSeries {
   exchange: string;
   name: string;
