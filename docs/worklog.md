@@ -378,11 +378,34 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ---
 
+## 2026-07-12~13 — 색인예산 최적화 · SEO 텍스트 콘텐츠 · 방문자통계 · 안전거래 가이드 확장
+
+> 전략 보고서(자문자답) 기반 P0/P1 실행. 색인 예산을 알짜 페이지에 집중 + 검색엔진이 읽는 텍스트 콘텐츠 확충. 전부 배포·라이브.
+
+### 매물 없는 서버 자동 noindex + 사이트맵 제외 (`dd27de4`)
+- **문제**: 매물 0인 빈 서버 페이지가 색인 예산 낭비 + 저품질 신호.
+- 서버 metadata `robots: indexable ? undefined : { index:false, follow:true }` — `latestPrice(history, server.id) > 0` 기준. **sitemap도 동일 조건으로 제외**(2,128→2,079 URL). 링크는 유지(follow)라 내부 크롤 경로 보존.
+- **데이터 기반·자동 복귀**: 매물이 생기면 다음 렌더에 자동으로 다시 색인·사이트맵 포함. 수동 관리 불필요.
+
+### '오늘의 급등/급락' 텍스트 섹션 (`f4752d1`)
+- 게임페이지에 `movers(table, 5)` 기반 **서버명·등락%·가격 텍스트** 섹션(상승/하락 2컬럼). 캔버스 마커와 달리 **검색엔진이 읽는 실텍스트** → SEO 유효. 서버명은 내부 링크(크롤 경로 + 사용자 이동).
+- dict `moversTitle·moversNote·rise·fall` 7언어 번역.
+
+### 안전거래 가이드 3→8 섹션 확장 (`81b74a6` ko · `ad8f84c` en·vi·zh)
+- 기존 단문 → **8개 섹션**: ①적정가 확인 ②에스크로 정식거래소 ③판매자 평판·이력 ④선입금·장외유인 위험신호 ⑤소액·분할 첫거래 ⑥게임머니 특유 사기(회수·도용) ⑦거래 증거 보관 ⑧사고 대응 + GameSise 면책.
+- ko/en/vi/zh 작성(ja/th/tl은 `guideList` en 폴백). **전부 원본 작성·번역**(저작권 무관). 프로덕션 h2 8개 렌더 확인.
+
+### 방문자 통계(umami) — 운영 (lc_vn `AdminNav`)
+- gamesise가 umami에 미집계 → DB에 웹사이트 생성(id `2ea27e0e…`) + `NEXT_PUBLIC_UMAMI_SRC/ID` env 인라인 후 재빌드. 관리자 네비에 **"방문자 통계 ↗"**(stats.gameboostforge.com) 박스 추가.
+- umami 관리자 비번 분실 → `"user"` 테이블 password를 bcrypt 재해시로 리셋(SSH heredoc + `psql -f` 임시SQL로 인용 이슈 우회).
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
 0. **(운영·모니터링) 색인 상태 확인** — 며칠 뒤 구글 서치콘솔 "색인 생성" 리포트 + `site:gamesise.co.kr`로 색인 페이지 수 증가 확인. 네이버 서치어드바이저 "검색 노출/수집" 현황도. 색인 지연/오류(예: 제외 사유) 있으면 대응. 대표 URL 색인요청 추가(하루 할당 재충전).
-1. **(선택·차트) 차트 — 대부분 완료(2026-07-11)**. ✅lightweight-charts 교체 ✅크로스헤어 툴팁 ✅선차트 자동전환 ✅금액축 자릿수눈금 ✅노이즈 despike ✅MA토글. **남은 것: 이벤트 마커**(캔들 위 패치/이벤트 핀, gamebit `setMarkers`) — `data/events.ts` 수동 큐레이션 or 급등락 자동. 이벤트 데이터 소스부터 필요.
-4. **(선택·i18n) 일본어·태국어·필리핀어 추가** — 구조 완성됨(ko/en/zh/vi). `config.ts` locales + `dictionaries.ts`·`content.ts`·`guides.ts`·`legal.ts`·`format.ts` TZ·`LangSwitch`에 각 언어 추가하면 됨. (사용자가 "ja/th/tl은 나중" 요청)
+1. **(완료·차트) 차트 개편 완료**. ✅lightweight-charts 교체 ✅크로스헤어 툴팁 ✅선차트 자동전환 ✅금액축 자릿수눈금 ✅노이즈 despike ✅MA토글 ✅**이벤트 마커**(lc_vn `events.ts` + `/admin/events` 관리자 등록 → `ChartPanel setMarkers`). 남은 선택지: 급등락 자동 마커 UX(급락 캔들 강조).
+4. **(완료·i18n) 7개 언어 지원** — ko/en/zh/vi/ja/th/tl 전부 등록(`a8d92bf`). 가이드 8섹션은 ko/en/vi/zh 번역, ja/th/tl은 en 폴백 — 필요 시 개별 번역 확장 가능.
 5. **(수익화) 광고 배너 링크/확장** — 현재 배너 링크=gameboostforge(임시). 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
 6. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크(배포경로·CI).
 7. **(운영·주의) KR 프록시 모니터링** — Vultr `158.247.239.183`(tinyproxy:8888) 꺼지면 아이템매니아만 중단. 월 ~$5.
