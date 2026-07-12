@@ -20,7 +20,7 @@ import { DiscordAlert } from "@/components/DiscordAlert";
 import { PriceCalc } from "@/components/PriceCalc";
 import { serverIntro } from "@/data/content";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
-import { change24h, latestCount, readHistory } from "@/lib/history";
+import { change24h, latestCount, latestPrice, readHistory } from "@/lib/history";
 
 export const dynamic = "force-dynamic";
 
@@ -40,9 +40,14 @@ export async function generateMetadata({
   const gameName = gameNameOf(game, locale);
   const title = `${server.nameKo} · ${gameName} ${currencyOf(game, locale)} | ${dict.brand}`;
   const description = serverIntro(locale as Locale, game, server.nameKo);
+  // 매물(시세)이 있는 서버만 검색 색인. 없으면 noindex(단 follow) — 색인 예산을
+  // 알짜 페이지에 집중. 매물이 생기면 자동으로 다시 색인된다(데이터 기반).
+  const price = latestPrice(await readHistory(game.slug), server.id);
+  const indexable = price !== null && price > 0;
   return {
     title,
     description,
+    robots: indexable ? undefined : { index: false, follow: true },
     alternates: {
       canonical: `/${locale}/${game.slug}/${server.id}`,
       languages: altLanguages(`/${game.slug}/${server.id}`),

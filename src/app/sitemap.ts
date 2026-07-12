@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { GAMES } from "@/data/games";
 import { guideList } from "@/data/guides";
 import { locales } from "@/i18n/config";
+import { readHistory, latestPrice } from "@/lib/history";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
 
@@ -18,7 +19,7 @@ function langs(seg: string): Record<string, string> {
   return m;
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const out: MetadataRoute.Sitemap = [];
   // 한 경로를 전 언어판으로 추가 + 각 항목에 hreflang 대체 + lastmod
@@ -47,8 +48,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const g of GAMES) {
     add(`/${g.slug}`, "hourly", 0.9);
     add(`/live/${g.slug}`, "always", 0.7);
+    // 매물(시세) 있는 서버만 사이트맵에 포함 — 빈 서버는 페이지 noindex와 일관되게 제외.
+    // 매물이 생기면 자동으로 다시 포함된다.
+    const history = await readHistory(g.slug);
     for (const s of g.servers) {
-      add(`/${g.slug}/${s.id}`, "hourly", 0.6);
+      if (latestPrice(history, s.id) !== null) {
+        add(`/${g.slug}/${s.id}`, "hourly", 0.6);
+      }
     }
   }
   return out;
