@@ -418,6 +418,10 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - adena.kr 모델. 매일 고유 dated URL `/report/YYYY-MM-DD` → 크롤 신선도 신호. `getDailyReport`(그 날 KST 서버별 시가·종가·변동+게임별 평균가·급등락, despike), `lib/reportDates.ts`(KST 날짜 유틸). `/report/[date]` 신설(일별 카드+이전/다음/최신 네비+canonical·hreflang+Breadcrumb, 보관 90일 밖·미래는 notFound). `/report` 인덱스에 '지난 리포트' 14일 링크+hreflang. 사이트맵에 최근 14일 dated URL(lastmod=그 날). dict 5키 7언어. **검증: 200·canonical·평균가(857·7,919…)·날짜별 값 상이(07-12 -2.14% vs 07-10 +0.52%)·en·미래/무효 404.**
 - **P0-③ Product/Offer 스키마: 보류 검토중** — 판매 없는 참고가 페이지에 Offer 마크업은 구글 가이드라인 위반(수동조치) 위험. 사용자 확인 후 결정.
 
+### SEO P1-④ 게임 FAQ + P1-⑥ 정보성 가이드 확장 (`07d6753`·`eddb50e`)
+- **P1-④**: 미사용이던 `faqItems()`를 14개 게임 페이지에 렌더 + FAQPage 스키마. 검증: 화면 summary 5 = Q마커 5 = 스키마 Question 5(표시=마크업, 규정준수), aion2 "per 10,000,000", 1200→1575단어.
+- **P1-⑥**: 정보성 가이드 2종 신설(원본) — `cash-out`(현금화: 정의·정식거래소·정산액·시세확인·위험·세금/합법성·체크리스트·고지 8섹션), `exchange-guide`(거래소: 개념·주요3사·비교·에스크로·수수료·확인·고지). ko/en/vi/zh(ja/th/tl=en폴백). **ToS/법률 단정 회피·위험고지·전문가상담 권고**로 규정 안전. 검증: 4언어 200·제목 로컬라이즈·가이드목록/사이트맵 자동반영.
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
