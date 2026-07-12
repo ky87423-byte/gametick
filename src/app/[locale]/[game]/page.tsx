@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { findGame, liveQuery, currencyOf, gameNameOf } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
 import { getMarketTable, summarize } from "@/lib/market";
+import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
@@ -36,7 +37,10 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/${locale}/${game.slug}` },
+    alternates: {
+      canonical: `/${locale}/${game.slug}`,
+      languages: altLanguages(`/${game.slug}`),
+    },
     openGraph: {
       title,
       description,

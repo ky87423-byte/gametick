@@ -5,6 +5,7 @@ import { findGame, findServer, currencyOf, gameNameOf } from "@/data/games";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { getServerCandles, TF_SPECS, Timeframe } from "@/lib/candles";
 import { getServerExchangeTable } from "@/lib/market";
+import { altLanguages } from "@/lib/seo";
 import { eventsForServer } from "@/lib/events";
 import { getRates, secondaryCurrency } from "@/lib/exchange";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -42,7 +43,10 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/${locale}/${game.slug}/${server.id}` },
+    alternates: {
+      canonical: `/${locale}/${game.slug}/${server.id}`,
+      languages: altLanguages(`/${game.slug}/${server.id}`),
+    },
     openGraph: {
       title,
       description,
