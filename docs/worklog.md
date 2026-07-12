@@ -399,6 +399,12 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - gamesise가 umami에 미집계 → DB에 웹사이트 생성(id `2ea27e0e…`) + `NEXT_PUBLIC_UMAMI_SRC/ID` env 인라인 후 재빌드. 관리자 네비에 **"방문자 통계 ↗"**(stats.gameboostforge.com) 박스 추가.
 - umami 관리자 비번 분실 → `"user"` 테이블 password를 bcrypt 재해시로 리셋(SSH heredoc + `psql -f` 임시SQL로 인용 이슈 우회).
 
+### 홈페이지 색인 문제 해결 — 리디렉션 → 실제 허브 (`b08ef50`)
+- **서치콘솔 진단**: `/ko` URL 검사에서 **"리디렉션이 포함된 페이지"로 색인 제외**, 색인된 페이지 0개. 원인 = `[locale]/page.tsx`가 `/[locale]` → `/[locale]/기본게임`으로 `redirect()`. 즉 `gamesise.co.kr → /ko → /ko/lineage-classic` 이중 튕김으로 **대표 홈페이지가 통째로 색인 불가**(사이트맵 priority-1 URL들이 전부 리디렉션).
+- **해결**: `/[locale]`을 **전 게임 시세 카드 허브**(게임명·평균가·최저가·활성서버수, 시세순 정렬)로 렌더 — redirect 제거, 200 실페이지. WebSite JSON-LD + self-canonical + hreflang(빈 세그먼트) + `homeAbout` SEO 문단. `homeHeadline/homeLead/homeGamesTitle/homeAbout` 7언어 추가.
+- 개별 게임/서버 페이지와 콘텐츠가 달라 중복색인 없음. 검증: `/ko`·`/en` **200**, canonical=자기자신, 루트 `/`→`/ko` 단일 리디렉션.
+- **후속(운영)**: 서치콘솔에서 `/ko` 등 대표 URL **색인 재요청** + 며칠 뒤 "리디렉션 포함" 제외가 사라지는지 확인.
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
