@@ -153,13 +153,64 @@ const vi: Guide[] = [
   },
   {
     slug: "safe-trade",
-    summary: "Quy tắc giao dịch an toàn",
+    summary: "8 quy tắc giao dịch an toàn",
     doc: {
       title: "Hướng dẫn giao dịch an toàn",
+      intro:
+        "Phần lớn giao dịch tiền game diễn ra suôn sẻ, nhưng vội vàng khi chưa chuẩn bị có thể dẫn đến lừa đảo. Đây là những quy tắc thực tế giúp giảm thiệt hại dù bạn mua hay bán.",
       sections: [
         {
+          heading: "1. Kiểm tra giá hợp lý trước tiên",
           paragraphs: [
-            "Hãy kiểm tra giá trên GameSise trước, dùng sàn uy tín và thanh toán bảo đảm (escrow). Cảnh giác với tin giá rẻ bất thường và yêu cầu chuyển khoản trước.",
+            "Trước hết hãy xem giá hợp lý của game và máy chủ trên GameSise. Không biết giá thị trường thì không thể phân biệt bị hớ hay bị dụ.",
+            "Tin đăng rẻ hơn thị trường nhiều thường là mồi. Những câu như ‘bán gấp’ thúc bạn vội vàng là dấu hiệu đáng ngờ. Tin đăng quá đắt cũng nên tránh.",
+          ],
+        },
+        {
+          heading: "2. Chỉ dùng sàn uy tín có thanh toán bảo đảm (escrow)",
+          paragraphs: [
+            "Với escrow, sàn giữ tiền của người mua và chỉ chuyển cho người bán sau khi xác nhận đã nhận tiền game. Nếu người bán không giao, bạn được hoàn tiền — chặn được lừa đảo chuyển khoản trước.",
+            "Bị dụ bỏ escrow để ‘giảm phí’ và chuyển khoản trực tiếp là dấu hiệu nguy hiểm điển hình. Tiết kiệm vài phần trăm có thể mất trắng.",
+          ],
+        },
+        {
+          heading: "3. Kiểm tra uy tín và lịch sử người bán",
+          paragraphs: [
+            "Hãy xem đánh giá, số giao dịch đã hoàn tất, thời gian tạo tài khoản và nhận xét gần đây. Cảnh giác nếu tài khoản mới, gần như không có lịch sử, lại muốn bán số lượng lớn một cách vội vã.",
+            "Chú ý nếu các nhận xét dồn vào một khoảng thời gian ngắn, hoặc có dấu hiệu xóa nhận xét tiêu cực.",
+          ],
+        },
+        {
+          heading: "4. Trả trước và dụ ra ngoài sàn là cờ đỏ",
+          paragraphs: [
+            "Chuyển cuộc trò chuyện ra ngoài sàn (KakaoTalk, Telegram, Discord) rồi yêu cầu chuyển vào tài khoản cá nhân là chiêu lừa phổ biến nhất. Một khi rời khỏi bảo vệ của sàn (escrow, xử lý tranh chấp), rất khó đòi lại.",
+            "Hãy dừng lại nếu họ dụ ra ngoài với lý do ‘sàn chậm’ hay ‘trực tiếp rẻ hơn’.",
+          ],
+        },
+        {
+          heading: "5. Giao dịch nhỏ, chia nhỏ lần đầu",
+          paragraphs: [
+            "Với người lạ, đừng gửi tất cả một lần — hãy chia thành nhiều giao dịch nhỏ để xây dựng lòng tin. Số tiền càng lớn, việc chia nhỏ càng an toàn.",
+          ],
+        },
+        {
+          heading: "6. Biết các chiêu lừa riêng của tiền game",
+          paragraphs: [
+            "Khác với tiền mặt, tiền game có thể bị ‘thu hồi’, tạo ra các chiêu lừa đặc thù: (1) bán xong rồi báo tài khoản bị hack để game thu hồi tiền; (2) bán lại tiền mua bằng phương thức có thể bồi hoàn hoặc bị đánh cắp.",
+            "Loại tiền này có thể bị thu hồi hoặc khóa về sau, nên đặc biệt cẩn thận với tin bán số lượng lớn giá rẻ bất thường, nguồn gốc không rõ. An toàn nhất là dùng tin chính thức trên sàn hợp pháp.",
+          ],
+        },
+        {
+          heading: "7. Lưu mọi bằng chứng giao dịch",
+          paragraphs: [
+            "Lưu nội dung trò chuyện, biên lai thanh toán, mã giao dịch và ảnh chụp thư/giao dịch trong game. Đó là bằng chứng quyết định khi tranh chấp hay tố cáo. Nên ghi lại cả nickname, tài khoản và số tài khoản ngân hàng của đối phương.",
+          ],
+        },
+        {
+          heading: "8. Khi có sự cố",
+          paragraphs: [
+            "Nếu bị lừa, trước tiên hãy báo cho bộ phận hỗ trợ của sàn và mở tranh chấp escrow. Nếu đã chuyển khoản trực tiếp, hãy yêu cầu ngân hàng phong tỏa và trình báo cảnh sát mạng hoặc cơ quan công an gần nhất.",
+            "GameSise chỉ cung cấp thông tin giá và không môi giới giao dịch. Giá hiển thị chỉ để tham khảo — hãy luôn giao dịch qua thanh toán bảo đảm của sàn uy tín.",
           ],
         },
       ],
@@ -198,13 +249,64 @@ const en: Guide[] = [
   },
   {
     slug: "safe-trade",
-    summary: "Rules for safe trading",
+    summary: "8 rules for safe trading",
     doc: {
       title: "Safe trading guide",
+      intro:
+        "Most game currency trades go fine, but rushing in unprepared can lead to scams. These are practical rules to reduce loss whether you are buying or selling.",
       sections: [
         {
+          heading: "1. Check the fair price first",
           paragraphs: [
-            "Check the price on GameSise first, use reputable exchanges with escrow, and be wary of listings that are unusually cheap or ask for payment upfront.",
+            "Start by checking the fair price for the game and server on GameSise. Without knowing the going rate, you cannot tell a rip-off from bait.",
+            "Listings far below market are usually bait. Phrases like ‘urgent sale’ that pressure you to hurry are a red flag. Overpriced listings are just as bad.",
+          ],
+        },
+        {
+          heading: "2. Use verified exchanges with escrow only",
+          paragraphs: [
+            "With escrow, the exchange holds the buyer’s money and releases it to the seller only after the currency is confirmed delivered. If the seller does not deliver, you are refunded — this blocks upfront-payment scams.",
+            "Being pushed to skip escrow for a ‘lower fee’ via direct bank transfer is a classic danger sign. Saving a few percent can cost you the whole amount.",
+          ],
+        },
+        {
+          heading: "3. Check seller reputation and history",
+          paragraphs: [
+            "Check the seller’s rating, number of completed trades, account age, and recent reviews. Be cautious if a brand-new account with almost no history wants to sell a large amount in a hurry.",
+            "Watch for reviews clustered in a short window, or signs that negative reviews were removed.",
+          ],
+        },
+        {
+          heading: "4. Upfront payment and off-platform lures are red flags",
+          paragraphs: [
+            "Moving the chat off the exchange (KakaoTalk, Telegram, Discord) and asking for a transfer to a personal account is the most common scam. Once you leave the exchange’s protection (escrow, dispute resolution), recovery is hard.",
+            "Stop the deal if they push you off-platform with excuses like ‘the exchange is slow’ or ‘it’s cheaper direct.’",
+          ],
+        },
+        {
+          heading: "5. Start small, split your first trades",
+          paragraphs: [
+            "With a new counterparty, do not send everything at once — split into smaller trades to build trust. The larger the amount, the more the safety margin of splitting matters.",
+          ],
+        },
+        {
+          heading: "6. Know game-currency-specific scams",
+          paragraphs: [
+            "Unlike cash, game currency can be ‘clawed back,’ which enables special scams: (1) selling, then reporting the account as hacked so the game reclaims the currency; (2) reselling currency bought with a chargebackable or stolen payment method.",
+            "Such currency can later be reclaimed or banned, so be especially careful with unusually cheap bulk listings of unclear origin. Sticking to official listings on legitimate exchanges is safest.",
+          ],
+        },
+        {
+          heading: "7. Keep all trade records",
+          paragraphs: [
+            "Save chat logs, payment records, trade IDs, and screenshots of in-game mail or trades. They are decisive evidence in a dispute or report. Record the counterparty’s nickname, account, and bank details too.",
+          ],
+        },
+        {
+          heading: "8. If something goes wrong",
+          paragraphs: [
+            "If you are scammed, report to the exchange’s support and file an escrow dispute first. For a direct bank transfer, ask your bank to freeze the payment and report to cyber police or your local police.",
+            "GameSise provides price information only and does not broker trades. Displayed prices are for reference — always trade through a verified exchange’s escrow.",
           ],
         },
       ],
@@ -243,13 +345,64 @@ const zh: Guide[] = [
   },
   {
     slug: "safe-trade",
-    summary: "安全交易守则",
+    summary: "安全交易 8 条守则",
     doc: {
       title: "安全交易指南",
+      intro:
+        "大多数游戏币交易都能顺利完成，但毫无准备地仓促交易可能招致诈骗。以下是无论买卖都能减少损失的实用守则。",
       sections: [
         {
+          heading: "1. 交易前先核对行情",
           paragraphs: [
-            "先在本站核对行情，使用信誉良好的交易所与担保交易（第三方托管），警惕异常便宜的挂单和要求先付款的直接交易。",
+            "先在 GameSise 查看该游戏与服务器的合理行情。不了解市价，就分不清是被宰还是被诱。",
+            "远低于市价的挂单多为诱饵。用‘急售’之类话术催你快点下手就是危险信号。报价过高的也应避开。",
+          ],
+        },
+        {
+          heading: "2. 只用有担保交易（第三方托管）的正规交易所",
+          paragraphs: [
+            "担保交易（托管）是指交易所先代为保管买家货款，确认收到游戏币后再付给卖家。卖家不发货则退款，从根本上杜绝先付款诈骗。",
+            "以‘省手续费’为由诱导你跳过担保、直接转账，是典型危险信号。省下几个百分点，可能赔上全部本金。",
+          ],
+        },
+        {
+          heading: "3. 核实卖家信誉与交易记录",
+          paragraphs: [
+            "查看卖家评分、累计成交数、注册时长和近期评价。若一个几乎没有记录的新账号急于大额出售，应提高警惕。",
+            "留意评价是否集中在极短时间内，或有删除负面评价的迹象。",
+          ],
+        },
+        {
+          heading: "4. 先付款、诱导至站外都是红旗",
+          paragraphs: [
+            "把对话转到交易所之外（KakaoTalk、Telegram、Discord 等）再要求转入私人账户，是最常见的骗术。一旦脱离交易所的保护（托管、纠纷调解），维权就很难。",
+            "若对方以‘交易所太慢’‘直接交易更便宜’为由把你引到站外，请立即中止。",
+          ],
+        },
+        {
+          heading: "5. 首次交易先小额、分批进行",
+          paragraphs: [
+            "与初次交易的对象，不要一次性全额转出——分成小额多次交易以建立信任。金额越大，分批的安全边际越重要。",
+          ],
+        },
+        {
+          heading: "6. 了解游戏币特有的骗术",
+          paragraphs: [
+            "与现金不同，游戏币可被‘追回’，因而有特有骗术：①售出后向游戏商谎报账号被盗，使已交付的游戏币被追回；②转卖以可退款或盗用的支付方式购得的游戏币。",
+            "这类游戏币日后可能被追回或封禁，因此对来源不明、异常便宜的大量挂单尤须小心。使用正规交易所的正式挂单最为安全。",
+          ],
+        },
+        {
+          heading: "7. 保留所有交易凭证",
+          paragraphs: [
+            "保存聊天记录、付款凭证、交易编号，以及游戏内邮件/交易的截图。发生纠纷或举报时，它们是决定性证据。最好同时记录对方的昵称、账号与银行账户信息。",
+          ],
+        },
+        {
+          heading: "8. 出问题时这样做",
+          paragraphs: [
+            "遭遇诈骗时，先向交易所客服举报并提交担保交易纠纷。若是直接转账被骗，请要求银行止付，并向网警或就近警方报案。",
+            "GameSise 仅提供行情信息，不居间交易。显示价格仅供参考——请务必通过正规交易所的担保交易进行实际交易。",
           ],
         },
       ],
