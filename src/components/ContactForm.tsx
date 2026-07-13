@@ -8,10 +8,17 @@ import { useState } from "react";
 export function ContactForm({
   labels,
 }: {
-  labels: { title: string; body: string; contact: string; send: string; sent: string };
+  labels: {
+    title: string;
+    titleDefault: string;
+    body: string;
+    contact: string;
+    send: string;
+    sent: string;
+  };
 }) {
   const [form, setForm] = useState({
-    title: "",
+    title: labels.titleDefault,
     content: "",
     telegram: "",
     kakao: "",

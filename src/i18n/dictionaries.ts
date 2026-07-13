@@ -115,6 +115,7 @@ export interface Dictionary {
   adSlot: string;
   adInquiry: string;
   contactTitle: string;
+  contactTitleDefault: string;
   contactBody: string;
   contactContact: string;
   contactSend: string;
@@ -232,6 +233,7 @@ const ko: Dictionary = {
   adSlot: "광고 영역",
   adInquiry: "광고/제휴 문의",
   contactTitle: "제목",
+  contactTitleDefault: "문의",
   contactBody: "내용",
   contactContact: "연락처 (메신저 아이디)",
   contactSend: "보내기",
@@ -350,6 +352,7 @@ const vi: Dictionary = {
   adSlot: "Khu vực quảng cáo",
   adInquiry: "Liên hệ quảng cáo",
   contactTitle: "Tiêu đề",
+  contactTitleDefault: "Liên hệ",
   contactBody: "Nội dung",
   contactContact: "Liên hệ (ID messenger)",
   contactSend: "Gửi",
@@ -470,6 +473,7 @@ const en: Dictionary = {
   adSlot: "Ad space",
   adInquiry: "Advertise",
   contactTitle: "Subject",
+  contactTitleDefault: "Inquiry",
   contactBody: "Message",
   contactContact: "Contact (messenger ID)",
   contactSend: "Send",
@@ -589,6 +593,7 @@ const zh: Dictionary = {
   adSlot: "广告位",
   adInquiry: "广告合作",
   contactTitle: "标题",
+  contactTitleDefault: "咨询",
   contactBody: "内容",
   contactContact: "联系方式（通讯ID）",
   contactSend: "发送",
@@ -709,6 +714,7 @@ const ja: Dictionary = {
   adSlot: "広告枠",
   adInquiry: "広告・提携のお問い合わせ",
   contactTitle: "件名",
+  contactTitleDefault: "お問い合わせ",
   contactBody: "内容",
   contactContact: "連絡先 (メッセンジャーID)",
   contactSend: "送信",
@@ -829,6 +835,7 @@ const th: Dictionary = {
   adSlot: "พื้นที่โฆษณา",
   adInquiry: "โฆษณา/พันธมิตร",
   contactTitle: "หัวข้อ",
+  contactTitleDefault: "สอบถาม",
   contactBody: "ข้อความ",
   contactContact: "ติดต่อ (ID แชท)",
   contactSend: "ส่ง",
@@ -951,6 +958,7 @@ const tl: Dictionary = {
   adSlot: "Espasyo ng ad",
   adInquiry: "Mag-advertise",
   contactTitle: "Paksa",
+  contactTitleDefault: "Katanungan",
   contactBody: "Mensahe",
   contactContact: "Kontak (messenger ID)",
   contactSend: "Ipadala",

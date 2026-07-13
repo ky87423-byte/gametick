@@ -32,11 +32,11 @@ export default async function ContactPage({
     <>
       <Header locale={locale} />
       <main className="mx-auto w-full max-w-lg px-4 py-8">
-        <h1 className="mb-1 text-2xl font-bold">{dict.adInquiry}</h1>
-        <p className="mb-6 text-sm text-zinc-500">ad@gamesise.co.kr</p>
+        <h1 className="mb-6 text-2xl font-bold">{dict.adInquiry}</h1>
         <ContactForm
           labels={{
             title: dict.contactTitle,
+            titleDefault: dict.contactTitleDefault,
             body: dict.contactBody,
             contact: dict.contactContact,
             send: dict.contactSend,

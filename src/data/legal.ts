@@ -21,7 +21,6 @@ const ko: Record<LegalKey, Doc> = {
         heading: "면책",
         paragraphs: [
           "본 서비스는 시세 정보 제공만 하며 직접 거래를 중개하지 않습니다. 표시되는 가격은 참고용이며 실제 거래가와 다를 수 있습니다.",
-          "광고/제휴 문의: ad@gamesise.co.kr",
         ],
       },
     ],
@@ -93,7 +92,6 @@ const vi: Record<LegalKey, Doc> = {
       {
         paragraphs: [
           "Chúng tôi thu thập giá bán thấp nhất từ sàn giao dịch bên ngoài để cung cấp giá theo máy chủ, biến động 24h, biểu đồ nến, cảnh báo giá và giao dịch gần đây.",
-          "Liên hệ quảng cáo: ad@gamesise.co.kr",
         ],
       },
     ],
@@ -129,7 +127,6 @@ const en: Record<LegalKey, Doc> = {
       {
         paragraphs: [
           "We collect the lowest asking price from external exchanges to provide per-server prices, 24h change, candle charts, price alerts, and a recent-trades feed.",
-          "Advertising inquiries: ad@gamesise.co.kr",
         ],
       },
     ],
@@ -164,7 +161,6 @@ const zh: Record<LegalKey, Doc> = {
       {
         paragraphs: [
           "我们采集外部交易所的最低售价，提供各服务器行情、24小时涨跌、K线图、价格提醒和最近成交动态。",
-          "广告合作：ad@gamesise.co.kr",
         ],
       },
     ],
