@@ -34,8 +34,8 @@ export function ContactForm({
 
   async function submit() {
     setErr("");
-    if (!form.title.trim() && !form.content.trim()) {
-      setErr("제목이나 내용을 입력하세요.");
+    if (!form.content.trim()) {
+      setErr("내용을 입력하세요.");
       return;
     }
     setBusy(true);
@@ -74,10 +74,6 @@ export function ContactForm({
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-xs text-zinc-500">{labels.title}</label>
-        <input value={form.title} onChange={set("title")} maxLength={120} className={input} />
-      </div>
       <div>
         <label className="mb-1 block text-xs text-zinc-500">{labels.body}</label>
         <textarea
