@@ -457,6 +457,11 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **결과**: HTML `cf-cache HIT`, /api는 DYNAMIC(제외 확인). 원격측정 TTFB 0.85~1.2초→0.44초(연결·TLS가 대부분=측정지 LAX 거리). **한국 사용자는 서울 PoP HIT로 ~30~50ms(gamebit급) 예상.** 원본 VPS 부하 급감 = 크롤예산·안정성 이득.
 - `.com`은 그대로(→.co.kr 301). CDN 관련: [[gamesise-deploy]]
 
+### 성능: origin SWR — cache-miss 지연 해소 (`d8434ab`)
+- **재진단**: Cloudflare HIT은 빠른데(한국 서울엣지 ~30~50ms) **MISS/EXPIRED 시 origin 1.4~3.1초**(홈 최악)라 체감 느림. 60초 TTL+수천 URL이라 MISS 빈번.
+- **makeTtlCache에 stale-while-revalidate**: 만료돼도 기존값 즉시 반환+백그라운드 갱신 → origin 재계산 블로킹 제거. VPS 로컬 측정 **홈 3.1초→0.04초**, 게임/서버/랭킹 ~40~90ms.
+- **남은 요인**: 서버가 **말레이시아**라 Cloudflare MISS 시 서울엣지→말레이시아 홉(~200~300ms). 대응책 = Cloudflare Edge TTL 60초→300초(적중률↑, 홈·랭킹 최대 5분 지연 감수) 또는 서버 한국 이전(큰 작업). 사용자 재테스트 후 결정.
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
