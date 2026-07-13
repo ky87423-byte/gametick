@@ -451,6 +451,12 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **결과**: 홈 **2.6초→0.83초**, 랭킹/리포트/계산기 1.2~1.4초→0.82초. 전 페이지 ~0.8초 **베이스라인**으로 수렴. 이하로는 캐싱 불가(origin VPS 왕복+SSR+네트워크 고정비용).
 - **남은 것 = A(CDN)**: 0.8초 베이스라인→gamebit급(0.03초)은 **Cloudflare 등 엣지 캐시**만 가능(DNS 작업, 사용자). 미실행.
 
+### 성능 A: Cloudflare CDN 도입 (사용자 작업 + 안내)
+- **1단계**: gamesise.co.kr을 Cloudflare Free에 추가(가비아 네임서버→CF 2개). DNS A레코드 @·www→111.90.148.135 Proxied, 구글인증 TXT 보존, SSL/TLS=Full. → 정적자산 엣지캐싱·HTTP3·TLS.
+- **2단계(HTML 캐싱)**: Cache Rule `URI Path does not start with /api/` → Eligible for cache, Edge TTL=Ignore cache-control & 60s. **force-dynamic이 no-cache 보내므로 "ignore cache-control"이 핵심.** `/api/*`는 제외(실시간 시세 폴링 보호).
+- **결과**: HTML `cf-cache HIT`, /api는 DYNAMIC(제외 확인). 원격측정 TTFB 0.85~1.2초→0.44초(연결·TLS가 대부분=측정지 LAX 거리). **한국 사용자는 서울 PoP HIT로 ~30~50ms(gamebit급) 예상.** 원본 VPS 부하 급감 = 크롤예산·안정성 이득.
+- `.com`은 그대로(→.co.kr 301). CDN 관련: [[gamesise-deploy]]
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
