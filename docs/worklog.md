@@ -445,6 +445,12 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - **원인 규명**: ①itembay — 오렌 seq(16303) 매핑은 정확(itembay 페이지도 동일). 단 realtime API가 "데이터 없음" = **오렌에 현재 itembay 매물 없음**. ②itemmania — **공식 시세 XML 피드(`gamemoney_servers.xml.php?gamecode=5913`)가 27서버만 제공, 오렌·발라카스 누락**. 실제 매물목록(`list_search.html`)엔 오렌 있으나 피드엔 없음. 우리 수집기는 피드 27서버를 100% 정확히 잡는 중(버그 아님).
 - **결정**: 매물 HTML 스크래핑(2서버 위해 프록시부하·깨지기쉬운 코드)은 **비채택**. itemmania/itembay가 신규서버를 피드/거래에 추가하면 자동 반영 → **대기**.
 
+### 성능: 서버 캐싱(B) — TTFB 개선 (`b6de0c5`)
+- **진단**: gamebit TTFB ~0.03초 vs 우리 0.8~2.6초(홈 최악). 원인 ①CDN/캐시 없음(force-dynamic 매요청 렌더) ②홈·랭킹·계산기가 15게임 시세표 매요청 재계산.
+- **B(코드 캐싱) 적용**: `lib/cache.ts makeTtlCache`(60초, 동시요청 inflight 공유). getMarketTable/getReport/getServerExchangeTable/getServerCandles 캐시 래퍼. 홈·랭킹·계산기·게임·서버·리포트·api/prices 교체.
+- **결과**: 홈 **2.6초→0.83초**, 랭킹/리포트/계산기 1.2~1.4초→0.82초. 전 페이지 ~0.8초 **베이스라인**으로 수렴. 이하로는 캐싱 불가(origin VPS 왕복+SSR+네트워크 고정비용).
+- **남은 것 = A(CDN)**: 0.8초 베이스라인→gamebit급(0.03초)은 **Cloudflare 등 엣지 캐시**만 가능(DNS 작업, 사용자). 미실행.
+
 ---
 
 ## 다음 세션 할 일 (우선순위)
