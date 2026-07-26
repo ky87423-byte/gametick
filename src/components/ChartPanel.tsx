@@ -45,6 +45,10 @@ export function ChartPanel({
           <Link
             key={t.tf}
             href={t.href}
+            // 기간 토글은 UX용 — 크롤러가 ?tf= 변형을 별도 페이지로 크롤/색인하지
+            // 않도록 nofollow + 프리페치 비활성. canonical은 쿼리 없는 URL을 가리킴.
+            rel="nofollow"
+            prefetch={false}
             className={`rounded px-3 py-1 text-sm ${
               t.active
                 ? "bg-zinc-100 text-zinc-900"
