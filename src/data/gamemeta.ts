@@ -154,4 +154,14 @@ export const GAME_META: Record<string, GameMeta> = {
     multiClient: "—",
     countries: "KR",
   },
+  "arthdal-chronicles": {
+    release: "2024.04.24",
+    company: "Netmarble",
+    genre: "MMORPG",
+    platform: "PC · Android · iOS",
+    minSpec: "—",
+    recSpec: "—",
+    multiClient: "—",
+    countries: "KR",
+  },
 };
