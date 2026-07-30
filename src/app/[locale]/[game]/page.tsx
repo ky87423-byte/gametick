@@ -108,10 +108,17 @@ export default async function GamePage({
   const move = movers(table, 5);
   const localized = (s: { name: string; nameEn: string; price: number } | null) =>
     s ? { name: localizedName(s.name, s.nameEn, locale), price: s.price } : null;
+  // "기타"는 바로템의 미분류 매물 버킷이지 실제 서버가 아니다. 시세표·평균에는
+  // 그대로 두되(실제 매물이므로), 문장에서 "가장 싼/비싼 서버"로 이름을 단정할
+  // 때만 제외한다 — 안 그러면 "가장 비싼 서버는 기타"라는 틀린 문장이 색인된다.
+  const named = summarize({
+    ...table,
+    servers: table.servers.filter((s) => s.nameEn !== "Etc"),
+  });
   const summaryData: GameSummaryData = {
     avg: summary.avg,
-    low: localized(summary.low),
-    high: localized(summary.high),
+    low: localized(named.low),
+    high: localized(named.high),
     activeCount: summary.activeCount,
     totalCount: table.servers.length,
     trendPercent: trend.changePercent,
