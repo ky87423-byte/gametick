@@ -118,9 +118,339 @@ export function serverMetaDescription(
   return `${serverName} 서버 ${game.nameKo} ${cur} 시세 — 현재 ${game.unitLabelKo} ${cur}당 ${won}원. 24시간 등락과 3분·1시간·일봉 차트, 가격 알림을 무료로 제공합니다.`;
 }
 
+// ── 게임 페이지 시세 요약 (실데이터 서술) ─────────────────────────────
+// 게임 페이지 본문은 시세표(숫자)와 정적 소개문뿐이라, 검색엔진이 읽을 문장에
+// 정작 "얼마"가 없었다. GSC 실측에서 /ko/lineage-m 175노출·/ko/lineage-2m
+// 135노출로 1페이지권인데 클릭이 0인 이유이기도 하다. 아래는 표에 이미 있는
+// 값만 문장으로 옮긴 것 — 없는 사실을 지어내지 않는다(가짜 prose 금지 원칙).
+
+export interface GameSummaryData {
+  avg: number | null;
+  low: { name: string; price: number } | null;
+  high: { name: string; price: number } | null;
+  activeCount: number;
+  totalCount: number;
+  /** 최근 N일 평균가 등락률(%) — 이력 부족 시 null */
+  trendPercent: number | null;
+  trendDays: number;
+}
+
+/** 서버 간 가격차(%) — 최저가 대비. 한쪽이라도 없거나 0이면 null */
+function spreadOf(d: GameSummaryData): number | null {
+  if (!d.low || !d.high || d.low.price <= 0) return null;
+  const pct = ((d.high.price - d.low.price) / d.low.price) * 100;
+  return pct >= 1 ? Math.round(pct) : null;
+}
+
+function krw(n: number): string {
+  return n.toLocaleString("ko-KR");
+}
+
+/**
+ * 한국어 조사 선택. 화폐명이 게임마다 달라(아데나·다이아·키나 vs 천당·아덴)
+ * 받침 유무가 갈린다 — 고정 문자열로 두면 "아데나이 가장 싼"이 된다.
+ * 한글 음절만 판별하고, 숫자·영문으로 끝나면 받침 없음으로 본다.
+ */
+function josa(word: string, withBatchim: string, without: string): string {
+  const last = word.trim().slice(-1);
+  const code = last.charCodeAt(0);
+  const isHangul = code >= 0xac00 && code <= 0xd7a3;
+  if (!isHangul) return without;
+  return (code - 0xac00) % 28 !== 0 ? withBatchim : without;
+}
+
+/** 등락률 표기용 절대값 1자리 (부호는 문장에서 단어로 표현) */
+function absPct(n: number): string {
+  return Math.abs(n).toFixed(1);
+}
+
+/**
+ * 게임 페이지 상단 시세 요약 문단. 평균·최저·최고·서버수는 항상, 서버간
+ * 가격차와 기간 등락은 데이터가 있을 때만 덧붙인다. 가격이 아예 없으면 null
+ * (호출부가 기존 소개문만 보여준다).
+ */
+export function gameSummaryText(
+  locale: Locale,
+  game: GameInfo,
+  d: GameSummaryData
+): string | null {
+  if (d.avg === null || d.activeCount === 0) return null;
+  const cur = currencyOf(game, locale);
+  const unitEn = game.unitAmount.toLocaleString("en-US");
+  const spread = spreadOf(d);
+  const up = d.trendPercent !== null && d.trendPercent > 0;
+  const parts: string[] = [];
+
+  if (locale === "en") {
+    parts.push(
+      `The average ${game.nameEn} ${cur} price is ${krw(d.avg)} KRW per ${unitEn} ${cur}.`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `The cheapest server is ${d.low.name} at ${krw(d.low.price)} KRW and the most expensive is ${d.high.name} at ${krw(d.high.price)} KRW` +
+          (spread ? `, a gap of ${spread}%.` : ".")
+      );
+    }
+    parts.push(
+      `${d.activeCount} of ${d.totalCount} servers currently have listings.`
+    );
+    if (d.trendPercent !== null) {
+      parts.push(
+        `Over the past ${d.trendDays} days the average price is ${up ? "up" : "down"} ${absPct(d.trendPercent)}%.`
+      );
+    }
+    return parts.join(" ");
+  }
+  if (locale === "zh") {
+    parts.push(
+      `${game.nameEn} ${cur} 平均行情为每 ${unitEn} ${cur} ${krw(d.avg)} 韩元。`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `最便宜的服务器是 ${d.low.name}（${krw(d.low.price)} 韩元），最贵的是 ${d.high.name}（${krw(d.high.price)} 韩元）` +
+          (spread ? `，价差 ${spread}%。` : "。")
+      );
+    }
+    parts.push(`${d.totalCount} 个服务器中有 ${d.activeCount} 个当前有挂单。`);
+    if (d.trendPercent !== null) {
+      parts.push(
+        `最近 ${d.trendDays} 天平均价${up ? "上涨" : "下跌"}了 ${absPct(d.trendPercent)}%。`
+      );
+    }
+    return parts.join("");
+  }
+  if (locale === "vi") {
+    parts.push(
+      `Giá ${cur} ${game.nameEn} trung bình là ${krw(d.avg)} KRW mỗi ${unitEn} ${cur}.`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `Máy chủ rẻ nhất là ${d.low.name} (${krw(d.low.price)} KRW), đắt nhất là ${d.high.name} (${krw(d.high.price)} KRW)` +
+          (spread ? `, chênh lệch ${spread}%.` : ".")
+      );
+    }
+    parts.push(`${d.activeCount}/${d.totalCount} máy chủ hiện có tin đăng.`);
+    if (d.trendPercent !== null) {
+      parts.push(
+        `Trong ${d.trendDays} ngày qua giá trung bình đã ${up ? "tăng" : "giảm"} ${absPct(d.trendPercent)}%.`
+      );
+    }
+    return parts.join(" ");
+  }
+  if (locale === "ja") {
+    parts.push(
+      `${game.nameEn} ${cur} の平均相場は ${unitEn} ${cur} あたり ${krw(d.avg)} ウォンです。`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `最安サーバーは ${d.low.name}（${krw(d.low.price)} ウォン）、最高は ${d.high.name}（${krw(d.high.price)} ウォン）` +
+          (spread ? `で、価格差は ${spread}% です。` : "です。")
+      );
+    }
+    parts.push(`${d.totalCount} サーバー中 ${d.activeCount} に出品があります。`);
+    if (d.trendPercent !== null) {
+      parts.push(
+        `直近 ${d.trendDays} 日間で平均価格は ${absPct(d.trendPercent)}% ${up ? "上昇" : "下落"}しました。`
+      );
+    }
+    return parts.join("");
+  }
+  if (locale === "th") {
+    parts.push(
+      `ราคา ${cur} ${game.nameEn} เฉลี่ยอยู่ที่ ${krw(d.avg)} วอน ต่อ ${unitEn} ${cur}`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `เซิร์ฟเวอร์ที่ถูกที่สุดคือ ${d.low.name} (${krw(d.low.price)} วอน) และแพงที่สุดคือ ${d.high.name} (${krw(d.high.price)} วอน)` +
+          (spread ? ` ต่างกัน ${spread}%` : "")
+      );
+    }
+    parts.push(`มี ${d.activeCount} จาก ${d.totalCount} เซิร์ฟเวอร์ที่มีประกาศขาย`);
+    if (d.trendPercent !== null) {
+      parts.push(
+        `ในช่วง ${d.trendDays} วันที่ผ่านมาราคาเฉลี่ย${up ? "เพิ่มขึ้น" : "ลดลง"} ${absPct(d.trendPercent)}%`
+      );
+    }
+    return parts.join(" ");
+  }
+  if (locale === "tl") {
+    parts.push(
+      `Ang karaniwang presyo ng ${game.nameEn} ${cur} ay ${krw(d.avg)} KRW kada ${unitEn} ${cur}.`
+    );
+    if (d.low && d.high) {
+      parts.push(
+        `Ang pinakamurang server ay ${d.low.name} (${krw(d.low.price)} KRW) at ang pinakamahal ay ${d.high.name} (${krw(d.high.price)} KRW)` +
+          (spread ? `, ${spread}% ang agwat.` : ".")
+      );
+    }
+    parts.push(
+      `${d.activeCount} sa ${d.totalCount} server ang may listing ngayon.`
+    );
+    if (d.trendPercent !== null) {
+      parts.push(
+        `Sa nakaraang ${d.trendDays} araw, ${up ? "tumaas" : "bumaba"} ng ${absPct(d.trendPercent)}% ang karaniwang presyo.`
+      );
+    }
+    return parts.join(" ");
+  }
+
+  parts.push(
+    `${game.nameKo} ${cur} 시세는 ${game.unitLabelKo} ${cur}당 평균 ${krw(d.avg)}원입니다.`
+  );
+  if (d.low && d.high) {
+    parts.push(
+      `가장 싼 서버는 ${d.low.name}(${krw(d.low.price)}원), 가장 비싼 서버는 ${d.high.name}(${krw(d.high.price)}원)으로` +
+        (spread ? ` 서버 간 가격 차이는 ${spread}%입니다.` : " 집계됩니다.")
+    );
+  }
+  parts.push(`전체 ${d.totalCount}개 서버 중 ${d.activeCount}개에 매물이 있습니다.`);
+  if (d.trendPercent !== null) {
+    parts.push(
+      `최근 ${d.trendDays}일 동안 평균가는 ${absPct(d.trendPercent)}% ${up ? "올랐습니다" : "내렸습니다"}.`
+    );
+  }
+  return parts.join(" ");
+}
+
 export interface FaqItem {
   q: string;
   a: string;
+}
+
+/**
+ * 실가격이 들어간 FAQ — 기존 faqItems(수집방식·단위 등 운영 안내) 앞에 붙는다.
+ * 질문 문장을 실제 검색어 형태("… 시세 얼마", "… 가장 싼 서버")로 맞춰,
+ * FAQPage 스키마와 본문 양쪽에서 롱테일 질의와 매칭되게 한다.
+ */
+export function priceFaqItems(
+  locale: Locale,
+  game: GameInfo,
+  d: GameSummaryData
+): FaqItem[] {
+  if (d.avg === null || !d.low) return [];
+  const cur = currencyOf(game, locale);
+  const unitEn = game.unitAmount.toLocaleString("en-US");
+  const out: FaqItem[] = [];
+  const up = d.trendPercent !== null && d.trendPercent > 0;
+
+  if (locale === "en") {
+    out.push({
+      q: `How much is ${game.nameEn} ${cur} right now?`,
+      a: `The average is ${krw(d.avg)} KRW per ${unitEn} ${cur}, with the lowest server at ${krw(d.low.price)} KRW. Updated automatically from external exchange listings.`,
+    });
+    out.push({
+      q: `Which ${game.nameEn} server has the cheapest ${cur}?`,
+      a: `${d.low.name} at ${krw(d.low.price)} KRW per ${unitEn} ${cur}. Prices move constantly, so check the table above for the current ranking.`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `Is the ${game.nameEn} ${cur} price going up or down?`,
+        a: `Over the past ${d.trendDays} days the average price is ${up ? "up" : "down"} ${absPct(d.trendPercent)}%. Open a server page for 3m/1h/1d candle charts.`,
+      });
+    }
+    return out;
+  }
+  if (locale === "zh") {
+    out.push({
+      q: `${game.nameEn} ${cur} 现在多少钱？`,
+      a: `平均每 ${unitEn} ${cur} ${krw(d.avg)} 韩元，最低的服务器为 ${krw(d.low.price)} 韩元。数据来自外部交易所挂单，自动更新。`,
+    });
+    out.push({
+      q: `${game.nameEn} 哪个服务器的 ${cur} 最便宜？`,
+      a: `${d.low.name}，每 ${unitEn} ${cur} ${krw(d.low.price)} 韩元。行情随时变动，请以上方表格为准。`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `${game.nameEn} ${cur} 行情在涨还是在跌？`,
+        a: `最近 ${d.trendDays} 天平均价${up ? "上涨" : "下跌"}了 ${absPct(d.trendPercent)}%。点击服务器可查看3分/1小时/日线K线图。`,
+      });
+    }
+    return out;
+  }
+  if (locale === "vi") {
+    out.push({
+      q: `Giá ${cur} ${game.nameEn} hiện tại là bao nhiêu?`,
+      a: `Trung bình ${krw(d.avg)} KRW mỗi ${unitEn} ${cur}, máy chủ thấp nhất là ${krw(d.low.price)} KRW. Cập nhật tự động từ tin đăng trên sàn bên ngoài.`,
+    });
+    out.push({
+      q: `Máy chủ ${game.nameEn} nào có ${cur} rẻ nhất?`,
+      a: `${d.low.name} với ${krw(d.low.price)} KRW mỗi ${unitEn} ${cur}. Giá thay đổi liên tục, hãy xem bảng phía trên.`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `Giá ${cur} ${game.nameEn} đang tăng hay giảm?`,
+        a: `Trong ${d.trendDays} ngày qua giá trung bình đã ${up ? "tăng" : "giảm"} ${absPct(d.trendPercent)}%. Mở trang máy chủ để xem biểu đồ nến.`,
+      });
+    }
+    return out;
+  }
+  if (locale === "ja") {
+    out.push({
+      q: `${game.nameEn} の ${cur} は今いくらですか？`,
+      a: `平均で ${unitEn} ${cur} あたり ${krw(d.avg)} ウォン、最安サーバーは ${krw(d.low.price)} ウォンです。外部取引所の出品から自動更新しています。`,
+    });
+    out.push({
+      q: `${game.nameEn} で ${cur} が一番安いサーバーは？`,
+      a: `${d.low.name}（${unitEn} ${cur} あたり ${krw(d.low.price)} ウォン）です。相場は常に変動するため、上の表で最新順位をご確認ください。`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `${game.nameEn} ${cur} の相場は上がっていますか、下がっていますか？`,
+        a: `直近 ${d.trendDays} 日間で平均価格は ${absPct(d.trendPercent)}% ${up ? "上昇" : "下落"}しました。サーバーページで3分・1時間・日足チャートを確認できます。`,
+      });
+    }
+    return out;
+  }
+  if (locale === "th") {
+    out.push({
+      q: `ตอนนี้ ${cur} ของ ${game.nameEn} ราคาเท่าไร?`,
+      a: `เฉลี่ย ${krw(d.avg)} วอน ต่อ ${unitEn} ${cur} เซิร์ฟเวอร์ที่ต่ำสุดอยู่ที่ ${krw(d.low.price)} วอน อัปเดตอัตโนมัติจากประกาศบนตลาดภายนอก`,
+    });
+    out.push({
+      q: `เซิร์ฟเวอร์ไหนของ ${game.nameEn} มี ${cur} ถูกที่สุด?`,
+      a: `${d.low.name} ที่ ${krw(d.low.price)} วอน ต่อ ${unitEn} ${cur} ราคาเปลี่ยนตลอดเวลา โปรดดูตารางด้านบน`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `ราคา ${cur} ของ ${game.nameEn} กำลังขึ้นหรือลง?`,
+        a: `ในช่วง ${d.trendDays} วันที่ผ่านมาราคาเฉลี่ย${up ? "เพิ่มขึ้น" : "ลดลง"} ${absPct(d.trendPercent)}% เปิดหน้าเซิร์ฟเวอร์เพื่อดูกราฟแท่งเทียน`,
+      });
+    }
+    return out;
+  }
+  if (locale === "tl") {
+    out.push({
+      q: `Magkano ang ${game.nameEn} ${cur} ngayon?`,
+      a: `Karaniwang ${krw(d.avg)} KRW kada ${unitEn} ${cur}, at ${krw(d.low.price)} KRW sa pinakamurang server. Awtomatikong ina-update mula sa mga listing sa panlabas na exchange.`,
+    });
+    out.push({
+      q: `Aling ${game.nameEn} server ang may pinakamurang ${cur}?`,
+      a: `${d.low.name} sa ${krw(d.low.price)} KRW kada ${unitEn} ${cur}. Palaging nagbabago ang presyo — tingnan ang talahanayan sa itaas.`,
+    });
+    if (d.trendPercent !== null) {
+      out.push({
+        q: `Tumataas ba o bumababa ang presyo ng ${game.nameEn} ${cur}?`,
+        a: `Sa nakaraang ${d.trendDays} araw, ${up ? "tumaas" : "bumaba"} ng ${absPct(d.trendPercent)}% ang karaniwang presyo. Buksan ang server page para sa candle chart.`,
+      });
+    }
+    return out;
+  }
+
+  out.push({
+    q: `${game.nameKo} ${cur} 시세는 지금 얼마인가요?`,
+    a: `${game.unitLabelKo} ${cur}당 평균 ${krw(d.avg)}원이고, 가장 싼 서버는 ${krw(d.low.price)}원입니다. 외부 거래소 매물을 기준으로 자동 갱신됩니다.`,
+  });
+  out.push({
+    q: `${game.nameKo} ${cur}${josa(cur, "이", "가")} 가장 싼 서버는 어디인가요?`,
+    a: `${d.low.name} 서버로 ${game.unitLabelKo} ${cur}당 ${krw(d.low.price)}원입니다. 시세는 수시로 바뀌므로 위 표에서 최신 순위를 확인하세요.`,
+  });
+  if (d.trendPercent !== null) {
+    out.push({
+      q: `${game.nameKo} ${cur} 시세가 오르고 있나요, 내리고 있나요?`,
+      a: `최근 ${d.trendDays}일 동안 평균가가 ${absPct(d.trendPercent)}% ${up ? "올랐습니다" : "내렸습니다"}. 서버를 누르면 3분·1시간·일봉 차트로 추이를 볼 수 있습니다.`,
+    });
+  }
+  return out;
 }
 
 export interface ServerFaqStats {

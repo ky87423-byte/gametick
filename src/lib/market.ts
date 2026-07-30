@@ -152,8 +152,10 @@ export async function getMarketTable(game: GameInfo): Promise<MarketTable> {
 
 export interface MarketSummary {
   avg: number | null;
-  high: { name: string; price: number } | null;
-  low: { name: string; price: number } | null;
+  // name은 한국어명(기존 호출부 호환). 외국어판에서 서버명을 문장에 넣을 때는
+  // nameEn과 localizedName()을 쓴다 — 안 그러면 영어 페이지에 한글이 섞인다.
+  high: { name: string; nameEn: string; price: number } | null;
+  low: { name: string; nameEn: string; price: number } | null;
   activeCount: number; // 시세가 있는 서버 수
 }
 
@@ -174,8 +176,8 @@ export function summarize(table: MarketTable): MarketSummary {
   }
   return {
     avg: Math.round(sum / priced.length),
-    high: { name: high.nameKo, price: high.priceKrw },
-    low: { name: low.nameKo, price: low.priceKrw },
+    high: { name: high.nameKo, nameEn: high.nameEn, price: high.priceKrw },
+    low: { name: low.nameKo, nameEn: low.nameEn, price: low.priceKrw },
     activeCount: priced.length,
   };
 }

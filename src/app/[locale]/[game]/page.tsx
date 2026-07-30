@@ -10,13 +10,25 @@ import {
   localizedName,
 } from "@/data/games";
 import { SOURCE_LABEL } from "@/data/exchanges";
-import { getMarketTableCached, summarize, movers } from "@/lib/market";
+import {
+  getMarketTableCached,
+  summarize,
+  movers,
+  getGameTrend,
+} from "@/lib/market";
 import { getRates } from "@/lib/exchange";
 import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
-import { gameIntro, gameMetaDescription, faqItems } from "@/data/content";
+import {
+  gameIntro,
+  gameMetaDescription,
+  gameSummaryText,
+  priceFaqItems,
+  faqItems,
+  type GameSummaryData,
+} from "@/data/content";
 import { Faq } from "@/components/Faq";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -26,7 +38,12 @@ import { MarketTable } from "@/components/MarketTable";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Rankings } from "@/components/Rankings";
 import { GuideLinks } from "@/components/GuideLinks";
-import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
+import {
+  JsonLd,
+  breadcrumbLd,
+  aggregateOfferLd,
+  SITE,
+} from "@/components/JsonLd";
 import { formatKrw, formatViewers, changeText, changeColor } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -78,16 +95,34 @@ export default async function GamePage({
 
   const dict = getDictionary(locale);
   const keyword = game.chzzkKeyword ?? game.nameKo;
-  const [table, trades, lives, popularVideos, rates] = await Promise.all([
+  const [table, trades, lives, popularVideos, rates, trend] = await Promise.all([
     getMarketTableCached(game.slug),
     readTrades(game.slug),
     fetchAllLives(liveQuery(game), 5),
     fetchPopularVideos(keyword, 5),
     getRates(),
+    // 7일 평균가 추이 — 요약 문단·FAQ의 "오르고 있나요" 답변에만 쓴다.
+    getGameTrend(game, 7 * 24 * 60 * 60 * 1000),
   ]);
   const summary = summarize(table);
   const move = movers(table, 5);
-  const faqs = faqItems(locale, game);
+  const localized = (s: { name: string; nameEn: string; price: number } | null) =>
+    s ? { name: localizedName(s.name, s.nameEn, locale), price: s.price } : null;
+  const summaryData: GameSummaryData = {
+    avg: summary.avg,
+    low: localized(summary.low),
+    high: localized(summary.high),
+    activeCount: summary.activeCount,
+    totalCount: table.servers.length,
+    trendPercent: trend.changePercent,
+    trendDays: 7,
+  };
+  const summaryText = gameSummaryText(locale, game, summaryData);
+  // 실가격 Q&A를 운영 안내 FAQ 앞에 — 검색 질의와 형태가 같은 질문이 먼저 온다.
+  const faqs = [
+    ...priceFaqItems(locale, game, summaryData),
+    ...faqItems(locale, game),
+  ];
   const namedRanks = popularVideos.map((v, i) => ({
     rank: i + 1,
     name: v.title,
@@ -343,8 +378,14 @@ export default async function GamePage({
           />
         </section>
 
-        {/* 게임 소개 (SEO) */}
+        {/* 시세 요약(실데이터) + 게임 소개 (SEO) */}
         <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+          <h2 className="mb-2 text-base font-bold text-zinc-100">
+            {dict.priceTitle(gameNameOf(game, locale), currencyOf(game, locale))}
+          </h2>
+          {summaryText && (
+            <p className="mb-3 text-sm leading-6 text-zinc-300">{summaryText}</p>
+          )}
           <p className="text-sm leading-6 text-zinc-400">
             {gameIntro(locale, game)}
           </p>
@@ -368,6 +409,20 @@ export default async function GamePage({
               }}
             />
           </>
+        )}
+
+        {/* 시세 범위 구조화 데이터 — 검색결과에 가격이 표시될 수 있게 */}
+        {summary.low && summary.high && (
+          <JsonLd
+            data={aggregateOfferLd({
+              name: `${gameNameOf(game, locale)} ${currencyOf(game, locale)}`,
+              description: unitText,
+              url: `${SITE}/${locale}/${game.slug}`,
+              lowPrice: summary.low.price,
+              highPrice: summary.high.price,
+              offerCount: summary.activeCount,
+            })}
+          />
         )}
 
         <JsonLd data={crumbLd} />
