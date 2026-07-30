@@ -24,7 +24,7 @@ import { AlertButton } from "@/components/AlertButton";
 import { TelegramAlert } from "@/components/TelegramAlert";
 import { DiscordAlert } from "@/components/DiscordAlert";
 import { PriceCalc } from "@/components/PriceCalc";
-import { serverIntro, serverFaq } from "@/data/content";
+import { serverIntro, serverMetaDescription, serverFaq } from "@/data/content";
 import { Faq } from "@/components/Faq";
 import { GuideLinks } from "@/components/GuideLinks";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
@@ -47,12 +47,20 @@ export async function generateMetadata({
   const dict = getDictionary(locale as Locale);
   const gameName = gameNameOf(game, locale);
   const serverName = serverNameOf(server, locale);
-  const title = `${serverName} · ${gameName} ${currencyOf(game, locale)} | ${dict.brand}`;
-  const description = serverIntro(locale as Locale, game, serverName);
+  const cur = currencyOf(game, locale);
+  // 제목에 '시세'(핵심 검색어)를 서버명과 게임명 양쪽에 넣는다. 이전 제목
+  // "지그 · 리니지2M 다이아"에는 검색어가 아예 없어 매칭이 약했다.
+  const title = `${dict.priceTitle(serverName, cur)} | ${dict.priceTitle(gameName, cur)} - ${dict.brand}`;
   // 매물(시세)이 있는 서버만 검색 색인. 없으면 noindex(단 follow) — 색인 예산을
   // 알짜 페이지에 집중. 매물이 생기면 자동으로 다시 색인된다(데이터 기반).
   const price = latestPrice(await readHistory(game.slug), server.id);
   const indexable = price !== null && price > 0;
+  const description = serverMetaDescription(
+    locale as Locale,
+    game,
+    serverName,
+    price
+  );
   return {
     title,
     description,

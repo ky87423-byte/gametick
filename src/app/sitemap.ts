@@ -4,6 +4,7 @@ import { guideList } from "@/data/guides";
 import { locales } from "@/i18n/config";
 import { readHistory, latestPrice } from "@/lib/history";
 import { recentDates, kstDayStartMs } from "@/lib/reportDates";
+import { makeTtlCache } from "@/lib/cache";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
 
@@ -20,7 +21,7 @@ function langs(seg: string): Record<string, string> {
   return m;
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+async function build(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const out: MetadataRoute.Sitemap = [];
   // 한 경로를 전 언어판으로 추가 + 각 항목에 hreflang 대체 + lastmod
@@ -42,6 +43,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   };
 
+  // 한국어판만 사이트맵에 올린다 (크롤 예산 집중). 서버 상세·날짜 리포트는
+  // 페이지 수가 로케일당 수백 개라, 7개 언어로 곱하면 사이트맵이 3천 URL을
+  // 넘겨 구글이 사이트 전체 크롤을 미뤘다(2026-07 노출 급락 원인).
+  // 외국어판 페이지는 그대로 살아있고 alternates로 계속 알리므로, 수요가
+  // 생기면 구글이 알아서 크롤한다. 되돌리려면 addKo → add 로 바꾸면 된다.
+  const addKo = (
+    seg: string,
+    changeFrequency: Freq,
+    priority: number,
+    lastModified: Date = now
+  ) => {
+    out.push({
+      url: `${BASE}/ko${seg}`,
+      lastModified,
+      changeFrequency,
+      priority,
+      alternates: { languages: langs(seg) },
+    });
+  };
+
   add("", "hourly", 1);
   add("/ranking", "hourly", 0.7);
   add("/calculator", "weekly", 0.5);
@@ -52,7 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 날짜별 시세 리포트(최근 14일) — 매일 새 URL로 크롤 신선도 확보. lastmod=그 날.
   for (const d of recentDates(14)) {
     const dayMs = kstDayStartMs(d);
-    add(`/report/${d}`, "monthly", 0.4, dayMs ? new Date(dayMs) : now);
+    addKo(`/report/${d}`, "monthly", 0.4, dayMs ? new Date(dayMs) : now);
   }
   // 가이드 슬러그는 언어 무관(내용만 번역) → 대표 로케일 목록으로 hreflang 구성
   for (const gd of guideList(locales[0])) {
@@ -66,9 +87,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const history = await readHistory(g.slug);
     for (const s of g.servers) {
       if (latestPrice(history, s.id) !== null) {
-        add(`/${g.slug}/${s.id}`, "hourly", 0.6);
+        addKo(`/${g.slug}/${s.id}`, "hourly", 0.6);
       }
     }
   }
   return out;
+}
+
+// force-dynamic이라 요청마다 전 게임 이력을 읽고 수백 URL을 다시 만들었다
+// (라이브 실측 TTFB 6.2초). 사이트맵은 분 단위로 바뀔 내용이 아니므로 30분
+// SWR 캐시로 감싼다 — 부팅 후 첫 요청만 기다리고, 이후 만료돼도 기존값을
+// 즉시 주고 백그라운드에서 갱신한다. 구글봇이 6초를 기다릴 일이 없어진다.
+const cachedSitemap = makeTtlCache(build, 30 * 60_000);
+
+export default function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return cachedSitemap();
 }

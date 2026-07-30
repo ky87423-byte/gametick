@@ -483,20 +483,68 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ---
 
+## 📌 세션 요약 (2026-07-27) — 신규게임·유튜브배너·구글색인 실측·?tf= 크롤 차단
+
+**① 신규 서버 4종 + 신규게임 아스달연대기** (gametick `58fc060` + lc_vn `2996eba`, 양쪽 VPS 배포)
+- 바로템 서버필터 대조로 신규서버 추가: **리니지클래식** 안타라스(27413)·글루디오(27455), **솔인챈트** 레지나(27059), **아이온** 중국-6(27556). (아이온2는 신규 "기타"=캐치올뿐 → 제외)
+- **신규게임 아스달연대기**(사용자는 "아스날"로 지칭, 실제 "아스달연대기: 세 개의 세력") — slug `arthdal-chronicles`, threadId `2382r416`, 화폐 다이아·천당(`unitAmount 1000`/lc_vn `fallbackUnit 1000`), serverParam opt1, 서버 18개("기타" 제외). `gamemeta.ts`에 넷마블·2024.04.24·MMORPG 추가.
+- 검증: lc_vn `data/history-arthdal-chronicles.json` 생성·18서버 시세·매물수 수집, 라이브 `/ko/arthdal-chronicles` 200, 사이트맵 포함. **별자리서버(레오/벨라 ~20원/다이아) vs 통합거래소(~4.8원) 4배차 = 실시세**(신섭 공급부족, 47750÷2449=19.5 파싱 정상, 크로스서버 ×8 안전망 통과).
+- 🔑 **교훈**: **바로템 로컬IP 차단 해제됨** — 과거 add-game 메모의 "로컬IP는 code 100 거부, VPS에서만"은 **틀림**. 지금은 집 IP에서 `lists`·`productTable` 200 정상(서버 발견에 VPS 불필요). 서버목록+opt id 추출은 `product/lists/{threadId}` HTML의 `<li data-title="opt1" data-opt1="24487"><p>데포로쥬</p></li>`(아이온 등은 opt2). "기타"=미분류 캐치올, 실제 서버 아님. [[add-game]]
+
+**② 데스사관학교 유튜브 채널 홍보 배너** (gametick `239a094`)
+- 게임상세 우측 `aside`(`[locale]/[game]/page.tsx`) 기존 boost-ad 배너 **아래** 슬롯 추가. `/ads/death-yt.jpg`(영상 썸네일 1280×720)+중앙 재생버튼 오버레이(인라인 SVG)+YouTube 레드 CTA. 링크=채널 `https://www.youtube.com/channel/UCEcxfCrlXCSxHk-PB3qtZIA`, `rel="sponsored"`. **기존 대리육성 배너와 동일 광고주**(데스사관학교).
+
+**③ 구글 색인 실측 (서치콘솔) — 큰 반전** (사용자 스샷 g12)
+- **색인됨 399** · 발견-현재색인안됨 808 · 크롤됨-현재색인안됨 48 · 대체페이지(정상 canonical) 10 · 리디렉션 2 · 중복 1.
+- **이전 세션들의 "site:gamesise.co.kr = 0"은 내 WebSearch(미국 구글) 착시**였음 — 실제 KR구글엔 6월말부터 색인. 문제 성격이 **색인 문제 → 순위(경쟁) 문제**로 전환. "리니지시세/게임시세" 미노출은 이제 색인이 아닌 **순위** 이슈(경쟁사 gamebit·kina3는 노출 중). memory 신규 `gsc-index-status`.
+
+**④ ?tf= 중복 URL 크롤 차단** (gametick `95f3b84`)
+- 크롤-미색인 48건 분석(스샷 z1~z5): **27건이 `?tf=1h/1d/3m` 중복 URL**(서버페이지 차트 기간토글이 `ChartPanel`의 `<Link href="...?tf=">`라 Googlebot이 변형 전부 크롤 → 크롤예산 낭비). 4건 정적에셋(woff2·manifest·favicon, 무시). ~17건 정상 서버/`live` 페이지(크롤예산·신선도).
+- 조치: `robots.ts`에 `Disallow: /*?tf=` 추가(양대 근본 차단), `ChartPanel` 기간탭 `<Link>`에 `rel="nofollow"`+`prefetch={false}`. server 페이지 canonical은 원래부터 쿼리없는 URL(`[server]/page.tsx:60`). **효과=크롤예산 회수, 리포트에서 27건 이탈은 2~4주 뒤 GSC 재크롤 후 확인**.
+- ⚠️ robots.txt는 Cloudflare 관리블록(AI크롤러 차단) + 우리 Next블록 **두 개의 `User-agent: *`** 로 나옴 — 구글은 동일 UA 그룹을 병합 처리하므로 `Disallow: /*?tf=` 적용됨(라이브 확인 완료).
+
+---
+
+## 📌 세션 요약 (2026-07-31) — 속도·순위 실측 + 미배포 SEO 변경분 배포 + 사이트맵 캐시
+
+**① 라이브 속도 실측** (한국에서 curl, TTFB)
+- **엣지 HIT 0.45초** (연결+TLS 0.31초 제외하면 엣지 자체 ~0.14초) — 홈·랭킹·게임·서버·리포트 전부 동일. CF 캐싱은 잘 동작.
+- **MISS(오리진 렌더)**: 홈 1.36 / 랭킹 1.24 / 게임 2.85 / 서버상세 3.52 / 리포트 3.39초. 콜드 1건에서 랭킹 **8.8초** 관측 → 크롤러가 미스를 밟으면 그대로 느림.
+- 자원: 홈 HTML 8KB(gzip)+JS 196KB+CSS 8KB = **205KB/12파일**(양호). 서버상세 HTML은 **86KB**(홈의 10배).
+- **`/sitemap.xml` = 2.87MB · TTFB 6.2초 / 총 7.1초** ← 최대 병목. PSI API는 일일 쿼터 429로 실패(LCP/CLS 실사용자 지표 미확보).
+
+**② 구글 순위 실측 — 핵심 키워드 전부 미노출**
+- "리니지 클래식 아데나 시세" / "…서버별…차트 비교" / "아이온2 키나 시세 실시간" / "데포로쥬 아데나 시세" / "gamesise.co.kr" 5개 검색 모두 **상위 10위 내 gamesise 없음**.
+- 상위는 **gamebit(서버별 페이지로 3~5칸 점유)**, adena.kr, 신규 **gamesaeng.com**, 아이템베이/아이템매니아, kina3. 경쟁사 공통 = **서버 1개당 독립 페이지 + 제목 "[서버명] 아데나 시세"**.
+- ⚠️ 내 WebSearch는 미국 구글이라 KR 실순위와 다름 — 권위 소스는 GSC. [[gsc-index-status]]
+
+**③ 미배포로 방치돼 있던 SEO 변경분 발견·배포** (working tree에 커밋 없이 남아 있었음)
+- `sitemap.ts` **addKo** — 서버상세·날짜리포트를 7개 로케일로 곱하지 않고 ko만 등재. 라이브는 여전히 **454×7=3,178 URL**이었음(7월 노출 급락 원인으로 지목했던 그 상태).
+- `[server]/page.tsx` **제목에 "시세" 삽입** — `데포로쥬 · 리니지 클래식 아데나` → **`데포로쥬 아데나 시세 | 리니지 클래식 아데나 시세 - 게임시세`**(gamebit 패턴과 동형). `dict.priceTitle`을 서버명·게임명 양쪽에 적용.
+- `content.ts` **스니펫 전용 meta description**(`gameMetaDescription`/`serverMetaDescription`, 7개 언어) — 앞머리에 **실가격+서버수**를 넣어 잘려도 숫자가 보이게. 가격 없으면 기존 intro 폴백.
+
+**④ 사이트맵 SWR 캐시** (이번 세션 신규)
+- `sitemap.ts`: 본문을 `build()`로 분리하고 `makeTtlCache(build, 30분)`으로 감쌈. force-dynamic이라 매 요청 전 게임 이력 read+수백 URL 생성을 반복하던 것을 부팅 후 1회로. 만료돼도 stale 즉시 반환+백그라운드 갱신이라 구글봇이 6초 대기할 일 없음.
+- addKo와 합쳐 URL 3,178 → **~470개**, 크기 2.87MB → 약 1/7.
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
-0. **(운영·최우선) 구글 색인 확인** — **기준값: 2026-07-13 `site:gamesise.co.kr` = 색인 0.** 며칠 뒤(~7/18 cron 리마인더 or 사용자 요청) 재확인해 0→증가 여부 보고. 사용자 서치콘솔 "색인생성→페이지" 스크린샷 받으면 정확. 여전히 0이면 `/ko`·`/en`·`/vi` 대표 URL 색인 재요청 안내. 홈 리디렉션·CDN·콘텐츠 다 손봤으니 이제 색인 늘 차례.
+0. **(운영·최우선) GSC 재확인 — ~8월 중순(2~4주 뒤)** — **기준값: 2026-07-27 색인됨 399 / 발견-미색인 808 / 크롤-미색인 48(그중 ?tf= 27건).** 사용자에게 서치콘솔 "색인생성→페이지"(g12형) 재캡처 요청해: ①`?tf=` 27건이 크롤-미색인에서 빠졌는지(→robots 효과) ②색인 399→증가 ③발견-미색인 808 감소 확인. `site:`는 내 WebSearch(미국)로는 부정확하니 **서치콘솔이 유일 권위 소스**. [[gsc-index-status]] 참고. ⚠️ 이전 "site:0" 오판 재발 금지.
+0a. **(SEO·선택) 크롤-미색인 17개 정상페이지 보강** — `/live/*`(라이브 방송 목록)가 얇을 수 있음. ?tf= 크롤예산 회수 후 자연 색인되는지 우선 관망, 안 되면 콘텐츠 보강.
 0b. **(성능·선택) Cloudflare Edge TTL 더 올리기** — 현재 5분(300초). 홈·랭킹이 폴링 실시간이라 **10~30분으로 올려 적중률 극대화 가능**(안전). Rules→Cache Rules→Cache HTML→Edge TTL. [[cloudflare-cdn]]
 1. **(완료·차트) 차트 개편 완료**. ✅lightweight-charts 교체 ✅크로스헤어 툴팁 ✅선차트 자동전환 ✅금액축 자릿수눈금 ✅노이즈 despike ✅MA토글 ✅**이벤트 마커**(lc_vn `events.ts` + `/admin/events` 관리자 등록 → `ChartPanel setMarkers`). 남은 선택지: 급등락 자동 마커 UX(급락 캔들 강조).
 4. **(완료·i18n) 7개 언어 지원** — ko/en/zh/vi/ja/th/tl 전부 등록(`a8d92bf`). 가이드 8섹션은 ko/en/vi/zh 번역, ja/th/tl은 en 폴백 — 필요 시 개별 번역 확장 가능.
-5. **(수익화) 광고 배너 링크/확장** — 현재 배너 링크=gameboostforge(임시). 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
+5. **(수익화) 광고 배너 링크/확장** — 게임상세 우측 `aside`에 배너 **2칸**: ①boost-ad(대리육성, `/ads/boost-ad.jpg`→gameboostforge, 임시링크) ②데스사관학교 유튜브 채널(`/ads/death-yt.jpg`→channel, `239a094`). boost-ad는 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
 6. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크(배포경로·CI).
 7. **(운영·주의) KR 프록시 모니터링** — Vultr `158.247.239.183`(tinyproxy:8888) 꺼지면 아이템매니아만 중단. 월 ~$5.
 8. **(데이터·기회) 멀티거래소 확장** — 새 게임 거래소 등록 시 `itembay.ts`/`itemmania.ts`에 매핑 추가. (한계: 리니지M/2M=통합거래소, 신생=시세 미운영)
 9. **(선택) 동적 OG**(게임/서버 카드) · **유튜브 Data API 키**(`GAMETICK_YT_API_KEY`, 라이브 결정성↑).
 
 ### ⚠️ 다음 세션 진입 전 확인
-- 양쪽 레포 푸시 완료(gametick `18ca465`·lc_vn `d8f4d4d`). 서버 라이브 정상.
+- 양쪽 레포 푸시·배포 완료(gametick `95f3b84`·lc_vn `2996eba`). 서버 라이브 정상. (2026-07-27 세션 끝)
+- **신규게임/서버 추가는 로컬에서 바로템 조회 가능**(집 IP OK, VPS 불필요). 서버목록=`lists/{threadId}` HTML `<li data-opt1>`, "기타" 제외. 신규게임=양쪽 레포(lc_vn 먼저 배포→history 확인→gametick)+`gamemeta.ts`. [[add-game]]
 - **사이트는 이제 Cloudflare 뒤에 있음** — DNS·캐시는 CF 대시보드(계정 ky87423). HTML 5분 엣지캐싱, `/api/*` 제외. 배포 후 캐시 때문에 변경이 최대 5분 뒤 반영(급하면 CF에서 Purge). [[cloudflare-cdn]]
 - **lc_vn 로컬 클론: `C:\Users\User\lc_vn_work`** (수집기 편집용, CRLF 주의). gametick은 `C:\Users\User\gametick`(LF).
 - 수집기 변경은 **lc_vn**(gmhm365 매입 라이브 사이트)이라 신중 + fetch엔 항상 timeout. barotem은 `X-Requested-With: XMLHttpRequest`+Referer 헤더 필수, 로컬IP는 거부(VPS에서만).

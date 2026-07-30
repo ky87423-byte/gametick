@@ -1,7 +1,13 @@
 # 게임시세 (GameSise) 프로젝트 메모리
 
-> 마지막 갱신: 2026-07-12 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
-> **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 §6 + worklog 맨 끝)
+> 마지막 갱신: 2026-07-27 / 작업 일지: `docs/worklog.md` / 계획서: `PLAN.md`
+> **세션 시작 시 이 파일부터 읽으세요.** (다음 할 일은 worklog 맨 끝 "다음 세션 할 일")
+>
+> **2026-07-27 요약**(worklog "2026-07-27") — 다음 세션은 여기부터:
+> - **구글 색인 실측(서치콘솔)**: 색인됨 **399**·발견미색인 808·크롤미색인 48. **이전 "site:0"은 내 WebSearch(미국 구글) 착시**였고 실제 KR구글엔 색인됨. 문제 성격이 **색인→순위(경쟁)**로 전환. memory `gsc-index-status`.
+> - **?tf= 중복 URL 크롤 차단**(`95f3b84`): 크롤미색인 48건 중 **27건이 차트 기간토글 `?tf=1h/1d/3m` 변형**. `robots.ts` `Disallow: /*?tf=` + `ChartPanel` 기간탭 `rel="nofollow"`+`prefetch={false}`. canonical은 원래 쿼리없는 URL. **효과 확인=2~4주 뒤 GSC 재크롤**.
+> - **신규게임 아스달연대기**(slug `arthdal-chronicles`, threadId `2382r416`, 다이아·천당·`fallbackUnit 1000`·opt1·서버18) + 신규서버(리니지클래식 안타라스27413·글루디오27455, 솔인챈트 레지나27059, 아이온 중국-6 27556). gametick `58fc060`·lc_vn `2996eba`. 🔑 바로템 **로컬IP 조회 가능**(과거 "code 100 거부" 기록 정정), 서버목록+opt id는 `lists/{threadId}` HTML `<li data-opt1="ID"><p>NAME</p></li>`, "기타"=캐치올 제외. memory `add-game` 갱신.
+> - **데스사관학교 유튜브 채널 배너**(`239a094`): 게임상세 우측 `aside` 기존 대리육성(boost-ad) 아래. `/ads/death-yt.jpg`+재생버튼+YouTube CTA, 링크=채널 `UCEcxfCrlXCSxHk-PB3qtZIA`(기존 배너와 동일 광고주).
 >
 > **2026-07-12 요약**(worklog "2026-07-12"): 모바일 테이블 오버플로우 수정(가로스크롤), **다국어 SEO 대폭 보강** — hreflang(페이지+sitemap 17k, `lib/seo.ts`), sitemap lastmod, vi 통화 로마자화(Adena), `<html lang>` 로케일 교정. 6개 외국어 전수 확인 완료. 색인은 서치콘솔 확인 대기.
 >

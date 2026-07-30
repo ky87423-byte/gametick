@@ -16,7 +16,7 @@ import { altLanguages } from "@/lib/seo";
 import { readTrades } from "@/lib/trades";
 import { fetchPopularVideos, chzzkVideoUrl } from "@/lib/chzzk";
 import { fetchAllLives, channelUrl } from "@/lib/live";
-import { gameIntro, faqItems } from "@/data/content";
+import { gameIntro, gameMetaDescription, faqItems } from "@/data/content";
 import { Faq } from "@/components/Faq";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, Locale } from "@/i18n/config";
@@ -42,7 +42,14 @@ export async function generateMetadata({
   const dict = getDictionary(locale as Locale);
   const gameName = gameNameOf(game, locale);
   const title = `${dict.priceTitle(gameName, currencyOf(game, locale))} | ${dict.brand}`;
-  const description = gameIntro(locale as Locale, game);
+  // 스니펫에 실가격을 싣는다 — 본문과 같은 캐시된 조회라 추가 비용이 없다.
+  const summary = summarize(await getMarketTableCached(game.slug));
+  const description = gameMetaDescription(
+    locale as Locale,
+    game,
+    summary.low?.price ?? null,
+    summary.activeCount
+  );
   return {
     title,
     description,

@@ -51,6 +51,73 @@ export function serverIntro(
   return `${serverName} 서버 ${game.nameKo} ${currencyOf(game, locale)} 실시간 시세입니다. ${game.unitLabelKo} ${currencyOf(game, locale)}당 최저 판매가와 24시간 등락률, 캔들 차트(3분·1시간·일봉), 가격 알림을 제공합니다. 시세는 외부 거래소 거래가능 매물을 기준으로 자동 갱신되며 참고용입니다.`;
 }
 
+// 검색결과 스니펫 전용 설명. 본문 소개(gameIntro/serverIntro)는 수집 방법과
+// 면책까지 담아 150자를 넘는데, 구글은 한글 기준 약 80자만 보여준다 — 잘리고
+// 남는 앞머리가 "외부 거래소의 거래가능 매물 중 최저 판매가를…" 같은 운영자
+// 설명이라 클릭을 못 끈다. 시세 검색자는 스니펫의 가격 숫자를 보고 누르므로
+// 앞머리에 실가격과 서버 수를 넣는다. 가격이 없으면 본문 소개로 폴백.
+export function gameMetaDescription(
+  locale: Locale,
+  game: GameInfo,
+  low: number | null,
+  activeCount: number
+): string {
+  if (low === null || activeCount === 0) return gameIntro(locale, game);
+  const cur = currencyOf(game, locale);
+  const unit = game.unitAmount.toLocaleString("en-US");
+  const won = low.toLocaleString("ko-KR");
+  if (locale === "en") {
+    return `${game.nameEn} ${cur} price — from ${won} KRW per ${unit} ${cur}, compared live across ${activeCount} servers. Free candle charts, 24h change, and price alerts.`;
+  }
+  if (locale === "zh") {
+    return `${game.nameEn} ${cur} 行情 — 每 ${unit} ${cur} 最低 ${won} 韩元，${activeCount} 个服务器实时对比。免费查看K线图、24小时涨跌和价格提醒。`;
+  }
+  if (locale === "vi") {
+    return `Giá ${cur} ${game.nameEn} — từ ${won} KRW mỗi ${unit} ${cur}, so sánh trực tiếp ${activeCount} máy chủ. Biểu đồ nến, biến động 24h và cảnh báo giá miễn phí.`;
+  }
+  if (locale === "ja") {
+    return `${game.nameEn} ${cur} 相場 — ${unit} ${cur} あたり最安 ${won} ウォン、${activeCount} サーバーをリアルタイム比較。ローソク足チャート・24時間騰落・価格アラート無料。`;
+  }
+  if (locale === "th") {
+    return `ราคา ${cur} ${game.nameEn} — เริ่มต้น ${won} วอน ต่อ ${unit} ${cur} เทียบสด ${activeCount} เซิร์ฟเวอร์ กราฟแท่งเทียน การเปลี่ยนแปลง 24 ชม. และแจ้งเตือนราคา ฟรี`;
+  }
+  if (locale === "tl") {
+    return `Presyo ng ${game.nameEn} ${cur} — mula ${won} KRW kada ${unit} ${cur}, live na paghahambing sa ${activeCount} server. Libreng candle chart, 24h na pagbabago, at price alert.`;
+  }
+  return `${game.nameKo} ${cur} 시세 — ${game.unitLabelKo} ${cur}당 최저 ${won}원, ${activeCount}개 서버 실시간 비교. 24시간 등락과 캔들 차트를 무료로 확인하세요.`;
+}
+
+export function serverMetaDescription(
+  locale: Locale,
+  game: GameInfo,
+  serverName: string,
+  price: number | null
+): string {
+  if (price === null) return serverIntro(locale, game, serverName);
+  const cur = currencyOf(game, locale);
+  const unit = game.unitAmount.toLocaleString("en-US");
+  const won = price.toLocaleString("ko-KR");
+  if (locale === "en") {
+    return `${serverName} server ${cur} price — ${won} KRW per ${unit} ${cur} right now. Free 24h change, 3m/1h/1d candle charts, and price alerts for ${game.nameEn}.`;
+  }
+  if (locale === "zh") {
+    return `${serverName} 服务器 ${cur} 行情 — 当前每 ${unit} ${cur} ${won} 韩元。免费提供 ${game.nameEn} 的24小时涨跌、3分/1小时/日线K线图和价格提醒。`;
+  }
+  if (locale === "vi") {
+    return `Giá ${cur} máy chủ ${serverName} — hiện ${won} KRW mỗi ${unit} ${cur}. Biến động 24h, biểu đồ nến 3 phút/1 giờ/ngày và cảnh báo giá ${game.nameEn} miễn phí.`;
+  }
+  if (locale === "ja") {
+    return `${serverName} サーバー ${cur} 相場 — 現在 ${unit} ${cur} あたり ${won} ウォン。${game.nameEn} の24時間騰落・3分/1時間/日足チャート・価格アラートを無料提供。`;
+  }
+  if (locale === "th") {
+    return `ราคา ${cur} เซิร์ฟเวอร์ ${serverName} — ขณะนี้ ${won} วอน ต่อ ${unit} ${cur} การเปลี่ยนแปลง 24 ชม. กราฟแท่งเทียน 3 นาที/1 ชม./รายวัน และแจ้งเตือนราคา ${game.nameEn} ฟรี`;
+  }
+  if (locale === "tl") {
+    return `Presyo ng ${cur} sa server na ${serverName} — ${won} KRW kada ${unit} ${cur} ngayon. Libreng 24h na pagbabago, 3m/1h/1d candle chart, at price alert para sa ${game.nameEn}.`;
+  }
+  return `${serverName} 서버 ${game.nameKo} ${cur} 시세 — 현재 ${game.unitLabelKo} ${cur}당 ${won}원. 24시간 등락과 3분·1시간·일봉 차트, 가격 알림을 무료로 제공합니다.`;
+}
+
 export interface FaqItem {
   q: string;
   a: string;
