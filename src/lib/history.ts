@@ -13,6 +13,10 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const READ_TTL_MS = 15 * 1000; // 조회용 짧은 메모리 캐시
+// 메모리 캐시에 보관할 최대 기간. 90일 이력을 전부 올리면 V8 힙이 600MB+를
+// 차지해 1.9GB VPS에서 OOM 크래시(2026-08 190회 재시작). 16일이면 시세표(24h
+// spark)·리포트(7d)·거래소 비교(14d) 모두 커버하고 메모리는 ~90% 절감.
+const CACHE_WINDOW_MS = 16 * 24 * 60 * 60 * 1000;
 
 const DATA_DIR =
   process.env.GAMETICK_DATA_DIR || path.join(process.cwd(), "data");
@@ -43,7 +47,11 @@ async function readFromDisk(
   try {
     const raw = await fs.readFile(historyPath(gameSlug, exchange), "utf8");
     const parsed = JSON.parse(raw) as { points?: HistoryPoint[] };
-    return Array.isArray(parsed.points) ? parsed.points : [];
+    const pts = Array.isArray(parsed.points) ? parsed.points : [];
+    // 캐시에 올릴 분량을 16일치로 제한 — 나머지는 GC가 회수한다.
+    const cutoff = Date.now() - CACHE_WINDOW_MS;
+    const idx = pts.findIndex((p) => p.t >= cutoff);
+    return idx > 0 ? pts.slice(idx) : pts;
   } catch {
     return [];
   }
@@ -69,6 +77,18 @@ export function latestPrice(
   for (let i = history.length - 1; i >= 0; i--) {
     const v = history[i].p[serverId];
     if (typeof v === "number" && v > 0) return v;
+  }
+  return null;
+}
+
+/** 특정 서버의 최신 (시각, 시세) — 역순 스캔 O(1). latestPrice와 달리 시각도 반환. */
+export function latestEntry(
+  history: HistoryPoint[],
+  serverId: string
+): { t: number; v: number } | null {
+  for (let i = history.length - 1; i >= 0; i--) {
+    const v = history[i].p[serverId];
+    if (typeof v === "number" && v > 0) return { t: history[i].t, v };
   }
   return null;
 }
@@ -116,6 +136,26 @@ export function change24h(
   }
   if (Date.now() - base.t < 60 * 60 * 1000) return null;
   return ((currentPrice - base.v) / base.v) * 100;
+}
+
+/**
+ * 디스크에서 마지막 N포인트만 읽는다 — 캐시하지 않음.
+ * sitemap 등 latestPrice만 확인하는 경량 경로용.
+ * 전체 JSON을 파싱하지만 슬라이스만 반환해 즉시 GC 대상이 된다.
+ */
+export async function readTail(
+  gameSlug: string,
+  n = 50,
+  exchange?: string
+): Promise<HistoryPoint[]> {
+  try {
+    const raw = await fs.readFile(historyPath(gameSlug, exchange), "utf8");
+    const parsed = JSON.parse(raw) as { points?: HistoryPoint[] };
+    const pts = Array.isArray(parsed.points) ? parsed.points : [];
+    return pts.slice(-n);
+  } catch {
+    return [];
+  }
 }
 
 /** 시계열을 최대 maxPoints개로 다운샘플(버킷 평균) */

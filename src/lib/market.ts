@@ -9,6 +9,7 @@ import {
   change24h,
   downsample,
   latestCount,
+  latestEntry,
   latestPrice,
   readHistory,
   seriesFor,
@@ -95,8 +96,7 @@ export async function getMarketTable(game: GameInfo): Promise<MarketTable> {
   const barotem = ACTIVE_EXCHANGES.find((e) => e.id === "barotem");
 
   const servers: ServerMarket[] = game.servers.map((s) => {
-    const all = seriesFor(history, s.id, 0);
-    const last = all.length > 0 ? all[all.length - 1] : null;
+    const last = latestEntry(history, s.id);
     const barotemPrice = last ? Math.round(last.v) : null;
     if (last && (latest === null || last.t > latest)) latest = last.t;
     const spark = downsample(seriesFor(history, s.id, since24h), 40).map(
@@ -572,8 +572,8 @@ export async function getServerChart(
   const raw = seriesFor(history, server.id, Date.now() - rangeMs);
   const points = downsample(raw, 180);
   const values = raw.map((p) => p.v);
-  const all = seriesFor(history, server.id, 0);
-  const current = all.length > 0 ? Math.round(all[all.length - 1].v) : null;
+  const le = latestEntry(history, server.id);
+  const current = le ? Math.round(le.v) : null;
   return {
     serverId: server.id,
     nameKo: server.nameKo,

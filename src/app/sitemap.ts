@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { GAMES } from "@/data/games";
 import { guideList } from "@/data/guides";
 import { locales } from "@/i18n/config";
-import { readHistory, latestPrice } from "@/lib/history";
+import { readTail, latestPrice } from "@/lib/history";
 import { recentDates, kstDayStartMs } from "@/lib/reportDates";
 import { makeTtlCache } from "@/lib/cache";
 
@@ -84,9 +84,11 @@ async function build(): Promise<MetadataRoute.Sitemap> {
     add(`/live/${g.slug}`, "always", 0.7);
     // 매물(시세) 있는 서버만 사이트맵에 포함 — 빈 서버는 페이지 noindex와 일관되게 제외.
     // 매물이 생기면 자동으로 다시 포함된다.
-    const history = await readHistory(g.slug);
+    // readTail: 마지막 50포인트만 비캐시 로드 — 전체 이력을 메모리에 올리지 않아
+    // OOM을 방지한다(odin 27MB 등 대형 파일도 슬라이스만 유지, 즉시 GC).
+    const tail = await readTail(g.slug, 50);
     for (const s of g.servers) {
-      if (latestPrice(history, s.id) !== null) {
+      if (latestPrice(tail, s.id) !== null) {
         addKo(`/${g.slug}/${s.id}`, "hourly", 0.6);
       }
     }
