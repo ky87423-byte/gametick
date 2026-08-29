@@ -79,5 +79,13 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => a.changePercent - b.changePercent)
     .slice(0, 25);
 
-  return NextResponse.json({ games, gainers, losers });
+  return NextResponse.json(
+    { games, gainers, losers },
+    {
+      headers: {
+        // Cloudflare 엣지에서 30초 캐시 + 60초 stale 허용 → 매번 말레이시아 왕복 방지
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+      },
+    }
+  );
 }

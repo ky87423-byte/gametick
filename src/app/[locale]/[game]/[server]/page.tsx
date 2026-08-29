@@ -30,7 +30,7 @@ import { GuideLinks } from "@/components/GuideLinks";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 import { change24h, latestCount, latestPrice, readHistory } from "@/lib/history";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const TF_ORDER: Timeframe[] = ["3m", "1h", "1d"];
 

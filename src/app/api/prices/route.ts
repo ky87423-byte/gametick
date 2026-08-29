@@ -15,19 +15,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "unknown game" }, { status: 400 });
   }
   const table = await getMarketTableCached(game.slug);
-  return NextResponse.json({
-    game: table.game,
-    updatedAt: table.updatedAt,
-    servers: table.servers.map((s) => ({
-      serverId: s.serverId,
-      nameKo: s.nameKo,
-      nameEn: s.nameEn,
-      priceKrw: s.priceKrw,
-      quotes: s.quotes,
-      spreadPercent: s.spreadPercent,
-      change24hPercent: s.change24hPercent,
-      spark: s.spark,
-      listingCount: s.listingCount,
-    })),
-  });
+  return NextResponse.json(
+    {
+      game: table.game,
+      updatedAt: table.updatedAt,
+      servers: table.servers.map((s) => ({
+        serverId: s.serverId,
+        nameKo: s.nameKo,
+        nameEn: s.nameEn,
+        priceKrw: s.priceKrw,
+        quotes: s.quotes,
+        spreadPercent: s.spreadPercent,
+        change24hPercent: s.change24hPercent,
+        spark: s.spark,
+        listingCount: s.listingCount,
+      })),
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+      },
+    }
+  );
 }

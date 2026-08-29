@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 import { HomeCards } from "@/components/HomeCards";
 import { JsonLd, SITE } from "@/components/JsonLd";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: 60초마다 재생성 (force-dynamic 제거)
 
 export async function generateMetadata({
   params,

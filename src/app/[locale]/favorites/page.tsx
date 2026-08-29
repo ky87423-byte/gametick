@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FavoritesView } from "@/components/FavoritesView";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function FavoritesPage({
   params,

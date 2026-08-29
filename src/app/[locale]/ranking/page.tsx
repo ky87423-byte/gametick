@@ -10,7 +10,7 @@ import { Footer } from "@/components/Footer";
 import { RankingLists } from "@/components/RankingLists";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

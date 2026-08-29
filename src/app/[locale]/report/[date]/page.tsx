@@ -17,7 +17,7 @@ import { Footer } from "@/components/Footer";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { changeColor, changeText, formatKrw } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 // 데이터 보관(90일) 밖 날짜는 얇으므로 라우트에서 차단(무한 thin URL 방지).
 const MAX_AGE_DAYS = 90;

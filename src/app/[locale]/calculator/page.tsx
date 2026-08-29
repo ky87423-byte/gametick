@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 import { JsonLd, breadcrumbLd, SITE } from "@/components/JsonLd";
 import { PriceCalculator, CalcGame } from "@/components/PriceCalculator";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

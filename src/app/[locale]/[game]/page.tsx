@@ -46,7 +46,7 @@ import {
 } from "@/components/JsonLd";
 import { formatKrw, formatViewers, changeText, changeColor } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: 60초마다 재생성 (force-dynamic 제거)
 
 export async function generateMetadata({
   params,
