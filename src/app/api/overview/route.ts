@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
     {
       headers: {
         // Cloudflare 엣지에서 30초 캐시 + 60초 stale 허용 → 매번 말레이시아 왕복 방지
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60",
       },
     }
   );
