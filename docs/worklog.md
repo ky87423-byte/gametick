@@ -696,11 +696,27 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 **⏰ 날짜** — Shinjiru 다음 결제일 **2026-09-12**. 해지 통보 기간이 있는지 `Request Cancellation`으로 확인할 것. 단 **한 달치 겹쳐 내더라도 롤백 가능성을 우선**할 것.
 
-### 0b-1. CF 캐시 규칙에 `/api/*` 추가 (대시보드 5분, 미실행)
+### ✅ 0b-1. CF 캐시 규칙 `/api/*` 추가 — 완료 (2026-08-29)
 
-`af2cb0f`로 `/api`에 `s-maxage=30, SWR 60`을 붙였지만 CF 규칙이 `/api` 제외라 아직 `cf-cache-status: DYNAMIC`(1.1~3.6초).
-- ⚠️ **기존 규칙("Ignore cache-control, Edge TTL 1800초")을 그대로 적용하면 시세가 30분 묵는다.**
-- 반드시 **별도 규칙**: 조건 `URI Path starts with /api/` + Edge TTL **"Use cache-control header"**(= `s-maxage=30` 존중).
+CF Cache Rules에 2번 규칙 **`Cache API`** 추가(1번은 기존 `Cache HTML`). 조건 `URI Path starts with /api/`, 액션 = `Eligible for cache` + Edge TTL **"Use cache-control header"** + Browser TTL **"Respect origin TTL"**.
+
+| `/api/overview?locale=ko` (서울, CF 경유) | 전 | 후 |
+| --- | --- | --- |
+| cf-cache-status | `DYNAMIC` | **`HIT`** (초회만 MISS) |
+| TTFB | 1.08~3.57s | **0.45~0.49s** |
+
+- 오리진 헤더는 `9fd8042`로 **`max-age=0`을 명시**했다. `s-maxage`는 공유캐시에만 적용돼서, `max-age`가 없으면 브라우저가 휴리스틱으로 시세를 붙잡을 수 있다. → 브라우저는 항상 재검증, 엣지만 30초 캐시.
+- **🔴 함정: Value에 `/api/`가 아니라 `api`를 넣으면 절대 매칭되지 않는다.** `http.request.uri.path`는 슬래시로 시작한다. 실제로 두 번 헛발질했고, `gt2.png`(규칙 목록 캡처)로 확정했다. 표현식으로 넣는 게 안전: `starts_with(http.request.uri.path, "/api/")`.
+- ⚠️ **Edge TTL에 기존 HTML 규칙 방식("Ignore cache-control, 1800초")을 쓰면 시세가 30분 묵는다.** 반드시 "Use cache-control header".
+
+**검증 완료**
+- Age가 0→29→`EXPIRED`→0으로 순환 = `s-maxage=30` 정상.
+- **캐시 키 분리 정상** — `?locale=` ko/vi/ja/en, `?game=` lineage-2m/lineage-m/aion2 각각 해시가 다르고 재요청 시 동일. 쿼리스트링이 CF 기본 캐시 키에 포함됨.
+- **쓰기 라우트 안전** — `/api/inquiry`·`/api/discord-alert`는 `405 BYPASS`(force-dynamic이 no-store를 보냄). `/api/` 전체에 규칙을 걸어도 무해.
+- **HTML 규칙 무손상** — `/ko` HIT(Age 1167), `/ko/ranking` HIT.
+- `Vary: rsc, next-router-*`는 무관 — **CF는 `Accept-Encoding` 외의 Vary를 캐싱 판단에 쓰지 않는다**(확인함). RSC 헤더 유무로 응답이 동일한 것도 확인.
+
+**남은 한계**: 엣지가 여전히 미국(SEA/SJC)이라 HIT여도 0.45초가 바닥이다. **0b 한국 이전 시 `/api`는 서울 직결 30~50ms가 되어 이 캐싱 자체가 덜 중요해진다.**
 
 ### 0b-2. 남은 성능 잔여 과제
 
