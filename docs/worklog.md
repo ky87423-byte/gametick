@@ -643,6 +643,101 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 
 ---
 
+## 🏆 세션 요약 (2026-08-30) — 한국 서버 이전 완료 + 사이트맵 82% 경량화
+
+**결과 한 줄**: gamesise.co.kr이 **경쟁사 gamebit보다 빨라졌다.** 서울 KT 실사용자 경로 TTFB **438~741ms → 27~30ms**(gamebit 31~36ms).
+
+### ① 신규 서버 (iwinv, 서울)
+
+| 항목 | 값 |
+| --- | --- |
+| IP | **115.68.230.59** |
+| 상품 | iwinv `gna_2.8_n` — 2vCPU / **8GB** / NVMe 50GB / 트래픽 20GB·일 |
+| 요금 | **월 33,400원** (일 1,240원, 후불) |
+| OS | Ubuntu 24.04.4 LTS |
+| 접속 | `ssh -i ~/.ssh/lc_info_deploy root@115.68.230.59` (**포트 22**, Shinjiru의 20203 아님) |
+| 실측 | 서울 RTT **3ms** · 디스크 쓰기 1.9GB/s·읽기 2.7GB/s · 빌드 6배 빠름(42초→7초) |
+
+**서버 생성 시 겪은 것 (다음에 반복 금지)**
+- 🔴 **SSH Key 항목이 세 번 실패했다.** 콘솔에서 키를 "등록"만 하고 드롭다운에서 "선택"하지 않으면 서버에 안 들어간다. 결국 **`Script 설정`(사용자 스크립트)에 `authorized_keys` 추가 스크립트를 넣는 방법**으로 해결했다 — 이게 가장 확실하다.
+- VNC는 클립보드가 막혀 68자 base64를 손으로 쳐야 한다. 공개키를 공개 레포에 임시 커밋해 `curl`로 받는 우회를 썼다(접속 후 즉시 제거).
+- **네트워크 할당 방식은 `Direct IP`**로 할 것. VPC 방식 + NAT Gateway 미연결이면 아웃바운드가 막힐 수 있다(실제로 첫 시도에서 이 조합이었음).
+- 스왑 0으로 생성되므로 2GB 추가함(`/swapfile`, swappiness=10).
+
+### ② 이전 절차 (실제로 한 것)
+
+1. 기본 스택: Node 22.23.2 · nginx 1.24 · pm2 7.0.4 · certbot 2.9.0 · **ufw 22/80/443만 개방**
+2. 레포 클론(3개 다 **공개**라 인증 불필요) → `npm install` → `build`
+3. 데이터 **162MB / 39파일** `tar czf - | ssh ... tar xzf -` 스트림 전송, 개수·용량 대조
+4. `.env.local` 2개 스트림 전송, **sha1 대조 일치** (내용은 출력하지 않음)
+5. `/etc/letsencrypt` 통째 전송 → 인증서 4개(gamesise.co.kr·com·gmhm365·gameboostforge) 그대로 사용
+6. nginx `conf.d/gamesise.conf`·`conf.d/lc_vn.conf` 복사
+7. **hosts 대신 `curl --resolve`로 전체 검증** — DNS 안 건드리고 다운타임 0으로 13개 페이지 확인
+8. DNS 전환 → lc_vn 교대 → SSL 갱신 시뮬레이션
+
+### ③ 🔴 프록시 폐기 — 원래 목적이 사라졌다
+
+- Vultr `158.247.239.183` tinyproxy는 **허용 IP 목록에 말레이시아 서버만** 있어 신규 한국 서버의 요청을 전부 15초 타임아웃으로 죽였다. 그대로 전환했으면 **아이템매니아 수집이 조용히 끊겼을 것.**
+- 그런데 프록시의 존재 이유가 "아이템매니아의 한국 외 IP 차단 우회"였고, **서버가 한국이 되니 직접 호출이 그냥 된다** — `gamecode=5913/5799` 둘 다 `result="success"` 실측.
+- 조치: `lc_vn` `56665d1` — `collectItemmania`의 `if (!gamecode || !proxy) return`에서 `|| !proxy` 제거, `dispatcher`는 프록시가 있을 때만 전달(해외 서버 호환 유지). 신규 서버 `.env.local`에서 `KR_PROXY_URL` 삭제.
+- **Vultr 프록시 해지 가능**(월 6,890원 절감). 사용자 결정: "폐기 — 3사 직접 수집".
+
+### ④ DNS 전환 — 관리처가 셋으로 나뉘어 있다
+
+| 도메인 | 네임서버 | 바꾼 곳 |
+| --- | --- | --- |
+| gamesise.co.kr | **Cloudflare** (santino/raquel.ns) | Cloudflare DNS |
+| gamesise.com | **가비아** (ns.gabia.co.kr) | 가비아 DNS |
+| gmhm365.com | **Njalla** (1-you.njalla.no) | Njalla DNS |
+
+- 🔴 **가비아에 두 도메인이 다 보이지만 `gamesise.co.kr`은 가비아에서 고쳐도 반영되지 않는다** — 네임서버가 CF로 위임돼 있다. 실제로 이걸로 한 번 헛수고했다(가비아 A 레코드만 바꿔놓고 반영을 기다림).
+- 🔴 **Cloudflare는 IP만 바꾸면 안 되고 `Proxy status`를 회색구름(DNS only)으로 내려야 한다.** 주황 구름이면 서울→**LAX(로스앤젤레스)**→서울이 된다(`colo=LAX` 실측).
+- 전파는 apex가 www보다 느렸다(약 5~7분). **권威 네임서버에 직접 질의**(`nslookup <도메인> <NS>`)하면 캐시와 설정을 구분할 수 있다.
+
+### ⑤ lc_vn 교대 — 텔레그램 봇 충돌 주의
+
+`instrumentation.ts`가 부팅 시 **텔레그램 `getUpdates` 폴러**를 띄운다. 두 서버에서 동시에 돌면 충돌한다.
+- 검증 기간엔 신규 서버의 `TELEGRAM_BOT_TOKEN`을 **주석 처리**해 병행 가동(값 보존, `sed`로 토글) → gmhm365.com 다운타임 0
+- 전환 시점에 **기존 lc_vn 정지 → 토큰 복구 → 신규 재시작** 순서
+
+### ⑥ 최종 실측 (서울 KT, 실사용자 경로)
+
+| | 오늘 아침 | 지금 | gamebit |
+| --- | --- | --- | --- |
+| `/ko` TTFB | 438~741ms | **27~30ms** | 31~36ms |
+| 연결 | 141~229ms | **9~10ms** | 8ms |
+| `/api/overview` | 1.0~3.6s | **27~29ms** | — |
+| 경유 | 서울→LAX→말레이시아 | **서울 직결** | — |
+
+15개 페이지 200 · 7개 언어 정상 · 루트 307→/ko · robots·sitemap 정상 · 홈 HTML은 이전 서버와 바이트 단위 동일.
+
+### ⑦ 사이트맵 82% 경량화 (`802e138`)
+
+- 실측: 782 URL에 **`<xhtml:link>` 6,256개** → **721,703 bytes**, Googlebot UA 응답 530ms
+- 원인: 각 URL마다 hreflang 8개(7언어+x-default)를 넣는데, **페이지 `<head>`에 이미 같은 8개가 있다**(`lib/seo.ts altLanguages`). 구글은 사이트맵/HTML/HTTP헤더 중 **하나만** 있으면 된다.
+- 조치: `langs()` 및 `add`/`addKo`의 `alternates` 제거. URL 목록·lastmod·priority·수집 로직은 그대로.
+- 결과: **130,554 bytes (−82%)**, TTFB **530ms → 30ms**. URL 782개 그대로, XML 구조 정상.
+
+### ⑧ SSL
+
+`/etc/letsencrypt` 통째 이전 → gamesise.co.kr(9/27 만료)·gmhm365.com(11/10) 둘 다 **갱신 시뮬레이션 성공**. `certbot.timer` enabled·active.
+- gamesise = **webroot** 방식(`/var/www/html`, nginx에 acme location 있음)
+- gmhm365 = **nginx** 방식(certbot이 임시 설정 주입)
+- ⚠️ `certbot renew --dry-run`은 **408초 랜덤 지연**이 걸린다. 급하면 `--no-random-sleep-on-renew`.
+
+### ⑨ 비용
+
+| | 이전 | 이후 |
+| --- | --- | --- |
+| Shinjiru 말레이시아 2GB | 28,800원($20.90) | **해지 예정** |
+| Vultr 프록시 | 6,890원($5) | **해지 예정** |
+| iwinv 8GB NVMe | — | 33,400원 |
+| **합계** | **35,690원** | **33,400원** (−2,290원) |
+
+RAM 4배·NVMe·한국 위치를 얻으면서 **오히려 싸졌다.**
+
+---
+
 ## 다음 세션 할 일 (우선순위)
 
 ### 🔴 0. 최우선 — 크롤 회복 확인 (기한 지남 — 다음 세션에서 바로 확인할 것)
@@ -670,33 +765,28 @@ gamebit.co.kr을 벤치마크한 한국 게임머니 시세 플랫폼을 새로 
 - 확인: ①`?tf=` 27건이 크롤-미색인에서 빠졌는지 ②색인 399→증가 ③CTR 2.09%→상승(오전 제목·스니펫·요약문 효과). **순위가 그대로여도 CTR이 4~5%면 성공.**
 - 내보내기 요청 시 **날짜 범위를 명시**할 것(기본값이 28일이라 "3개월"이라 말해도 28일치가 온다).
 
-### 🔴 0b. 최우선 실행 — 한국 서버 이전 (8/29 결정, 미실행)
+### ✅ 0b. 한국 서버 이전 — 완료 (2026-08-30)
 
-**결정안**: iwinv `gna_2.8_n` (2vCPU / **8GB** / NVMe 50GB / 600GB, **33,400원**) — 4개 앱 통합 이전 후 Shinjiru 해지. **순증 월 4,600원.** 상세 비교표는 상단 2026-08-29 세션 ④ 참조.
+`115.68.230.59` (iwinv `gna_2.8_n`, 8GB/NVMe, 월 33,400원)로 **gamesise + lc_vn 이전 완료.** 세 도메인 DNS 전환·SSL·수집기까지 정상. 상세는 위 2026-08-30 세션 참조.
 
-**⚠️ 반드시 세트로 가야 효과가 난다** — 하나라도 빼면 어중간해진다:
-1. **한국 리전** → 말레이시아 RTT 198ms 제거
-2. **RAM 8GB + NVMe** → 스왑 재발 방지 (현재 실사용 ~3GB)
-3. **CF 프록시 끄기(회색구름)** → 안 끄면 서울→시애틀→서울이 돼서 **이전 효과가 거의 날아간다**
+### 🔴 0b-A. 남은 이전 — lc_info · umami (Shinjiru 해지 전 필수)
 
-**이전 제약**
-- **gamesise만 떼서 못 옮긴다** — `GAMETICK_DATA_DIR`로 lc_vn이 쓴 JSON **161MB**(최대 단일 `history-odin.json` 36MB)를 같은 박스 파일시스템에서 읽고, `LC_VN_INTERNAL_URL=127.0.0.1:3001`로 호출한다 → **gamesise + lc_vn 세트**.
-- **lc_vn은 gmhm365 매입 라이브** — 수집이 끊기면 안 된다. 검증 단계에서 신 서버 수집까지 돌려본 뒤에 전환.
-- **프록시 유지 + 바로템·아이템베이도 프록시 경유로 변경** (상단 ④ 참조).
+기존 말레이시아 서버(`111.90.148.135` **포트 20203**)에 아직 남아 있는 것:
 
-**단계** (실작업 5~6시간, 관망 포함 2~3일)
-1. iwinv 서버 생성 + 기본 세팅(Node 22·nginx·pm2·certbot) — 1시간
-2. gamesise·lc_vn 배포 + build — 1시간
-3. 데이터 161MB rsync — 10분
-4. `barotem.ts`·`itembay.ts` 프록시 경유 추가 + 수집 테스트 — 1시간
-5. SSL + nginx — 30분
-6. **hosts 파일로 신 서버 가리켜 전체 검증**(다운타임 0) — 1시간
-7. 데이터 재동기화 → DNS 전환 → CF 회색구름 — 30분
-8. 1~2주 안정화 확인 **후에** Shinjiru 해지
+| 앱 | 도메인 | 난이도 |
+| --- | --- | --- |
+| lc_info | gameboostforge.com | 낮음 (Next 앱, 5.8MB) |
+| **umami** | stats.gameboostforge.com | **높음 — 로컬 PostgreSQL 1.6GB** (pg 설치 + dump/restore 필요) |
 
-**⏰ 날짜** — Shinjiru 다음 결제일 **2026-09-12**. 해지 통보 기간이 있는지 `Request Cancellation`으로 확인할 것. 단 **한 달치 겹쳐 내더라도 롤백 가능성을 우선**할 것.
+- 기존 서버의 `gamesise`는 아직 online, `lc_vn`은 **stopped**(롤백 대비). 롤백하려면 **DNS만 되돌리고 `pm2 start lc_vn`**.
+- 인증서는 이미 신규 서버에 4개 다 복사돼 있다(gameboostforge·stats 포함).
 
-### ✅ 0b-1. CF 캐시 규칙 `/api/*` 추가 — 완료 (2026-08-29)
+### 🔴 0b-B. 해지 (안정화 확인 후)
+
+1. **Shinjiru** — $20.90/월, 다음 결제일 **2026-09-12**. `Request Cancellation`에 통보 기간이 있는지 확인할 것. **한 달 겹쳐 내더라도 롤백 가능성 우선.**
+2. **Vultr 프록시** `158.247.239.183` — $5/월. 이제 아무도 안 쓴다(`KR_PROXY_URL` 제거됨). 해지 가능.
+
+### 💤 0b-1. CF 캐시 규칙 — 완료했으나 2026-08-30부터 잠들어 있음
 
 CF Cache Rules에 2번 규칙 **`Cache API`** 추가(1번은 기존 `Cache HTML`). 조건 `URI Path starts with /api/`, 액션 = `Eligible for cache` + Edge TTL **"Use cache-control header"** + Browser TTL **"Respect origin TTL"**.
 
@@ -716,14 +806,16 @@ CF Cache Rules에 2번 규칙 **`Cache API`** 추가(1번은 기존 `Cache HTML`
 - **HTML 규칙 무손상** — `/ko` HIT(Age 1167), `/ko/ranking` HIT.
 - `Vary: rsc, next-router-*`는 무관 — **CF는 `Accept-Encoding` 외의 Vary를 캐싱 판단에 쓰지 않는다**(확인함). RSC 헤더 유무로 응답이 동일한 것도 확인.
 
-**남은 한계**: 엣지가 여전히 미국(SEA/SJC)이라 HIT여도 0.45초가 바닥이다. **0b 한국 이전 시 `/api`는 서울 직결 30~50ms가 되어 이 캐싱 자체가 덜 중요해진다.**
+⚠️ **2026-08-30 한국 이전 + 회색구름(DNS only) 전환으로 트래픽이 CF를 거치지 않는다.** 따라서 `Cache API`·`Cache HTML` 두 규칙 모두 **현재 동작하지 않는다**(설정은 그대로 남아 있음). 오리진이 27ms라 문제 없다.
+
+되살릴 상황: Googlebot 응답시간이 2주 뒤에도 500ms 이상이면 **서울 PoP 있는 CDN**(Bunny.net, 아시아 $0.03~0.06/GB·최소 $1/월 — 트래픽 월 20GB라 사실상 월 1,400원)을 검토한다. CF Free는 한국→미국 라우팅 때문에 다시 켜면 안 된다.
 
 ### 0b-2. 남은 성능 잔여 과제
 
-- ✅ **오리진 렌더는 해결됨**(8/29 `af2cb0f`) — 홈 0.072s·랭킹 0.007~0.024s·서버상세 0.06~0.08s. **7/31의 "오리진 MISS 1.2~3.5초·콜드 8.8초" 수치는 폐기할 것.**
+- ✅ **오리진 렌더 해결**(8/29 `af2cb0f`) **+ 한국 이전**(8/30, 실사용자 TTFB 27~30ms — gamebit 31~36ms보다 빠름) — 홈 0.072s·랭킹 0.007~0.024s·서버상세 0.06~0.08s. **7/31의 "오리진 MISS 1.2~3.5초·콜드 8.8초" 수치는 폐기할 것.**
 - 콜드 렌더는 여전히 있다 — `/report/[date]` 7.18s, `/[game]/[server]` 3.25s(캐시 만료 직후 첫 요청). SWR로 덮고 있을 뿐 근본 부하는 남음(161MB JSON 파싱).
 - `[game]/[server]`는 `searchParams`(`?tf=`) 때문에 **ISR 대상이 아니다**. 정 필요하면 `?tf=`를 경로 세그먼트나 클라이언트 상태로 옮겨야 한다.
-- `sitemap.xml` **722KB·8.4초** — 여전히 `force-dynamic`. 줄일 여지 있음.
+- ✅ `sitemap.xml` **722KB → 130KB(−82%)·TTFB 30ms** (2026-08-30 `802e138`, 중복 hreflang 제거). URL 782개·구조 그대로. `force-dynamic` + 30분 SWR 캐시는 유지.
 - 서버상세 HTML **78KB** — 줄일 여지 있음.
 - PSI(LCP/CLS 실사용자 지표) **미확보** — API 무키 호출은 일일 쿼터 429. 필요하면 PSI 웹UI 또는 API 키 발급.
 0c. **(SEO·보류) 서버 URL 슬러그화** — `/lineage-classic/24487` → `/depo` 식. 경쟁사(gamebit `/depo`, gamesaeng)와의 남은 격차이고 URL에 키워드가 없다. **7/31에 의도적으로 보류함**: 대상인 리니지클래식 롱테일이 45~58위(5페이지)라 회수가 느린데, 이미 색인된 399페이지의 URL을 바꾸고 301을 거는 리스크가 크다. **크롤·노출이 회복된 뒤에 재검토**.
@@ -732,12 +824,16 @@ CF Cache Rules에 2번 규칙 **`Cache API`** 추가(1번은 기존 `Cache HTML`
 4. **(완료·i18n) 7개 언어 지원** — ko/en/zh/vi/ja/th/tl 전부 등록(`a8d92bf`). 가이드 8섹션은 ko/en/vi/zh 번역, ja/th/tl은 en 폴백 — 필요 시 개별 번역 확장 가능.
 5. **(수익화) 광고 배너 링크/확장** — 게임상세 우측 `aside`에 배너 **2칸**: ①boost-ad(대리육성, `/ads/boost-ad.jpg`→gameboostforge, 임시링크) ②데스사관학교 유튜브 채널(`/ads/death-yt.jpg`→channel, `239a094`). boost-ad는 카카오 오픈챗 URL 받으면 교체. 슬롯 추가(시세표 위 리더보드 등)·실규격(300×250) 고려.
 6. **(선택·정리) gametick→gamesise 리네이밍** — 레포/폴더/`GAMETICK_*` env. 리스크(배포경로·CI).
-7. **(운영·주의) KR 프록시 모니터링** — Vultr `158.247.239.183`(tinyproxy:8888) 꺼지면 아이템매니아만 중단. 월 ~$5.
+7. **(완료) KR 프록시 폐기** — 한국 이전으로 아이템매니아 직접 수집 가능(`lc_vn` `56665d1`). Vultr `158.247.239.183` **해지 대상**(월 $5). 참고: tinyproxy 허용 IP에 말레이시아 서버만 있어 신규 서버는 애초에 못 썼다.
 8. **(데이터·기회) 멀티거래소 확장** — 새 게임 거래소 등록 시 `itembay.ts`/`itemmania.ts`에 매핑 추가. (한계: 리니지M/2M=통합거래소, 신생=시세 미운영)
 9. **(선택) 동적 OG**(게임/서버 카드) · **유튜브 Data API 키**(`GAMETICK_YT_API_KEY`, 라이브 결정성↑).
 
 ### ⚠️ 다음 세션 진입 전 확인
-- 푸시·배포 완료(gametick `af2cb0f`). 서버 라이브 정상·전페이지 200 검증. (2026-08-29 세션 끝)
+- 🔴 **서버가 바뀌었다 (2026-08-30)**: gamesise·lc_vn은 이제 **한국 iwinv `115.68.230.59` 포트 22**.
+  `ssh -i ~/.ssh/lc_info_deploy root@115.68.230.59` — **Shinjiru의 포트 20203이 아니다.**
+  앱 경로 `/var/www/gamesise`(3003)·`/var/www/lc_vn`(3001), pm2 이름 동일.
+- 말레이시아 `111.90.148.135` 포트 20203에는 **lc_info·umami만 살아있고**, `gamesise`는 online·`lc_vn`은 stopped로 롤백 대기 중.
+- 푸시·배포 완료(gametick `802e138`, lc_vn `56665d1`). 전 페이지 200 검증. (2026-08-30 세션 끝)
 - **8/29 세션 커밋 2개**: `1b5bffd`(OOM 수정 — 이미 서버에 수동 적용돼 있던 것을 git으로 정리) → `af2cb0f`(**force-dynamic 제거·ISR 전환 + /api 엣지캐시 헤더**).
 - 서버에 롤백용 `/var/www/gamesise/.next.bak`과 `git stash@{0}`(수동패치 백업) 남겨둠. 문제 없으면 정리해도 됨.
 - **7/31 세션 커밋 5개**: `3169ff7`(사이트맵 ko전용+30분캐시, 서버 제목·스니펫) → `c67ea63`(게임페이지 요약문·가격FAQ·AggregateOffer) → `8ea5f35`("기타" 버킷 수정) → `ff0eebd`(**robots `Disallow: /api/`**) → `9035f09`·`d26a64c`(docs).
@@ -746,8 +842,10 @@ CF Cache Rules에 2번 규칙 **`Cache API`** 추가(1번은 기존 `Cache HTML`
 - 🔑 **성능 진단은 localhost에서 측정할 것**. 외부 TTFB는 거리·CDN·오리진렌더가 섞여 원인을 못 가른다. `ssh … curl http://127.0.0.1:3003/ko`가 병목을 바로 가른다(8/29에 이걸로 "위치"가 아니라 "스왑 스래싱"임을 확인).
 - ⚠️ **working tree에 커밋 안 된 변경이 남아 있는지 세션 시작 시 `git status`로 확인**. 7/31에 sitemap addKo·제목·스니펫 개선이 **커밋조차 안 된 채 방치돼 라이브에 없었다**(이전 세션이 배포를 빠뜨림).
 - **신규게임/서버 추가는 로컬에서 바로템 조회 가능**(집 IP OK, VPS 불필요). 서버목록=`lists/{threadId}` HTML `<li data-opt1>`, "기타" 제외. 신규게임=양쪽 레포(lc_vn 먼저 배포→history 확인→gametick)+`gamemeta.ts`. [[add-game]]
-- **사이트는 Cloudflare 뒤에 있음** — DNS·캐시는 CF 대시보드(계정 ky87423). **HTML 엣지캐싱 30분**(2026-07-31에 5분→30분 상향, `Age 414초 HIT` 검증완료), `/api/*` 제외. ⚠️ **배포 후 변경이 최대 30분 뒤 반영** — 확인이 필요한 배포면 CF Caching→Configuration→**Purge Everything** 하거나 `?v=` 쿼리로 우회 검증. **"Ignore cache-control header"는 그대로 둘 것** — 단 이유가 바뀌었다: 8/29 `af2cb0f`로 force-dynamic을 없앴기 때문에 HTML은 이제 `no-cache`가 아니라 `s-maxage=60, SWR`를 보낸다. 옵션을 끄면 캐시가 안 먹는 게 아니라 **엣지 TTL이 30분→60초로 떨어져** 적중률이 낮아진다. ⚠️ `/api/*`를 캐시에 추가할 때는 반드시 **별도 규칙 + "Use cache-control header"**로 할 것(이 규칙을 그대로 쓰면 시세가 30분 묵는다). [[cloudflare-cdn]]
+- 🔴 **사이트는 더 이상 Cloudflare 프록시 뒤에 있지 않다(2026-08-30 회색구름/DNS only).** CF는 이제 **DNS만** 담당하고 캐시 규칙은 잠들어 있다. 아래는 과거 구성 기록: ~~사이트는 Cloudflare 뒤에 있음~~ — DNS·캐시는 CF 대시보드(계정 ky87423). **HTML 엣지캐싱 30분**(2026-07-31에 5분→30분 상향, `Age 414초 HIT` 검증완료), `/api/*` 제외. ⚠️ **배포 후 변경이 최대 30분 뒤 반영** — 확인이 필요한 배포면 CF Caching→Configuration→**Purge Everything** 하거나 `?v=` 쿼리로 우회 검증. **"Ignore cache-control header"는 그대로 둘 것** — 단 이유가 바뀌었다: 8/29 `af2cb0f`로 force-dynamic을 없앴기 때문에 HTML은 이제 `no-cache`가 아니라 `s-maxage=60, SWR`를 보낸다. 옵션을 끄면 캐시가 안 먹는 게 아니라 **엣지 TTL이 30분→60초로 떨어져** 적중률이 낮아진다. ⚠️ `/api/*`를 캐시에 추가할 때는 반드시 **별도 규칙 + "Use cache-control header"**로 할 것(이 규칙을 그대로 쓰면 시세가 30분 묵는다). [[cloudflare-cdn]]
 - **lc_vn 로컬 클론: `C:\Users\User\lc_vn_work`** (수집기 편집용, CRLF 주의). gametick은 `C:\Users\User\gametick`(LF).
+- 🔑 **도메인 관리처가 셋으로 나뉜다** — gamesise.co.kr=**Cloudflare**, gamesise.com=**가비아**, gmhm365.com=**Njalla**. ⚠️ 가비아 목록에 .co.kr도 보이지만 네임서버가 CF로 위임돼 있어 **가비아에서 고쳐도 반영 안 된다**(2026-08-30에 이걸로 헛수고함).
+- 🔑 **KR 프록시 폐기** — 아이템매니아는 한국 서버에서 직접 수집된다. `KR_PROXY_URL` 환경변수 없음.
 - 수집기 변경은 **lc_vn**(gmhm365 매입 라이브 사이트)이라 신중 + fetch엔 항상 timeout. barotem은 `X-Requested-With: XMLHttpRequest`+Referer 헤더 필수, 로컬IP는 거부(VPS에서만).
 - KR 프록시·텔레그램 토큰·KR_PROXY_URL은 **서버 `.env.local`에만**(깃 X).
 - 캐시 유틸 `lib/cache.ts makeTtlCache`(SWR) — getMarketTableCached 등이 60초 캐시. 성능 관련 [[cloudflare-cdn]].
