@@ -8,37 +8,33 @@ import { makeTtlCache } from "@/lib/cache";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://gamesise.co.kr";
 
+// hreflang은 사이트맵에 넣지 않는다 — 각 페이지 <head>의
+// <link rel="alternate" hreflang>(lib/seo.ts altLanguages)가 이미 8개(7언어+x-default)를
+// 선언하고 있고, 구글은 사이트맵/HTML/HTTP헤더 중 "하나만" 있으면 된다.
+// 2026-08-30 실측: 782 URL에 xhtml:link 6,256개가 붙어 사이트맵이 722KB였다.
+// 중복 제거로 크롤 예산·전송량을 아낀다.
+
 // [locale] 동적 세그먼트가 /sitemap.xml 을 가로채지 않도록 라우트로 강제
 export const dynamic = "force-dynamic";
 
 type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 
-// seg(로케일 뒤 경로)의 전 언어판 URL — hreflang 대체용. x-default = 한국어.
-function langs(seg: string): Record<string, string> {
-  const m: Record<string, string> = {};
-  for (const l of locales) m[l] = `${BASE}/${l}${seg}`;
-  m["x-default"] = `${BASE}/ko${seg}`;
-  return m;
-}
-
 async function build(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const out: MetadataRoute.Sitemap = [];
-  // 한 경로를 전 언어판으로 추가 + 각 항목에 hreflang 대체 + lastmod
+  // 한 경로를 전 언어판 URL로 추가 + lastmod (hreflang은 페이지 <head>가 담당)
   const add = (
     seg: string,
     changeFrequency: Freq,
     priority: number,
     lastModified: Date = now
   ) => {
-    const alternates = { languages: langs(seg) };
     for (const locale of locales) {
       out.push({
         url: `${BASE}/${locale}${seg}`,
         lastModified,
         changeFrequency,
         priority,
-        alternates,
       });
     }
   };
@@ -46,8 +42,9 @@ async function build(): Promise<MetadataRoute.Sitemap> {
   // 한국어판만 사이트맵에 올린다 (크롤 예산 집중). 서버 상세·날짜 리포트는
   // 페이지 수가 로케일당 수백 개라, 7개 언어로 곱하면 사이트맵이 3천 URL을
   // 넘겨 구글이 사이트 전체 크롤을 미뤘다(2026-07 노출 급락 원인).
-  // 외국어판 페이지는 그대로 살아있고 alternates로 계속 알리므로, 수요가
-  // 생기면 구글이 알아서 크롤한다. 되돌리려면 addKo → add 로 바꾸면 된다.
+  // 외국어판 페이지는 그대로 살아있고 각 페이지 <head>의 hreflang이 계속
+  // 알리므로, 수요가 생기면 구글이 알아서 크롤한다.
+  // 되돌리려면 addKo → add 로 바꾸면 된다.
   const addKo = (
     seg: string,
     changeFrequency: Freq,
@@ -59,7 +56,6 @@ async function build(): Promise<MetadataRoute.Sitemap> {
       lastModified,
       changeFrequency,
       priority,
-      alternates: { languages: langs(seg) },
     });
   };
 
@@ -75,7 +71,7 @@ async function build(): Promise<MetadataRoute.Sitemap> {
     const dayMs = kstDayStartMs(d);
     addKo(`/report/${d}`, "monthly", 0.4, dayMs ? new Date(dayMs) : now);
   }
-  // 가이드 슬러그는 언어 무관(내용만 번역) → 대표 로케일 목록으로 hreflang 구성
+  // 가이드 슬러그는 언어 무관(내용만 번역) → 대표 로케일 목록으로 전 언어판 생성
   for (const gd of guideList(locales[0])) {
     add(`/guide/${gd.slug}`, "monthly", 0.5);
   }
