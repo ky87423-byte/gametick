@@ -210,7 +210,7 @@ export default async function ServerDetail({
         {/* 배너 광고 — 차트(사용자가 원한 정보) 직후에 둔다.
             자사 이미지라 외부 스크립트가 없고 <Image> 크기 고정이라 CLS도 없다.
             상단 배치는 LCP/CLS를 해쳐 의도적으로 피했다. */}
-        <AdBanners layout="row" className="mt-6" />
+        <AdBanners locale={locale} layout="row" className="mt-6" />
 
         {/* 최근 7일 시세 통계 — 서버마다 값이 달라 고유 콘텐츠(롱테일 SEO) */}
         {stats.avg !== null && (

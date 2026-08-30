@@ -243,7 +243,7 @@ export default async function GamePage({
           {/* 모바일 전용 배너 — lg 미만에서는 아래 aside가 본문 뒤로 밀려
               배너가 페이지 최하단에 묻힌다. 시세표 직후에 하나 띄우고
               데스크톱에서는 숨겨 사이드바 배너와 중복되지 않게 한다. */}
-          <AdBanners layout="row" className="lg:hidden" />
+          <AdBanners locale={locale} layout="row" className="lg:hidden" />
 
           {/* 사이드 */}
           <aside className="space-y-4">
@@ -259,7 +259,7 @@ export default async function GamePage({
                 localizedName(s.nameKo, s.nameEn, locale)
               )}
             />
-            <AdBanners className="hidden lg:block" />
+            <AdBanners locale={locale} className="hidden lg:block" />
           </aside>
         </div>
 

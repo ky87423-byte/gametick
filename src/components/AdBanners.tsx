@@ -5,20 +5,37 @@
 // 렌더링 차단 스크립트도 없어 속도·SEO 영향이 사실상 0이다.
 // (2026-08-31 실측: 배너 2개 전송 0.03~0.13초, 페이지 TTFB 27ms 유지)
 //
-// layout: "stack" = 세로 1열(우측 사이드바용), "row" = 넓은 화면에서 2열(본문용)
+// layout
+//   "stack" = 세로 1열(우측 사이드바 260px용)
+//   "row"   = 넓은 화면에서 2열. 본문 폭(max-w-5xl)을 다 쓰면 배너가 너무
+//             커지므로(490px 폭 → 327px 높이) max-w-2xl로 묶어 절반 크기로 둔다.
 
 import Image from "next/image";
+import { Locale } from "@/i18n/config";
+
+// 빈 슬롯 문구 — 전용 사전 키를 만들 만큼 크지 않아 여기서 관리한다.
+const ADS_LABEL: Record<Locale, string> = {
+  ko: "광고 문의",
+  en: "Advertise here",
+  zh: "广告咨询",
+  vi: "Liên hệ quảng cáo",
+  ja: "広告のお問い合わせ",
+  th: "ลงโฆษณาที่นี่",
+  tl: "Mag-advertise dito",
+};
 
 export function AdBanners({
+  locale,
   layout = "stack",
   className = "",
 }: {
+  locale: Locale;
   layout?: "stack" | "row";
   className?: string;
 }) {
   const wrap =
     layout === "row"
-      ? "grid gap-4 sm:grid-cols-2"
+      ? "grid gap-4 sm:grid-cols-2 max-w-2xl"
       : "space-y-4";
 
   return (
@@ -39,40 +56,16 @@ export function AdBanners({
         />
       </a>
 
-      {/* 데스사관학교 유튜브 채널 홍보 배너 */}
+      {/* 빈 슬롯 — 광고주 모집용. 채워지면 위 <a>처럼 이미지 배너로 교체한다.
+          형제 배너(3:2)와 같은 비율을 줘서 2열일 때 높이가 어긋나지 않는다. */}
       <a
-        href="https://www.youtube.com/channel/UCEcxfCrlXCSxHk-PB3qtZIA"
-        target="_blank"
-        rel="noopener noreferrer sponsored"
-        className="group block overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40"
+        href={`/${locale}/contact`}
+        className="group flex aspect-[3/2] items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-zinc-900/30 transition-colors hover:border-zinc-500 hover:bg-zinc-900/60"
       >
-        <div className="relative">
-          <Image
-            src="/ads/death-yt.jpg"
-            alt="데스사관학교 유튜브 채널 · 리니지클래식·아이온2·솔인첸트·아스달연대기 해외육성 실시간 방송"
-            width={1280}
-            height={720}
-            className="h-auto w-full"
-          />
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span className="flex h-11 w-16 items-center justify-center rounded-xl bg-red-600/90 shadow-lg transition group-hover:bg-red-600">
-              <svg viewBox="0 0 24 24" aria-hidden className="h-6 w-6 fill-white">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </span>
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-2 px-3 py-2">
-          <p className="truncate text-sm font-semibold text-zinc-100">
-            데스사관학교
-          </p>
-          <span className="flex shrink-0 items-center gap-1 rounded-md bg-red-600 px-2 py-1 text-xs font-bold text-white transition group-hover:bg-red-500">
-            <svg viewBox="0 0 24 24" aria-hidden className="h-3.5 w-3.5 fill-white">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            YouTube
-          </span>
-        </div>
+        <span className="flex flex-col items-center gap-1.5 text-zinc-600 transition-colors group-hover:text-zinc-400">
+          <span className="text-3xl leading-none font-light">+</span>
+          <span className="text-xs font-medium">{ADS_LABEL[locale]}</span>
+        </span>
       </a>
     </div>
   );
